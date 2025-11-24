@@ -33,6 +33,32 @@ export default {
       pay: 'Pagar',
     },
   },
+  company: {
+    myTeams: {
+      title: 'Mis Equipos',
+      machines: {
+        title: 'Mis máquinas',
+        loading: 'Cargando equipos...',
+        error: 'Error al cargar las máquinas',
+        empty: 'No se encontró equipo para esta empresa.',
+        reload: 'Recargar',
+      },
+      maintenance: {
+        title: 'Mantenimiento',
+        loading: 'Cargando solicitudes de mantenimiento...',
+        error: 'Error al cargar las solicitudes',
+        empty: 'No se encontraron solicitudes de mantenimiento.',
+        reload: 'Recargar',
+        client: 'Cliente',
+        status: {
+          pending: 'Pendiente',
+          completed: 'Completado',
+          inProgress: 'En Progreso',
+        },
+        submit: 'Enviar',
+      },
+    },
+  },
   footer: {
     copyright: '© 2025 CoolGym. Todos los derechos reservados.',
     links: {
