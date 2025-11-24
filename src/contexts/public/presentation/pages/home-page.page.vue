@@ -126,7 +126,7 @@ const fetchEquipment = async () => {
     const equipmentMap = new Map(
       equipmentDataRaw.map((e) => [
         e.id,
-        { id: e.id, name: e.name, img: e.images?.[0] || '/assets/images/placeholder.png' },
+        { id: e.id, name: e.name, img: e.image || '/assets/images/placeholder.png' },
       ]),
     )
 

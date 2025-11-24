@@ -58,8 +58,8 @@ const fetchMyMachines = async () => {
   myMachines.value = []
 
   try {
-    // 1. Simula una llamada GET a la colección 'equipment'
-    const response = await http.get('/equipment')
+    // 1. Simula una llamada GET a la colección 'equipments'
+    const response = await http.get('/equipments')
 
     // **CORRECCIÓN CLAVE:** Extraer el array de datos de la propiedad 'data'
     const equipmentArray = response.data || [];
@@ -70,8 +70,8 @@ const fetchMyMachines = async () => {
       .map((e) => ({
         id: e.id,
         name: e.name,
-        // Asume que las imágenes están en el campo 'images'
-        img: e.images && e.images.length > 0 ? e.images[0] : 'https://placehold.co/400x300/4169e1/ffffff?text=No+Image',
+        // Asume que las imágenes están en el campo 'image'
+        img: e.image || 'https://placehold.co/400x300/4169e1/ffffff?text=No+Image',
         model: e.model,
       }))
 

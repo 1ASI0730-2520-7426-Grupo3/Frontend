@@ -97,9 +97,7 @@ const fetchCompanyMachines = async () => {
     companyMachines.value = equipment.map(e => ({
       id: e.id,
       name: e.name,
-      img: e.images && e.images.length > 0
-        ? e.images[0]
-        : 'https://placehold.co/400x300/4169e1/ffffff?text=No+Image',
+      img: e.image || 'https://placehold.co/400x300/4169e1/ffffff?text=No+Image',
       model: e.model
     }))
   } catch (error) {
@@ -133,7 +131,7 @@ const fetchMaintenanceRequests = async () => {
  */
 const getEquipmentImage = (equipment) => {
   if (!equipment) return 'https://placehold.co/400x300/4169e1/ffffff?text=Equipment'
-  if (equipment.images && equipment.images.length > 0) return equipment.images[0]
+  if (equipment.image) return equipment.image
   return 'https://placehold.co/400x300/4169e1/ffffff?text=No+Image'
 }
 

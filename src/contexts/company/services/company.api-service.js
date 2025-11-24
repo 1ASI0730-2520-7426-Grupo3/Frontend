@@ -21,7 +21,7 @@ export class CompanyApiService {
       // Get equipment details for each machine
       const equipmentIds = companyMachines.map(cm => cm.equipmentId)
       const equipmentPromises = equipmentIds.map(id =>
-        http.get(`/equipment/${id}`).then(res => res.data)
+        http.get(`/equipments/${id}`).then(res => res.data)
       )
 
       const equipment = await Promise.all(equipmentPromises)
