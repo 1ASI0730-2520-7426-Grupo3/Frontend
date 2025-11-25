@@ -47,6 +47,12 @@ const routes = [
     component: () => import('@/contexts/company/presentation/pages/my-teams.page.vue'),
     meta: { requiresAuth: true },
   },
+  {
+    path: '/profile',
+    name: 'profile',
+    component: () => import('@/contexts/profile/presentation/pages/profile.page.vue'),
+    meta: { requiresAuth: true },
+  },
 
   { path: '/:catchAll(.*)', redirect: { name: 'not-found' } },
 

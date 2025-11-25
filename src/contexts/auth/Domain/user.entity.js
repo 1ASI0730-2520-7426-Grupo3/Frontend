@@ -11,6 +11,8 @@ export class User {
     name = '',
     phone = '',
     type = 'individual',
+    clientPlanId = null,
+    profilePhoto = null,
   }) {
     this.id = id
     this.username = username
@@ -19,6 +21,8 @@ export class User {
     this.name = name
     this.phone = phone
     this.type = type
+    this.clientPlanId = clientPlanId
+    this.profilePhoto = profilePhoto
   }
 
   /**
