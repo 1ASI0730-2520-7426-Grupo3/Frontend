@@ -5,27 +5,26 @@ const HomePage = () => import('@/contexts/public/presentation/pages/home-page.pa
 const MachinesPage = () => import('@/contexts/public/presentation/pages/machines-page.page.vue')
 const RentPage = () => import('@/contexts/public/presentation/pages/rent-page.page.vue')
 const ContactPage = () => import('@/contexts/public/presentation/pages/contact-page.page.vue')
+const LandingPage = () => import('@/contexts/public/presentation/pages/landing.page.vue')
 const LoginPage = () => import('@/contexts/auth/presentation/pages/login-page.page.vue')
+const RegisterPage = () => import('@/contexts/auth/presentation/pages/register-page.page.vue')
 const MachineControls = () =>
   import('@/contexts/public/presentation/pages/machine-controls.page.vue')
 
 
 const routes = [
+  { path: '/', redirect: { name: 'landing' } },
 
-  { path: '/', name: 'home', component: HomePage, meta: { requiresAuth: true } },
-  {
-    path: '/home',
-    name: 'home',
-    component: () => import('../../../contexts/public/presentation/pages/home-page.page.vue'),
-  },
+  { path: '/landing', name: 'landing', component: LandingPage, meta: { requiresAuth: false } },
+  { path: '/login/:role?', name: 'login', component: LoginPage, meta: { requiresAuth: false } },
+  { path: '/register/:role?', name: 'register', component: RegisterPage, meta: { requiresAuth: false } },
 
+  { path: '/home', name: 'home', component: HomePage, meta: { requiresAuth: true } },
   { path: '/machines', name: 'machines', component: MachinesPage, meta: { requiresAuth: true } },
   { path: '/machines/:id', name: 'MachineControls', component: MachineControls, meta: { requiresAuth: true } },
 
   { path: '/rent', name: 'rent', component: RentPage, meta: { requiresAuth: false } },
   { path: '/contact', name: 'contact', component: ContactPage, meta: { requiresAuth: false } },
-
-  { path: '/login', name: 'login', component: LoginPage, meta: { requiresAuth: false } },
 
   { path: '/:pathMatch(.*)*', name: 'not-found', component: PageNotFoundComponent, meta: { requiresAuth: false } },
 
@@ -55,8 +54,6 @@ const routes = [
   },
 
   { path: '/:catchAll(.*)', redirect: { name: 'not-found' } },
-
-  {path: '/', name: 'default', redirect: {name: 'home'}},
 ]
 
 const router = createRouter({
@@ -72,8 +69,10 @@ router.beforeEach((to, from, next) => {
   const requiresAuth = to.meta.requiresAuth ?? true
 
   if (requiresAuth && !isAuthenticated) {
-    next({ name: 'login' })
-  } else if (!requiresAuth && isAuthenticated && to.name === 'login') {
+    // Redirect to landing page if not authenticated
+    next({ name: 'landing' })
+  } else if (!requiresAuth && isAuthenticated && (to.name === 'login' || to.name === 'landing' || to.name === 'register')) {
+    // If already authenticated, don't allow access to login/landing/register
     next({ name: 'home' })
   } else {
     next()
