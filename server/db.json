@@ -156,7 +156,6 @@
         "next": "2025-11-02"
       },
       "image": "/stationary-bike-gx.png"
-
     },
     {
       "id": 3,
@@ -197,7 +196,6 @@
         "next": null
       },
       "image": "/rowing-r300.jpg"
-
     },
     {
       "id": 4,
@@ -239,7 +237,6 @@
         "next": "2025-10-05"
       },
       "image": "/elliptical-e500.jpg"
-
     }
   ],
   "maintenanceHistory": [
@@ -577,7 +574,8 @@
       "username": "juanp",
       "phone": "987654321",
       "type": "individual",
-      "clientPlanId": 1
+      "clientPlanId": 1,
+      "profilePhoto": null
     },
     {
       "id": 2,
@@ -587,7 +585,8 @@
       "username": "mariar",
       "phone": "987654322",
       "type": "individual",
-      "clientPlanId": 1
+      "clientPlanId": 1,
+      "profilePhoto": null
     }
   ]
 }

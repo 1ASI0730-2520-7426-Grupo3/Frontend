@@ -16,7 +16,10 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 
 const handleLogin = () => {
+  // For simple login, use default user (Juan Pérez - id: 1)
   localStorage.setItem('isAuthenticated', 'true')
+  localStorage.setItem('userId', '1')
+  localStorage.setItem('userEmail', 'juan@ejemplo.com')
   router.push({ name: 'home' })
 }
 </script>

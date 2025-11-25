@@ -169,7 +169,7 @@ const handleNotifications = () => {
 }
 
 const handleProfile = () => {
-  console.log('Show user profile')
+  router.push({ name: 'profile' })
 }
 
 const setLanguage = (lang) => {

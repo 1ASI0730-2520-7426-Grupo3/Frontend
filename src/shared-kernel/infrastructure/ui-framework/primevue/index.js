@@ -1,6 +1,7 @@
 import PrimeVue from 'primevue/config'
 import Aura from '@primeuix/themes/aura'
 import Lara from '@primeuix/themes/lara'
+import ToastService from 'primevue/toastservice'
 
 // Only import components we actually use
 import Button from 'primevue/button'
@@ -23,6 +24,9 @@ export function setupPrimeVue(app, selectedTheme = 'aura') {
       },
     },
   })
+
+  // Register Toast service
+  app.use(ToastService)
 
   // Only register components we actually use
   app.component('pv-button', Button)
