@@ -1,0 +1,439 @@
+<template>
+  <div class="my-machines-container">
+    <h1 class="page-title">My Machines</h1>
+
+    <div class="machines-grid">
+      <Card v-for="machine in machines" :key="machine.id" class="machine-card">
+        <template #content>
+          <div class="card-header">
+            <button
+              class="power-button"
+              :class="{ active: machine.isPoweredOn }"
+              @click="togglePower(machine.id)"
+              :title="machine.isPoweredOn ? 'Power Off' : 'Power On'"
+            >
+              <i class="pi pi-power-off"></i>
+            </button>
+            <div class="status-indicator" :class="{ active: machine.isPoweredOn }"></div>
+          </div>
+
+          <div class="machine-image-container">
+            <img
+              :src="machine.image || '/placeholder-equipment.png'"
+              :alt="machine.name"
+              class="machine-image"
+            />
+          </div>
+
+          <div class="machine-info">
+            <h3 class="machine-name">{{ machine.name }}</h3>
+
+            <div class="usage-info">
+              <span class="usage-label">Usage Today:</span>
+              <span class="usage-value">{{ machine.usage.todayMinutes }} min</span>
+              <Tag
+                :value="machine.isPoweredOn ? 'Active' : 'Inactive'"
+                :severity="machine.isPoweredOn ? 'success' : 'secondary'"
+                class="status-tag"
+              />
+            </div>
+
+            <div class="calories-info" v-if="machine.usage.caloriesToday">
+              <span class="calories-label">Calories Burned:</span>
+              <span class="calories-value">{{ machine.usage.caloriesToday }} kcal</span>
+            </div>
+
+            <div class="location-info">
+              <i class="pi pi-map-marker"></i>
+              <span>{{ machine.location.name }} - {{ machine.location.address }}</span>
+            </div>
+
+            <div class="card-actions">
+              <Button
+                icon="pi pi-cog"
+                label="Control"
+                outlined
+                size="small"
+                @click="goToControls(machine.id)"
+                class="control-button"
+              />
+            </div>
+          </div>
+        </template>
+      </Card>
+    </div>
+
+    <div class="add-equipment-section">
+      <Button
+        label="Add Equipment"
+        icon="pi pi-plus"
+        @click="goToAddEquipment"
+        class="add-equipment-button"
+      />
+    </div>
+
+    <div v-if="loading" class="loading-overlay">
+      <ProgressSpinner />
+    </div>
+
+    <div v-if="!loading && machines.length === 0" class="empty-state">
+      <i class="pi pi-inbox empty-icon"></i>
+      <h3>No Machines Yet</h3>
+      <p>Add your first equipment to get started</p>
+      <Button
+        label="Add Equipment"
+        icon="pi pi-plus"
+        @click="goToAddEquipment"
+      />
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted, defineOptions } from 'vue'
+import { useRouter } from 'vue-router'
+import { useToast } from 'primevue/usetoast'
+import Card from 'primevue/card'
+import Button from 'primevue/button'
+import Tag from 'primevue/tag'
+import ProgressSpinner from 'primevue/progressspinner'
+import { EquipmentApiService } from '../../infrastructure/equipment-api.service.js'
+
+defineOptions({
+  name: 'MyMachinesPage',
+})
+
+const router = useRouter()
+const toast = useToast()
+const equipmentService = new EquipmentApiService()
+
+const machines = ref([])
+const loading = ref(true)
+
+const loadMachines = async () => {
+  loading.value = true
+  try {
+    const clientId = localStorage.getItem('userId')
+
+    // For development with json-server, we'll fetch all equipments
+    // In production, this would filter by clientId
+    const response = await fetch('http://localhost:3000/equipments')
+    const data = await response.json()
+
+    machines.value = data.map(machine => ({
+      ...machine,
+      usage: machine.usage || { todayMinutes: 0, totalMinutes: 0, caloriesToday: 0 },
+      location: machine.location || { name: 'Not Set', address: '' },
+      isPoweredOn: machine.isPoweredOn ?? true,
+    }))
+  } catch (error) {
+    console.error('Error loading machines:', error)
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to load machines',
+      life: 3000,
+    })
+  } finally {
+    loading.value = false
+  }
+}
+
+const togglePower = async (machineId) => {
+  const machine = machines.value.find(m => m.id === machineId)
+  if (!machine) return
+
+  const newPowerState = !machine.isPoweredOn
+
+  try {
+    // Update locally first for immediate feedback
+    machine.isPoweredOn = newPowerState
+
+    // Update on server
+    await fetch(`http://localhost:3000/equipments/${machineId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ isPoweredOn: newPowerState }),
+    })
+
+    toast.add({
+      severity: 'success',
+      summary: newPowerState ? 'Powered On' : 'Powered Off',
+      detail: `${machine.name} is now ${newPowerState ? 'active' : 'inactive'}`,
+      life: 2000,
+    })
+  } catch (error) {
+    console.error('Error toggling power:', error)
+    // Revert on error
+    machine.isPoweredOn = !newPowerState
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to update machine power state',
+      life: 3000,
+    })
+  }
+}
+
+const goToControls = (machineId) => {
+  router.push({ name: 'MachineControls', params: { id: machineId } })
+}
+
+const goToAddEquipment = () => {
+  router.push({ name: 'add-equipment' })
+}
+
+onMounted(() => {
+  loadMachines()
+})
+</script>
+
+<style scoped>
+.my-machines-container {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background-color: #f8fafc;
+}
+
+.page-title {
+  color: #2563eb;
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 2rem 0;
+  text-align: center;
+}
+
+.machines-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.machine-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.machine-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.machine-card :deep(.p-card-body) {
+  padding: 1.5rem;
+}
+
+.machine-card :deep(.p-card-content) {
+  padding: 0;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.power-button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid #6b7280;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  color: #6b7280;
+}
+
+.power-button:hover {
+  border-color: #2563eb;
+  color: #2563eb;
+}
+
+.power-button.active {
+  border-color: #10b981;
+  color: #10b981;
+  background-color: #ecfdf5;
+}
+
+.status-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #9ca3af;
+  transition: background-color 0.3s;
+}
+
+.status-indicator.active {
+  background-color: #10b981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+}
+
+.machine-image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5rem 0;
+  min-height: 200px;
+}
+
+.machine-image {
+  max-width: 100%;
+  max-height: 180px;
+  object-fit: contain;
+}
+
+.machine-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.machine-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+  text-align: center;
+}
+
+.usage-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.usage-label {
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.usage-value {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.status-tag {
+  font-size: 0.75rem;
+}
+
+.calories-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.calories-label {
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.calories-value {
+  font-weight: 700;
+  color: #ef4444;
+}
+
+.location-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.location-info i {
+  color: #2563eb;
+}
+
+.card-actions {
+  display: flex;
+  justify-content: center;
+  padding-top: 0.5rem;
+}
+
+.control-button {
+  flex: 1;
+  max-width: 200px;
+}
+
+.add-equipment-section {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+.add-equipment-button {
+  background-color: #2563eb;
+  border-color: #2563eb;
+  padding: 0.75rem 2.5rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.add-equipment-button:hover {
+  background-color: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+.loading-overlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 1.5rem;
+  color: #6b7280;
+}
+
+.empty-icon {
+  font-size: 4rem;
+  color: #9ca3af;
+}
+
+.empty-state h3 {
+  font-size: 1.5rem;
+  color: #1f2937;
+  margin: 0;
+}
+
+.empty-state p {
+  color: #6b7280;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .my-machines-container {
+    padding: 1rem;
+  }
+
+  .machines-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+  }
+}
+</style>
