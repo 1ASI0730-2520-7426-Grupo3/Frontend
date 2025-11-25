@@ -28,8 +28,7 @@
 <script setup>
 import { onMounted, ref, computed } from 'vue';
 import { MaintenanceApiService } from '../../infrastructure/maintenance.api-service.js';
-import { toEquipmentOption } from '../../Domain/equipment.model.js';
-import { newMaintenanceRequest } from '../../Domain/maintenance-request.entity';
+import { MaintenanceAssembler } from '../../Domain/maintenance.assembler.js';
 
 const api = new MaintenanceApiService();
 const userId = 1;
@@ -37,7 +36,7 @@ const userId = 1;
 const loading = ref(false);
 const equipments = ref([]);
 const pricing = ref(new Map());
-const options = computed(() => equipments.value.map(toEquipmentOption));
+const options = computed(() => MaintenanceAssembler.toEquipmentOptions(equipments.value));
 
 const selectedId = ref(null);
 const dateStr = ref(new Date().toISOString().slice(0, 10));
@@ -63,7 +62,7 @@ async function load() {
 
 async function submit() {
   if (!canSubmit.value) return;
-  const payload = newMaintenanceRequest({
+  const payload = MaintenanceAssembler.toCreateResource({
     userId,
     equipmentId: Number(selectedId.value),
     costUSD: currentCost.value,

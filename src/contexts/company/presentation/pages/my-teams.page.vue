@@ -67,7 +67,7 @@
 import { ref, onMounted } from 'vue'
 import MachineCard from '@/shared-kernel/presentation/ui/components/machine-card.component.vue'
 import MaintenanceRequestCard from '../components/maintenance-request-card.component.vue'
-import { CompanyApiService } from '../services/company.api-service'
+import { CompanyApiService } from '../../infrastructure/company-api.service.js'
 
 const api = new CompanyApiService()
 
@@ -92,13 +92,15 @@ const fetchCompanyMachines = async () => {
   machinesError.value = null
 
   try {
-    const equipment = await api.getCompanyEquipment(COMPANY_ID)
+    // API now returns CompanyMachine entities
+    const machines = await api.getCompanyEquipment(COMPANY_ID)
 
-    companyMachines.value = equipment.map(e => ({
-      id: e.id,
-      name: e.name,
-      img: e.image || 'https://placehold.co/400x300/4169e1/ffffff?text=No+Image',
-      model: e.model
+    // Transform entities for the view
+    companyMachines.value = machines.map(machine => ({
+      id: machine.id,
+      name: machine.name,
+      img: machine.image || 'https://placehold.co/400x300/4169e1/ffffff?text=No+Image',
+      model: machine.model
     }))
   } catch (error) {
     console.error('Error fetching company machines:', error)

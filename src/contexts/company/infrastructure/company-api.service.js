@@ -1,4 +1,5 @@
 import { http } from '@/shared-kernel/infrastructure/http'
+import { CompanyAssembler } from '../Domain/company.assembler.js'
 
 export class CompanyApiService {
   /**
@@ -25,7 +26,8 @@ export class CompanyApiService {
       )
 
       const equipment = await Promise.all(equipmentPromises)
-      return equipment
+      // Transform API data to domain entities
+      return CompanyAssembler.toEntityListFromResources(equipment)
     } catch (error) {
       console.error('Error fetching company equipment:', error)
       throw error
