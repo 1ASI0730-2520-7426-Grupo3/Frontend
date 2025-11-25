@@ -75,7 +75,7 @@ const routes = [
   {
     path: '/provider/home',
     name: 'provider-home',
-    component: HomePage,
+    component: () => import('@/contexts/provider/presentation/pages/provider-home.page.vue'),
     meta: { requiresAuth: true, role: 'provider' },
   },
   {
