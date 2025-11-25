@@ -13,51 +13,79 @@ const MachineControls = () =>
 
 
 const routes = [
+  // Root redirect to landing
   { path: '/', redirect: { name: 'landing' } },
 
+  // ========== PUBLIC ROUTES (No auth required) ==========
   { path: '/landing', name: 'landing', component: LandingPage, meta: { requiresAuth: false } },
   { path: '/login/:role?', name: 'login', component: LoginPage, meta: { requiresAuth: false } },
   { path: '/register/:role?', name: 'register', component: RegisterPage, meta: { requiresAuth: false } },
-
-  { path: '/home', name: 'home', component: HomePage, meta: { requiresAuth: true } },
-  { path: '/machines', name: 'machines', component: MachinesPage, meta: { requiresAuth: true } },
-  { path: '/machines/:id', name: 'MachineControls', component: MachineControls, meta: { requiresAuth: true } },
-
   { path: '/rent', name: 'rent', component: RentPage, meta: { requiresAuth: false } },
   { path: '/contact', name: 'contact', component: ContactPage, meta: { requiresAuth: false } },
 
-  { path: '/:pathMatch(.*)*', name: 'not-found', component: PageNotFoundComponent, meta: { requiresAuth: false } },
+  // ========== DYNAMIC HOME (Redirects based on role) ==========
+  {
+    path: '/home',
+    name: 'home',
+    redirect: () => {
+      const userRole = localStorage.getItem('userRole')
+      return userRole === 'provider' ? { name: 'provider-home' } : { name: 'client-home' }
+    },
+  },
 
+  // ========== CLIENT ROUTES ==========
   {
-    path: '/maintenance',
-    name: 'maintenance',
-    component: () => import('@/contexts/maintenance/presentation/pages/maintenance-page.vue'),
-    meta: { requiresAuth: true },
-  },
-  {
-    path: '/account-statement',
-    name: 'account-statement',
-    component: () => import('@/contexts/account-statement/presentation/pages/account-statement.page.vue'),
-    meta: { requiresAuth: true },
-  },
-  {
-    path: '/add-equipment',
-    name: 'add-equipment',
-    component: () => import('@/contexts/equipment/presentation/pages/add-equipment.page.vue'),
-    meta: { requiresAuth: true },
+    path: '/client/home',
+    name: 'client-home',
+    component: HomePage,
+    meta: { requiresAuth: true, role: 'client' },
   },
   {
     path: '/my-machines',
     name: 'my-machines',
     component: () => import('@/contexts/equipment/presentation/pages/my-machines.page.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, role: 'client' },
+  },
+  {
+    path: '/machines/:id',
+    name: 'MachineControls',
+    component: MachineControls,
+    meta: { requiresAuth: true, role: 'client' },
+  },
+  {
+    path: '/add-equipment',
+    name: 'add-equipment',
+    component: () => import('@/contexts/equipment/presentation/pages/add-equipment.page.vue'),
+    meta: { requiresAuth: true, role: 'client' },
+  },
+  {
+    path: '/maintenance',
+    name: 'maintenance',
+    component: () => import('@/contexts/maintenance/presentation/pages/maintenance-page.vue'),
+    meta: { requiresAuth: true, role: 'client' },
+  },
+  {
+    path: '/account-statement',
+    name: 'account-statement',
+    component: () => import('@/contexts/account-statement/presentation/pages/account-statement.page.vue'),
+    meta: { requiresAuth: true, role: 'client' },
+  },
+
+  // ========== PROVIDER ROUTES ==========
+  {
+    path: '/provider/home',
+    name: 'provider-home',
+    component: HomePage,
+    meta: { requiresAuth: true, role: 'provider' },
   },
   {
     path: '/my-teams',
     name: 'my-teams',
     component: () => import('@/contexts/company/presentation/pages/my-teams.page.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, role: 'provider' },
   },
+
+  // ========== SHARED ROUTES (Both roles) ==========
   {
     path: '/profile',
     name: 'profile',
@@ -65,6 +93,8 @@ const routes = [
     meta: { requiresAuth: true },
   },
 
+  // ========== 404 NOT FOUND ==========
+  { path: '/:pathMatch(.*)*', name: 'not-found', component: PageNotFoundComponent, meta: { requiresAuth: false } },
   { path: '/:catchAll(.*)', redirect: { name: 'not-found' } },
 ]
 
@@ -78,17 +108,29 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true'
+  const userRole = localStorage.getItem('userRole') // 'client' or 'provider'
   const requiresAuth = to.meta.requiresAuth ?? true
 
+  // Not authenticated - redirect to landing
   if (requiresAuth && !isAuthenticated) {
-    // Redirect to landing page if not authenticated
     next({ name: 'landing' })
-  } else if (!requiresAuth && isAuthenticated && (to.name === 'login' || to.name === 'landing' || to.name === 'register')) {
-    // If already authenticated, don't allow access to login/landing/register
-    next({ name: 'home' })
-  } else {
-    next()
+    return
   }
+
+  // Authenticated users can't access landing/login/register
+  if (!requiresAuth && isAuthenticated && (to.name === 'login' || to.name === 'landing' || to.name === 'register')) {
+    next({ name: 'home' })
+    return
+  }
+
+  // Role-based access control
+  if (to.meta.role && to.meta.role !== userRole) {
+    // User trying to access wrong role's page - redirect to their home
+    next({ name: `${userRole}-home` })
+    return
+  }
+
+  next()
 })
 
 export default router

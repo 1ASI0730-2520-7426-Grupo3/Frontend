@@ -31,36 +31,14 @@
           </button>
           <div class="nav-links-desktop">
             <a
+              v-for="link in navigationLinks"
+              :key="link.name"
               href="#"
-              @click.prevent="handleNavigation('home')"
-              :class="['nav-link', { active: activeRoute === 'home' }]"
-              :aria-label="$t('toolbar.nav.home')"
+              @click.prevent="handleNavigation(link.route)"
+              :class="['nav-link', { active: activeRoute === link.route }]"
+              :aria-label="link.label"
             >
-              {{ $t('toolbar.nav.home') }}
-            </a>
-            <a
-              href="#"
-              @click.prevent="handleNavigation('machines')"
-              :class="['nav-link', { active: activeRoute === 'machines' }]"
-              :aria-label="$t('toolbar.nav.myMachines')"
-            >
-              {{ $t('toolbar.nav.myMachines') }}
-            </a>
-            <a
-              href="#"
-              @click.prevent="handleNavigation('rent')"
-              :class="['nav-link', { active: activeRoute === 'rent' }]"
-              :aria-label="$t('toolbar.nav.rent')"
-            >
-              {{ $t('toolbar.nav.rent') }}
-            </a>
-            <a
-              href="#"
-              @click.prevent="handleNavigation('contact')"
-              :class="['nav-link', { active: activeRoute === 'contact' }]"
-              :aria-label="$t('toolbar.nav.contact')"
-            >
-              {{ $t('toolbar.nav.contact') }}
+              {{ link.label }}
             </a>
           </div>
         </nav>
@@ -110,32 +88,13 @@
     <!-- Mobile Menu -->
     <div v-if="isMenuOpen" class="mobile-menu">
       <a
+        v-for="link in navigationLinks"
+        :key="link.name"
         href="#"
-        @click.prevent="handleNavigation('home')"
-        :class="['mobile-nav-link', { active: activeRoute === 'home' }]"
+        @click.prevent="handleNavigation(link.route)"
+        :class="['mobile-nav-link', { active: activeRoute === link.route }]"
       >
-        {{ $t('toolbar.nav.home') }}
-      </a>
-      <a
-        href="#"
-        @click.prevent="handleNavigation('machines')"
-        :class="['mobile-nav-link', { active: activeRoute === 'machines' }]"
-      >
-        {{ $t('toolbar.nav.myMachines') }}
-      </a>
-      <a
-        href="#"
-        @click.prevent="handleNavigation('rent')"
-        :class="['mobile-nav-link', { active: activeRoute === 'rent' }]"
-      >
-        {{ $t('toolbar.nav.rent') }}
-      </a>
-      <a
-        href="#"
-        @click.prevent="handleNavigation('contact')"
-        :class="['mobile-nav-link', { active: activeRoute === 'contact' }]"
-      >
-        {{ $t('toolbar.nav.contact') }}
+        {{ link.label }}
       </a>
     </div>
   </div>
@@ -146,7 +105,7 @@ import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
-const { locale } = useI18n()
+const { locale, t } = useI18n()
 const currentLanguage = ref(locale.value)
 const isMenuOpen = ref(false)
 
@@ -154,6 +113,40 @@ const router = useRouter()
 const route = useRoute()
 
 const activeRoute = computed(() => route.name)
+const userRole = ref(localStorage.getItem('userRole') || 'client')
+
+// Navigation links based on user role
+const navigationLinks = computed(() => {
+  const isClient = userRole.value === 'client'
+  const isProvider = userRole.value === 'provider'
+
+  const links = [
+    { name: 'home', route: 'home', label: t('toolbar.nav.home'), roles: ['client', 'provider'] },
+  ]
+
+  if (isClient) {
+    links.push(
+      { name: 'my-machines', route: 'my-machines', label: 'My Machines', roles: ['client'] },
+      { name: 'maintenance', route: 'maintenance', label: 'Maintenance', roles: ['client'] },
+      { name: 'account-statement', route: 'account-statement', label: 'Billing', roles: ['client'] }
+    )
+  }
+
+  if (isProvider) {
+    links.push(
+      { name: 'my-teams', route: 'my-teams', label: 'My Teams', roles: ['provider'] },
+      { name: 'maintenance', route: 'maintenance', label: 'Requests', roles: ['provider'] }
+    )
+  }
+
+  // Add common public links if not authenticated or for all users
+  links.push(
+    { name: 'rent', route: 'rent', label: t('toolbar.nav.rent'), roles: ['client', 'provider'] },
+    { name: 'contact', route: 'contact', label: t('toolbar.nav.contact'), roles: ['client', 'provider'] }
+  )
+
+  return links
+})
 
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value
