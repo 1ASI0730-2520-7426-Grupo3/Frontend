@@ -139,9 +139,15 @@ const navigationLinks = computed(() => {
     )
   }
 
-  // Add common public links if not authenticated or for all users
+  // Rent is only for clients (they rent equipment from providers)
+  if (isClient) {
+    links.push(
+      { name: 'rent', route: 'rent', label: t('toolbar.nav.rent'), roles: ['client'] }
+    )
+  }
+
+  // Contact is available for all users
   links.push(
-    { name: 'rent', route: 'rent', label: t('toolbar.nav.rent'), roles: ['client', 'provider'] },
     { name: 'contact', route: 'contact', label: t('toolbar.nav.contact'), roles: ['client', 'provider'] }
   )
 

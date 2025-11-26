@@ -81,7 +81,7 @@ const routes = [
   {
     path: '/my-teams',
     name: 'my-teams',
-    component: () => import('@/contexts/company/presentation/pages/my-teams.page.vue'),
+    component: () => import('@/contexts/provider/presentation/pages/my-clients-teams.page.vue'),
     meta: { requiresAuth: true, role: 'provider' },
   },
 
