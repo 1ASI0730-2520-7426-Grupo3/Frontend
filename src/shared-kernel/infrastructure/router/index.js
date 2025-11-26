@@ -84,6 +84,12 @@ const routes = [
     component: () => import('@/contexts/provider/presentation/pages/my-clients-teams.page.vue'),
     meta: { requiresAuth: true, role: 'provider' },
   },
+  {
+    path: '/work-orders',
+    name: 'work-orders',
+    component: () => import('@/contexts/provider/presentation/pages/work-orders.page.vue'),
+    meta: { requiresAuth: true, role: 'provider' },
+  },
 
   // ========== SHARED ROUTES (Both roles) ==========
   {

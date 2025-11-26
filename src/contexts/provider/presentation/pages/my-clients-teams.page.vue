@@ -124,8 +124,7 @@ const viewTechnicians = () => {
 }
 
 const viewWorkOrders = () => {
-  console.log('View work orders')
-  // TODO: Navigate to work orders page
+  router.push({ name: 'work-orders' })
 }
 
 const goBack = () => {
