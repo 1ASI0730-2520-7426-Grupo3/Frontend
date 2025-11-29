@@ -1,0 +1,592 @@
+{
+  "billingInvoices": [
+    {
+      "id": 1,
+      "userId": 1,
+      "companyName": "FRITMO CORP",
+      "amount": 2351.23,
+      "currency": "PEN",
+      "status": "paid",
+      "issuedAt": "2025-08-30",
+      "paidAt": "2025-09-05"
+    },
+    {
+      "id": 2,
+      "userId": 1,
+      "companyName": "COOLPROV S.A.C.",
+      "amount": 458.5,
+      "currency": "PEN",
+      "status": "paid",
+      "issuedAt": "2025-09-25",
+      "paidAt": "2025-11-25"
+    },
+    {
+      "id": 3,
+      "userId": 1,
+      "companyName": "COOLGYMPROV S.A.C.",
+      "amount": 5000,
+      "currency": "PEN",
+      "status": "pending",
+      "issuedAt": "2025-09-25",
+      "paidAt": "2025-10-04"
+    }
+  ],
+  "clientPlans": [
+    {
+      "id": 1,
+      "name": "Basic",
+      "price": 18.99,
+      "billingCycle": "monthly",
+      "maxMachines": 6
+    },
+    {
+      "id": 2,
+      "name": "Standard",
+      "price": 35.13,
+      "billingCycle": "monthly",
+      "maxMachines": 12
+    },
+    {
+      "id": 3,
+      "name": "Premium",
+      "price": 67.56,
+      "billingCycle": "monthly",
+      "maxMachines": 24
+    }
+  ],
+  "companies": [
+    {
+      "id": 1,
+      "name": "COOLPROV S.A.C.",
+      "email": "coolprovsac@gmail.com",
+      "phone": "0199887766",
+      "businessType": "equipment_provider",
+      "location": "La Molina, Lima",
+      "providerPlanId": 1
+    },
+    {
+      "id": 2,
+      "name": "FRITMO CORP",
+      "email": "contact@fritmo.com",
+      "phone": "012345678",
+      "businessType": "gym_chain",
+      "location": "San Isidro, Lima",
+      "providerPlanId": 2
+    }
+  ],
+  "equipments": [
+    {
+      "id": 1,
+      "name": "Treadmill Pro X-500",
+      "type": "treadmill",
+      "model": "TRX-500",
+      "manufacturer": "LifeFitness",
+      "serialNumber": "CF-200",
+      "code": "CAM-002",
+      "installationDate": "2023-02-15",
+      "powerWatts": 1500,
+      "status": "active",
+      "isPoweredOn": true,
+      "activeStatus": "Normal",
+      "notes": "Machine functioning properly",
+      "location": {
+        "name": "Cardio Area",
+        "address": "Av. Principal 123, Lima"
+      },
+      "usage": {
+        "totalMinutes": 12870,
+        "todayMinutes": 35,
+        "caloriesToday": 420
+      },
+      "controls": {
+        "power": "on",
+        "level": {
+          "current": 5,
+          "set": 8,
+          "range": [
+            1,
+            12
+          ]
+        },
+        "status": "normal"
+      },
+      "maintenanceInfo": {
+        "last": "2025-03-15",
+        "next": null
+      },
+      "image": "/treadmill-pro-x.png"
+    },
+    {
+      "id": 2,
+      "name": "Stationary Bike GX",
+      "type": "bike",
+      "model": "SB-GX",
+      "manufacturer": "ProCycler",
+      "serialNumber": "SBGX-7788",
+      "code": "BIKE-001",
+      "installationDate": "2023-04-10",
+      "powerWatts": 350,
+      "status": "active",
+      "isPoweredOn": true,
+      "activeStatus": "Normal",
+      "notes": "",
+      "location": {
+        "name": "Cardio Area",
+        "address": "Av. Principal 123, Lima"
+      },
+      "usage": {
+        "totalMinutes": 6530,
+        "todayMinutes": 22,
+        "caloriesToday": 260
+      },
+      "controls": {
+        "power": "on",
+        "level": {
+          "current": 3,
+          "set": 4,
+          "range": [
+            1,
+            10
+          ]
+        },
+        "status": "normal"
+      },
+      "maintenanceInfo": {
+        "last": "2025-05-02",
+        "next": "2025-11-02"
+      },
+      "image": "/stationary-bike-gx.png"
+    },
+    {
+      "id": 3,
+      "name": "Rowing Machine R-300",
+      "type": "rower",
+      "model": "R-300",
+      "manufacturer": "RowMax",
+      "serialNumber": "RW-3300",
+      "code": "ROW-300",
+      "installationDate": "2023-06-01",
+      "powerWatts": 200,
+      "status": "pending_maintenance",
+      "isPoweredOn": false,
+      "activeStatus": "Attention",
+      "notes": "Noise from flywheel",
+      "location": {
+        "name": "Cross Area",
+        "address": "Av. Principal 123, Lima"
+      },
+      "usage": {
+        "totalMinutes": 3120,
+        "todayMinutes": 0
+      },
+      "controls": {
+        "power": "off",
+        "level": {
+          "current": 2,
+          "set": 6,
+          "range": [
+            1,
+            8
+          ]
+        },
+        "status": "pending"
+      },
+      "maintenanceInfo": {
+        "last": "2024-12-10",
+        "next": null
+      },
+      "image": "/rowing-r300.jpg"
+    },
+    {
+      "id": 4,
+      "name": "Elliptical Trainer E-500",
+      "type": "elliptical",
+      "model": "E-500",
+      "manufacturer": "FitStride",
+      "serialNumber": "EL-500-2211",
+      "code": "ELL-500",
+      "installationDate": "2023-03-20",
+      "powerWatts": 500,
+      "status": "active",
+      "isPoweredOn": true,
+      "activeStatus": "Normal",
+      "notes": "",
+      "location": {
+        "name": "Cardio Area",
+        "address": "Av. Principal 123, Lima"
+      },
+      "usage": {
+        "totalMinutes": 7400,
+        "todayMinutes": 18,
+        "caloriesToday": 210
+      },
+      "controls": {
+        "power": "on",
+        "level": {
+          "current": 4,
+          "set": 5,
+          "range": [
+            1,
+            10
+          ]
+        },
+        "status": "normal"
+      },
+      "maintenanceInfo": {
+        "last": "2025-04-05",
+        "next": "2025-10-05"
+      },
+      "image": "/elliptical-e500.jpg"
+    }
+  ],
+  "maintenanceHistory": [
+    {
+      "id": 1,
+      "equipmentId": 4,
+      "date": "2025-04-05T10:00:00",
+      "type": "preventive",
+      "status": "completed",
+      "costUSD": 30,
+      "technicianId": 1,
+      "notes": "Lubrication and alignment",
+      "nextScheduledDate": "2025-10-05"
+    }
+  ],
+  "maintenancePricing": [
+    {
+      "id": 1,
+      "equipmentId": 1,
+      "model": "TRX-500",
+      "fixedCostUSD": 45
+    },
+    {
+      "id": 2,
+      "equipmentId": 2,
+      "model": "SB-GX",
+      "fixedCostUSD": 35
+    },
+    {
+      "id": 3,
+      "equipmentId": 3,
+      "model": "R-300",
+      "fixedCostUSD": 50
+    },
+    {
+      "id": 4,
+      "equipmentId": 4,
+      "model": "E-500",
+      "fixedCostUSD": 30
+    }
+  ],
+  "maintenanceRequests": [
+    {
+      "id": 1,
+      "userId": 1,
+      "equipmentId": 3,
+      "type": "corrective",
+      "status": "pending",
+      "costUSD": 50,
+      "selectedDate": "2025-10-05",
+      "createdAt": "2025-10-02T16:00:00Z",
+      "notes": "Vibration at medium level",
+      "assignedTechnicianId": null
+    },
+    {
+      "userId": 1,
+      "equipmentId": 4,
+      "type": "corrective",
+      "status": "pending",
+      "costUSD": 30,
+      "selectedDate": "2025-10-22",
+      "createdAt": "2025-10-04T07:21:59.687Z",
+      "notes": "",
+      "assignedTechnicianId": null,
+      "id": 2
+    },
+    {
+      "userId": 1,
+      "equipmentId": 1,
+      "type": "corrective",
+      "status": "pending",
+      "costUSD": 45,
+      "selectedDate": "2025-10-04",
+      "createdAt": "2025-10-04T07:37:35.313Z",
+      "notes": "",
+      "assignedTechnicianId": null,
+      "id": 3
+    },
+    {
+      "userId": 1,
+      "equipmentId": 4,
+      "type": "corrective",
+      "status": "pending",
+      "costUSD": 30,
+      "selectedDate": "2025-10-08",
+      "createdAt": "2025-10-09T02:58:55.213Z",
+      "notes": "",
+      "assignedTechnicianId": null,
+      "id": 4
+    }
+  ],
+  "notifications": [
+    {
+      "id": 1,
+      "title": "Maintenance completed",
+      "description": "Elliptical Trainer E-500 maintenance completed",
+      "status": "unread",
+      "timestamp": "2025-04-05T12:30:00",
+      "userId": 1,
+      "equipmentId": 4,
+      "type": "info"
+    },
+    {
+      "id": 2,
+      "title": "Pending maintenance",
+      "description": "Rowing Machine R-300 requires service",
+      "status": "unread",
+      "timestamp": "2025-10-02T15:20:00",
+      "userId": 1,
+      "equipmentId": 3,
+      "type": "warning"
+    }
+  ],
+  "userMachines": [
+    {
+      "id": 1,
+      "userId": 1,
+      "equipmentId": 1,
+      "role": "owner",
+      "ownershipShare": 70,
+      "permissions": {
+        "control": true,
+        "requestMaintenance": true,
+        "viewBilling": true
+      },
+      "since": "2023-02-15",
+      "until": null,
+      "active": true
+    },
+    {
+      "id": 2,
+      "userId": 2,
+      "equipmentId": 1,
+      "role": "owner",
+      "ownershipShare": 30,
+      "permissions": {
+        "control": true,
+        "requestMaintenance": true,
+        "viewBilling": false
+      },
+      "since": "2023-02-15",
+      "until": null,
+      "active": true
+    },
+    {
+      "id": 3,
+      "userId": 1,
+      "equipmentId": 2,
+      "role": "owner",
+      "ownershipShare": 100,
+      "permissions": {
+        "control": true,
+        "requestMaintenance": true,
+        "viewBilling": true
+      },
+      "since": "2023-04-10",
+      "until": null,
+      "active": true
+    },
+    {
+      "id": 4,
+      "userId": 1,
+      "equipmentId": 3,
+      "role": "owner",
+      "ownershipShare": 100,
+      "permissions": {
+        "control": true,
+        "requestMaintenance": true,
+        "viewBilling": true
+      },
+      "since": "2023-06-01",
+      "until": null,
+      "active": true
+    },
+    {
+      "id": 5,
+      "userId": 1,
+      "equipmentId": 4,
+      "role": "owner",
+      "ownershipShare": 100,
+      "permissions": {
+        "control": true,
+        "requestMaintenance": true,
+        "viewBilling": true
+      },
+      "since": "2023-03-20",
+      "until": null,
+      "active": true
+    },
+    {
+      "id": 6,
+      "userId": 2,
+      "equipmentId": 2,
+      "role": "viewer",
+      "ownershipShare": 0,
+      "permissions": {
+        "control": false,
+        "requestMaintenance": true,
+        "viewBilling": false
+      },
+      "since": "2025-01-10",
+      "until": null,
+      "active": true
+    }
+  ],
+  "companyMachines": [
+    {
+      "id": 1,
+      "companyId": 1,
+      "equipmentId": 1,
+      "relationship": "provider",
+      "since": "2023-02-15",
+      "until": null,
+      "active": true
+    },
+    {
+      "id": 2,
+      "companyId": 1,
+      "equipmentId": 3,
+      "relationship": "provider",
+      "since": "2023-06-01",
+      "until": null,
+      "active": true
+    },
+    {
+      "id": 3,
+      "companyId": 2,
+      "equipmentId": 2,
+      "relationship": "host",
+      "since": "2023-04-10",
+      "until": null,
+      "active": true
+    },
+    {
+      "id": 4,
+      "companyId": 2,
+      "equipmentId": 4,
+      "relationship": "host",
+      "since": "2023-03-20",
+      "until": null,
+      "active": true
+    }
+  ],
+  "providerPlans": [
+    {
+      "id": 1,
+      "name": "Small Company",
+      "price": 40.51,
+      "billingCycle": "monthly",
+      "maxClients": 10
+    },
+    {
+      "id": 2,
+      "name": "Medium Company",
+      "price": 81.08,
+      "billingCycle": "monthly",
+      "maxClients": 30
+    },
+    {
+      "id": 3,
+      "name": "Enterprise Premium",
+      "price": 162.16,
+      "billingCycle": "monthly",
+      "maxClients": null
+    }
+  ],
+  "rentalCatalog": [
+    {
+      "id": 1,
+      "equipmentName": "Treadmill Pro X",
+      "type": "treadmill",
+      "model": "TRX-300",
+      "monthlyPriceUSD": 200,
+      "currency": "USD",
+      "imageUrl": "/treadmill-pro-x.png",
+      "isAvailable": true
+    },
+    {
+      "id": 2,
+      "equipmentName": "Stationary Bike GX",
+      "type": "bike",
+      "model": "SB-GX",
+      "monthlyPriceUSD": 99,
+      "currency": "USD",
+      "imageUrl": "/stationary-bike-gx.png",
+      "isAvailable": true
+    },
+    {
+      "id": 3,
+      "equipmentName": "Rowing Machine R-300",
+      "type": "rower",
+      "model": "R-300",
+      "monthlyPriceUSD": 200,
+      "currency": "USD",
+      "imageUrl": "/rowing-r300.jpg",
+      "isAvailable": true
+    },
+    {
+      "id": 4,
+      "equipmentName": "Elliptical Trainer E-500",
+      "type": "elliptical",
+      "model": "E-500",
+      "monthlyPriceUSD": 99,
+      "currency": "USD",
+      "imageUrl": "/elliptical-e500.jpg",
+      "isAvailable": true
+    }
+  ],
+  "technicians": [
+    {
+      "id": 1,
+      "name": "Roberto Técnico",
+      "specialization": "Cardio machines",
+      "phone": "987123456",
+      "email": "roberto@tecnico.com",
+      "rating": 4.8,
+      "availability": "available"
+    },
+    {
+      "id": 2,
+      "name": "Ana García",
+      "specialization": "Strength & cardio",
+      "phone": "987123457",
+      "email": "ana@tecnico.com",
+      "rating": 4.9,
+      "availability": "busy"
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "name": "Juan Pérez",
+      "email": "juan@ejemplo.com",
+      "password": "hola123",
+      "username": "juanp",
+      "phone": "987654321",
+      "type": "individual",
+      "clientPlanId": 1,
+      "profilePhoto": null
+    },
+    {
+      "id": 2,
+      "name": "María Rodríguez",
+      "email": "maria@ejemplo.com",
+      "password": "hola123",
+      "username": "mariar",
+      "phone": "987654322",
+      "type": "individual",
+      "clientPlanId": 1,
+      "profilePhoto": null
+    }
+  ]
+}
