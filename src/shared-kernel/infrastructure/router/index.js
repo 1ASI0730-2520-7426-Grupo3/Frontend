@@ -2,8 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import PageNotFoundComponent from '@/public/pages/page-not-found.component.vue'
 
 const ClientHomePage = () => import('@/contexts/client/presentation/pages/client-home.page.vue')
-const MachinesPage = () => import('@/contexts/public/presentation/pages/machines-page.page.vue')
-const RentPage = () => import('@/contexts/public/presentation/pages/rent-page.page.vue')
+const RentPage = () => import('@/contexts/rent/presentation/pages/rent-page.page.vue')
 const ContactPage = () => import('@/contexts/public/presentation/pages/contact-page.page.vue')
 const LandingPage = () => import('@/contexts/public/presentation/pages/landing.page.vue')
 const LoginPage = () => import('@/contexts/auth/presentation/pages/login-page.page.vue')

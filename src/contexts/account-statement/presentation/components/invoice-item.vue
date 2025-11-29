@@ -1,9 +1,10 @@
 <template>
-  <div class="row" :class="{ paid: isPaid(invoice), pending: !isPaid(invoice) }">
+  <div class="row" :class="{ paid: invoice.isPaid(), pending: !invoice.isPaid() }">
     <span class="company">{{ invoice.companyName }}</span>
-    <span class="amount">{{ formatCurrencyPEN(invoice.amount) }}</span>
 
-    <span v-if="isPaid(invoice)" class="status paid">{{ $t('accountStatement.item.paid') }}</span>
+    <span class="amount">{{ invoice.getFormattedAmount() }}</span>
+
+    <span v-if="invoice.isPaid()" class="status paid">{{ $t('accountStatement.item.paid') }}</span>
 
     <div v-else class="actions">
       <span class="status pending">{{ $t('accountStatement.item.pending') }}</span>
@@ -16,8 +17,10 @@
 
 <script setup>
 import { ref } from 'vue'
-import { formatCurrencyPEN, isPaid } from '../../Domain/invoice.entity.js'
 import { AccountStatementApiService } from '../../infrastructure/account-statement.api-service.js'
+
+// Ya NO necesitamos importar funciones sueltas de invoice.entity.js
+// porque ahora los métodos viven dentro del objeto 'invoice'
 
 const props = defineProps({ invoice: { type: Object, required: true } })
 const emit = defineEmits(['changed'])

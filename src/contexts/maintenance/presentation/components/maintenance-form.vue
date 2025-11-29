@@ -6,22 +6,29 @@
       <div class="field">
         <label>{{ $t('maintenance.form.selectEquipment') }}</label>
         <select v-model="selectedId">
+          <option v-if="loading" value="" disabled>Loading equipments...</option>
           <option v-for="opt in options" :key="opt.id" :value="opt.id">{{ opt.label }}</option>
         </select>
       </div>
 
       <div class="field">
-        <label>{{ $t('maintenance.form.cost') }}</label>
-        <input type="text" :value="costLabel" readonly />
+        <label>{{ $t('maintenance.form.selectDate') }}</label>
+        <input type="date" v-model="dateStr" :min="minDate" />
       </div>
 
       <div class="field">
-        <label>{{ $t('maintenance.form.selectDate') }}</label>
-        <input type="date" v-model="dateStr" />
+        <label>Observation / Notes</label>
+        <textarea
+          v-model="observation"
+          rows="3"
+          class="text-area"
+          placeholder="Describe the issue (e.g., Strange noise, belt broken...)"
+        ></textarea>
       </div>
 
-      <button class="btn" :disabled="!canSubmit" @click="submit">
-        {{ $t('maintenance.form.request') }}
+      <button class="btn" :disabled="!canSubmit || isSubmitting" @click="submit">
+        <i v-if="isSubmitting" class="pi pi-spin pi-spinner" style="margin-right: 8px"></i>
+        {{ isSubmitting ? 'Sending...' : $t('maintenance.form.request') }}
       </button>
     </div>
   </section>
@@ -29,31 +36,54 @@
 
 <script setup>
 import { onMounted, ref, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useToast } from 'primevue/usetoast'
 import { MaintenanceApiService } from '../../infrastructure/maintenance.api-service.js'
 import { MaintenanceAssembler } from '../../Domain/maintenance.assembler.js'
 
 const api = new MaintenanceApiService()
-const userId = 1
+const route = useRoute()
+const router = useRouter()
+const toast = useToast()
 
 const loading = ref(false)
+const isSubmitting = ref(false)
 const equipments = ref([])
-const pricing = ref(new Map())
-const options = computed(() => MaintenanceAssembler.toEquipmentOptions(equipments.value))
 
+// Form Data
 const selectedId = ref(null)
 const dateStr = ref(new Date().toISOString().slice(0, 10))
+const observation = ref('')
 
-const currentCost = computed(() => pricing.value.get(Number(selectedId.value)) ?? 0)
-const costLabel = computed(() => `$${currentCost.value.toFixed(2)}`)
-const canSubmit = computed(() => !!selectedId.value && !!dateStr.value && currentCost.value > 0)
+// Fecha mínima (hoy)
+const minDate = new Date().toISOString().slice(0, 10)
+
+const options = computed(() => MaintenanceAssembler.toEquipmentOptions(equipments.value))
+
+const canSubmit = computed(() => !!selectedId.value && !!dateStr.value && !!observation.value)
 
 async function load() {
   loading.value = true
   try {
-    const [eqs, priceMap] = await Promise.all([api.getUserEquipments(userId), api.getPricingMap()])
+    // 1. Cargar equipos desde el backend real
+    const eqs = await api.getUserEquipments()
     equipments.value = eqs
-    pricing.value = priceMap
-    if (eqs.length) selectedId.value = eqs[0].id
+
+    // 2. Verificar si venimos redirigidos con un ID específico
+    const queryId = route.query.equipmentId
+    if (queryId) {
+      // Convertimos a número para asegurar coincidencia
+      const found = eqs.find((e) => e.id === Number(queryId))
+      if (found) {
+        selectedId.value = found.id
+      }
+    } else if (eqs.length > 0) {
+      // Default al primero si no hay pre-selección
+      selectedId.value = eqs[0].id
+    }
+  } catch (error) {
+    console.error('Error loading equipments:', error)
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Could not load equipments list.' })
   } finally {
     loading.value = false
   }
@@ -61,16 +91,34 @@ async function load() {
 
 async function submit() {
   if (!canSubmit.value) return
-  const payload = MaintenanceAssembler.toCreateResource({
-    userId,
-    equipmentId: Number(selectedId.value),
-    costUSD: currentCost.value,
-    selectedDate: dateStr.value,
-    type: 'corrective',
-    notes: '',
-  })
-  await api.createRequest(payload)
-  alert('Maintenance request created')
+
+  isSubmitting.value = true
+
+  try {
+    // Preparamos el payload usando el Assembler corregido
+    const payload = MaintenanceAssembler.toCreateResource({
+      equipmentId: selectedId.value,
+      selectedDate: dateStr.value,
+      notes: observation.value, // El assembler lo renombrará a 'observation'
+    })
+
+    await api.createRequest(payload)
+
+    toast.add({
+      severity: 'success',
+      summary: 'Success',
+      detail: 'Maintenance request created successfully',
+    })
+
+    // Redirigir al home o limpiar
+    setTimeout(() => router.push({ name: 'my-machines' }), 1500)
+  } catch (error) {
+    console.error('Error creating request:', error)
+    const msg = error.response?.data?.message || 'Failed to create request'
+    toast.add({ severity: 'error', summary: 'Error', detail: msg })
+  } finally {
+    isSubmitting.value = false
+  }
 }
 
 onMounted(load)
@@ -120,8 +168,8 @@ label {
 
 select,
 input[type='text'],
-input[type='date'] {
-  height: 44px;
+input[type='date'],
+textarea {
   border: 1px solid #d4d8dd;
   border-radius: 10px;
   padding: 0 0.75rem;
@@ -132,29 +180,27 @@ input[type='date'] {
   transition:
     border 0.2s ease,
     box-shadow 0.2s ease;
-
   color-scheme: light;
+  width: 100%;
+}
+
+select,
+input[type='date'] {
+  height: 44px;
+}
+
+textarea {
+  padding: 10px;
+  resize: vertical;
+  min-height: 80px;
 }
 
 select:focus,
 input[type='text']:focus,
-input[type='date']:focus {
+input[type='date']:focus,
+textarea:focus {
   border-color: #1976d2;
   box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.15);
-}
-
-input[type='date']::-webkit-calendar-picker-indicator {
-  opacity: 0;
-}
-
-input[type='date'] {
-  -webkit-appearance: none;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23444' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'/%3E%3Cline x1='16' y1='2' x2='16' y2='6'/%3E%3Cline x1='8' y1='2' x2='8' y2='6'/%3E%3Cline x1='3' y1='10' x2='21' y2='10'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.75rem center;
-  background-size: 18px 18px;
-  padding-right: 0.6rem;
 }
 
 .btn {
@@ -171,6 +217,9 @@ input[type='date'] {
   transition:
     background 0.2s ease,
     transform 0.1s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .btn:hover:not(:disabled) {

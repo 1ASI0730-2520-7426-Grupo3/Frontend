@@ -13,6 +13,7 @@ export class MaintenanceRequest {
     selectedDate = '',
     createdAt = '',
     notes = '',
+    observation = '', // <--- AGREGADO: Campo que viene del Backend
     assignedTechnicianId = null,
   }) {
     this.id = id
@@ -23,7 +24,12 @@ export class MaintenanceRequest {
     this.costUSD = costUSD
     this.selectedDate = selectedDate
     this.createdAt = createdAt
-    this.notes = notes
+
+    // Mapeo inteligente: Usa 'observation' (Backend) si existe, si no usa 'notes'
+    this.notes = observation || notes
+    // Guardamos también la propiedad original por si acaso
+    this.observation = this.notes
+
     this.assignedTechnicianId = assignedTechnicianId
   }
 
@@ -32,7 +38,7 @@ export class MaintenanceRequest {
    * @returns {boolean}
    */
   isPending() {
-    return this.status === 'pending'
+    return String(this.status).toLowerCase() === 'pending'
   }
 
   /**
@@ -40,7 +46,7 @@ export class MaintenanceRequest {
    * @returns {boolean}
    */
   isCompleted() {
-    return this.status === 'completed'
+    return String(this.status).toLowerCase() === 'completed'
   }
 
   /**
@@ -56,6 +62,6 @@ export class MaintenanceRequest {
    * @returns {string}
    */
   getFormattedCost() {
-    return `$${this.costUSD.toFixed(2)}`
+    return `$${Number(this.costUSD).toFixed(2)}`
   }
 }

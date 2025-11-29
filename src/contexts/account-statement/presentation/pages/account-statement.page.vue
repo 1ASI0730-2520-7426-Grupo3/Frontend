@@ -2,11 +2,19 @@
   <section class="wrap">
     <h1 class="title">{{ $t('accountStatement.title') }}</h1>
 
-    <div class="list" v-if="invoices.length">
+    <div v-if="loading" class="loading-state">
+      <p>Cargando estado de cuenta...</p>
+    </div>
+
+    <div v-else-if="error" class="error-box">
+      <p>Error: {{ error }}</p>
+    </div>
+
+    <div class="list" v-else-if="invoices.length">
       <invoice-item v-for="inv in invoices" :key="inv.id" :invoice="inv" @changed="load" />
     </div>
 
-    <p v-else class="hint">Here you can view your pending and paid receipts.</p>
+    <p v-else class="hint">No se encontraron facturas pendientes o pagadas.</p>
   </section>
 </template>
 
@@ -17,10 +25,29 @@ import { AccountStatementApiService } from '../../infrastructure/account-stateme
 
 const api = new AccountStatementApiService()
 const invoices = ref([])
-const userId = 1
+const loading = ref(false)
+const error = ref(null)
+
+// Obtener el ID del usuario real autenticado
+const userId = localStorage.getItem('userId')
 
 async function load() {
-  invoices.value = await api.getInvoicesByUser(userId)
+  if (!userId) {
+    error.value = 'Usuario no autenticado.'
+    return
+  }
+
+  loading.value = true
+  error.value = null
+
+  try {
+    invoices.value = await api.getInvoicesByUser(userId)
+  } catch (err) {
+    console.error('Error cargando facturas:', err)
+    error.value = 'No se pudieron cargar las facturas.'
+  } finally {
+    loading.value = false
+  }
 }
 
 onMounted(load)
@@ -47,10 +74,17 @@ onMounted(load)
   flex-direction: column;
   gap: 0.9rem;
 }
-.hint {
+.hint,
+.loading-state {
   margin-top: 1.8rem;
   color: #636a73;
   font-size: 0.98rem;
   text-align: center;
+}
+.error-box {
+  color: #d32f2f;
+  background: #ffebee;
+  padding: 1rem;
+  border-radius: 8px;
 }
 </style>
