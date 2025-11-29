@@ -160,7 +160,6 @@ const router = useRouter()
 const toast = useToast()
 const equipmentService = new EquipmentApiService()
 
-// Datos del formulario alineados con lo que tu Backend .NET necesita
 const formData = ref({
   name: '',
   type: '',
@@ -169,9 +168,9 @@ const formData = ref({
   serialNumber: '',
   code: '',
   installationDate: null,
-  powerWatts: null, // Cambiado de 'energyConsumption' a 'powerWatts' (integer)
-  locationName: '', // Cambiado de 'location'
-  locationAddress: '', // Cambiado de 'address'
+  powerWatts: null,
+  locationName: '',
+  locationAddress: '',
   image: '',
 })
 
@@ -205,7 +204,6 @@ const handleSubmit = async () => {
   loading.value = true
 
   try {
-    // Preparar el objeto EXACTO que espera el Backend (CreateEquipmentResource.cs)
     const payload = {
       name: formData.value.name,
       type: formData.value.type,
@@ -213,17 +211,16 @@ const handleSubmit = async () => {
       manufacturer: formData.value.manufacturer,
       serialNumber: formData.value.serialNumber,
       code: formData.value.code,
-      // Aseguramos que la fecha sea un ISO string válido o la fecha actual si es nula
       installationDate: formData.value.installationDate
         ? new Date(formData.value.installationDate).toISOString()
         : new Date().toISOString(),
-      powerWatts: formData.value.powerWatts || 0, // Backend espera int, no string
+      powerWatts: formData.value.powerWatts || 0,
       locationName: formData.value.locationName || 'General',
       locationAddress: formData.value.locationAddress || 'Main Building',
       image: formData.value.image || null,
     }
 
-    console.log('Sending payload:', payload) // Para depuración
+    console.log('Sending payload:', payload)
 
     await equipmentService.createEquipment(payload)
 
@@ -234,13 +231,11 @@ const handleSubmit = async () => {
       life: 3000,
     })
 
-    // Redirigir a la lista para ver el equipo recién creado
     setTimeout(() => {
       router.push({ name: 'my-machines' })
     }, 1000)
   } catch (error) {
     console.error('Error adding equipment:', error)
-    // Mostrar mensaje de error más detallado si viene del backend
     const msg = error.response?.data?.message || 'Failed to add equipment. Please check your data.'
     toast.add({
       severity: 'error',

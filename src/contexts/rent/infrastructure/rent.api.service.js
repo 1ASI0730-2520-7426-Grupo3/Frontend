@@ -4,7 +4,6 @@ import { RentAssembler } from '../Domain/rent.assembler.js'
 export class RentApiService {
   async getRentalCatalog() {
     try {
-      // Intenta llamar al backend real (si existiera)
       const response = await http.get('/rentals')
       return RentAssembler.toEntityList(response.data)
     } catch (err) {

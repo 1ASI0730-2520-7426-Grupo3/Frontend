@@ -19,9 +19,6 @@
 import { ref } from 'vue'
 import { AccountStatementApiService } from '../../infrastructure/account-statement.api-service.js'
 
-// Ya NO necesitamos importar funciones sueltas de invoice.entity.js
-// porque ahora los métodos viven dentro del objeto 'invoice'
-
 const props = defineProps({ invoice: { type: Object, required: true } })
 const emit = defineEmits(['changed'])
 

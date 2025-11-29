@@ -1,101 +1,108 @@
 <template>
-  <section class="grid">
-    <div
-      class="panel panel--link"
-      role="button"
-      tabindex="0"
-      @click="goTo('machines')"
-      @keydown="onKey($event, 'machines')"
-    >
-      <h2 class="panel__title">My machines</h2>
-      <template v-if="isLoading.myMachines"><p class="muted">Cargando tus máquinas…</p></template>
-      <template v-else-if="error.myMachines"
-        ><p class="text-red-500">Error: {{ error.myMachines.message }}</p></template
-      >
-      <div v-else class="cards">
-        <MachineCard v-for="m in myMachines" :key="m.id" :img="m.img" :title="m.name" />
+  <section class="dashboard-wrapper">
+    <div class="grid">
+      <div class="panel panel--link" role="button" tabindex="0" @click="goTo('my-machines')">
+        <div class="panel-header">
+          <h2 class="panel__title">My machines</h2>
+          <span class="badge-count" v-if="!isLoading.myMachines">{{ myMachines.length }}</span>
+        </div>
+
+        <template v-if="isLoading.myMachines">
+          <div class="loading-state"><i class="pi pi-spin pi-spinner"></i></div>
+        </template>
+
+        <template v-else-if="error.myMachines">
+          <p class="text-red-500 text-sm">Error cargando máquinas</p>
+        </template>
+
+        <div v-else class="cards">
+          <MachineCard
+            v-for="m in myMachines.slice(0, 2)"
+            :key="m.id"
+            :img="m.img"
+            :title="m.name"
+          />
+        </div>
+
+        <p v-if="!isLoading.myMachines && myMachines.length === 0" class="muted spacer">
+          No tienes máquinas asignadas.
+        </p>
       </div>
-      <p v-if="!isLoading.myMachines && myMachines.length === 0" class="muted spacer">
-        No tienes máquinas asignadas.
-      </p>
-    </div>
 
-    <div
-      class="panel panel--link"
-      role="button"
-      tabindex="0"
-      @click="goTo('rent')"
-      @keydown="onKey($event, 'rent')"
-    >
-      <h2 class="panel__title">Rent machines</h2>
-      <template v-if="isLoading.rentMachines"
-        ><p class="muted">Cargando máquinas de renta…</p></template
-      >
-      <template v-else-if="error.rentMachines"
-        ><p class="text-red-500">Error: {{ error.rentMachines.message }}</p></template
-      >
-      <div v-else class="cards">
-        <MachineCard
-          v-for="m in rentMachines"
-          :key="m.id"
-          :img="m.img"
-          :title="m.name"
-          :subtitle="m.price"
-          :isPrice="true"
-        />
+      <div class="panel panel--link" role="button" tabindex="0" @click="goTo('rent')">
+        <div class="panel-header">
+          <h2 class="panel__title">Rent machines</h2>
+        </div>
+
+        <template v-if="isLoading.rentMachines">
+          <div class="loading-state"><i class="pi pi-spin pi-spinner"></i></div>
+        </template>
+
+        <template v-else-if="error.rentMachines">
+          <p class="text-red-500 text-sm">Catálogo no disponible</p>
+        </template>
+
+        <div v-else class="cards">
+          <MachineCard
+            v-for="m in rentMachines.slice(0, 2)"
+            :key="m.id"
+            :img="m.img"
+            :title="m.name"
+            :subtitle="m.price"
+            :isPrice="true"
+          />
+        </div>
       </div>
-      <p v-if="!isLoading.rentMachines && rentMachines.length === 0" class="muted spacer">
-        No hay máquinas disponibles para renta.
-      </p>
-    </div>
 
-    <div
-      class="panel panel--link"
-      role="button"
-      tabindex="0"
-      @click="goTo('maintenance')"
-      @keydown="onKey($event, 'maintenance')"
-    >
-      <h2 class="panel__title">Maintenance</h2>
-      <template v-if="isLoading.maintenance"><p class="muted">Cargando solicitudes…</p></template>
-      <template v-else-if="error.maintenance"
-        ><p class="text-red-500">Error: {{ error.maintenance.message }}</p></template
-      >
-      <ul v-else-if="maintenance.length > 0" class="list">
-        <li class="list__item" v-for="i in maintenance" :key="i.id">
-          <span class="list__label">{{ i.equipmentName }}</span>
-          <span class="badge" :class="i.status === 'Done' ? 'badge--ok' : 'badge--warn'">{{
-            i.status
+      <div class="panel panel--link" role="button" tabindex="0" @click="goTo('maintenance')">
+        <div class="panel-header">
+          <h2 class="panel__title">Maintenance</h2>
+          <span class="badge-count orange" v-if="maintenance.length > 0">{{
+            maintenance.length
           }}</span>
-        </li>
-      </ul>
-      <p v-else class="muted spacer">
-        Aquí se mostrarán las solicitudes de mantenimiento de tu equipo.
-      </p>
-    </div>
+        </div>
 
-    <div
-      class="panel panel--link"
-      role="button"
-      tabindex="0"
-      @click="goTo('account-statement')"
-      @keydown="onKey($event, 'account-statement')"
-    >
-      <h2 class="panel__title">Account statement</h2>
-      <template v-if="isLoading.account"><p class="muted">Cargando extracto…</p></template>
-      <template v-else-if="error.account"
-        ><p class="text-red-500">Error: {{ error.account.message }}</p></template
-      >
-      <ul v-else-if="account.length > 0" class="list">
-        <li class="list__item" v-for="t in account" :key="t.id">
-          <span class="list__label">{{ t.entity }}</span>
-          <span class="list__amount">{{ t.amount }}</span>
-          <span class="badge" :class="t.status === 'Done' ? 'badge--ok' : 'badge--warn'">{{
-            t.status
-          }}</span>
-        </li>
-      </ul>
-      <p v-else class="muted spacer">Aquí se mostrará el estado de cuenta de tus transacciones.</p>
+        <template v-if="isLoading.maintenance">
+          <div class="loading-state"><i class="pi pi-spin pi-spinner"></i></div>
+        </template>
+
+        <ul v-else-if="maintenance.length > 0" class="list">
+          <li class="list__item" v-for="item in maintenance.slice(0, 3)" :key="item.id">
+            <span class="list__label">{{ item.equipmentName }}</span>
+            <span class="badge" :class="getStatusClass(item.status)">
+              {{ item.status }}
+            </span>
+          </li>
+        </ul>
+
+        <p v-else class="muted spacer">No hay solicitudes pendientes.</p>
+      </div>
+
+      <div class="panel panel--link" role="button" tabindex="0" @click="goTo('account-statement')">
+        <div class="panel-header">
+          <h2 class="panel__title">Account statement</h2>
+          <span class="badge-count green" v-if="account.length > 0">{{ account.length }}</span>
+        </div>
+
+        <template v-if="isLoading.account">
+          <div class="loading-state"><i class="pi pi-spin pi-spinner"></i></div>
+        </template>
+
+        <ul v-else-if="account.length > 0" class="list">
+          <li class="list__item" v-for="inv in account.slice(0, 3)" :key="inv.id">
+            <span class="list__label">{{ inv.entity }}</span>
+            <span class="list__amount">{{ inv.amount }}</span>
+            <span
+              class="badge"
+              :class="inv.status.toLowerCase() === 'paid' ? 'badge--ok' : 'badge--warn'"
+            >
+              {{ inv.status }}
+            </span>
+          </li>
+        </ul>
+
+        <p v-else class="muted spacer">Estás al día en tus pagos.</p>
+      </div>
     </div>
   </section>
 </template>
@@ -104,16 +111,19 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import MachineCard from '@/shared-kernel/presentation/ui/components/machine-card.component.vue'
-import { http } from '@/shared-kernel/infrastructure/http'
+
+import { EquipmentApiService } from '../../../equipment/infrastructure/equipment-api.service.js'
+import { MaintenanceApiService } from '../../../maintenance/infrastructure/maintenance.api-service.js'
+import { AccountStatementApiService } from '../../../account-statement/infrastructure/account-statement.api-service.js'
+import { RentApiService } from '../../../rent/infrastructure/rent.api.service.js'
 
 const router = useRouter()
 const goTo = (name) => router.push({ name })
-const onKey = (e, name) => {
-  if (e.key === 'Enter' || e.key === ' ') {
-    e.preventDefault()
-    goTo(name)
-  }
-}
+
+const equipmentService = new EquipmentApiService()
+const maintenanceService = new MaintenanceApiService()
+const billingService = new AccountStatementApiService()
+const rentService = new RentApiService()
 
 const myMachines = ref([])
 const rentMachines = ref([])
@@ -123,228 +133,241 @@ const account = ref([])
 const isLoading = ref({ myMachines: true, rentMachines: true, maintenance: true, account: true })
 const error = ref({ myMachines: null, rentMachines: null, maintenance: null, account: null })
 
-const myMachineIds = [1, 2]
-const rentOrder = [2, 1]
-const USER_ID = 1
+const USER_ID = localStorage.getItem('userId') || 1
 
 const formatCurrency = (amount, currency = 'PEN') => {
-  if (typeof amount !== 'number') return amount
-  return new Intl.NumberFormat('es-PE', {
-    style: 'currency',
-    currency,
-    minimumFractionDigits: 2,
-  }).format(amount)
-}
-const normalizeStatus = (s) => {
-  const v = String(s || '').toLowerCase()
-  if (['paid', 'completed', 'resolved', 'done'].includes(v)) return 'Done'
-  if (['pending', 'pending_maintenance', 'open'].includes(v)) return 'Pending'
-  return s
+  return new Intl.NumberFormat('es-PE', { style: 'currency', currency }).format(amount)
 }
 
-const fetchEquipment = async () => {
-  isLoading.value.myMachines = true
-  isLoading.value.rentMachines = true
-  error.value.myMachines = null
-  error.value.rentMachines = null
+const getStatusClass = (status) => {
+  const s = status.toLowerCase()
+  if (s === 'completed' || s === 'done' || s === 'resolved') return 'badge--ok'
+  return 'badge--warn'
+}
+
+const fetchData = async () => {
+  // 1. Equipos (Real)
   try {
-    const { data: equipmentDataRaw } = await http.get('/equipments')
-    const { data: rentalCatalog } = await http.get('/rentalCatalog')
-
-    const equipmentMap = new Map(
-      equipmentDataRaw.map((e) => [
-        e.id,
-        { id: e.id, name: e.name, img: e.image || '/assets/images/placeholder.png' },
-      ]),
-    )
-
-    myMachines.value = myMachineIds.map((id) => equipmentMap.get(id)).filter(Boolean)
-
-    const rentalMap = new Map(rentalCatalog.map((r) => [r.id, r]))
-    rentMachines.value = rentOrder
-      .map((id) => {
-        const cat = rentalMap.get(id)
-        if (!cat) return null
-        return {
-          id,
-          name: cat.equipmentName,
-          img: cat.imageUrl || equipmentMap.get(id)?.img || '/assets/images/placeholder.png',
-          price: `${formatCurrency(cat.monthlyPriceUSD, cat.currency)} / month`,
-        }
-      })
-      .filter(Boolean)
-  } catch (err) {
-    error.value.myMachines = err
-    error.value.rentMachines = err
+    const data = await equipmentService.getClientEquipment(USER_ID)
+    myMachines.value = data.map((e) => ({
+      id: e.id,
+      name: e.name,
+      img: e.image || 'https://placehold.co/400x300/e0e0e0/ffffff?text=Gym',
+    }))
+  } catch (e) {
+    error.value.myMachines = e
   } finally {
     isLoading.value.myMachines = false
+  }
+
+  // 2. Renta (Mock Service)
+  try {
+    const data = await rentService.getRentalCatalog()
+    rentMachines.value = data.map((m) => ({
+      id: m.id,
+      name: m.name,
+      img: m.image || 'https://placehold.co/400x300/e0e0e0/ffffff?text=Rent',
+      price: m.getFormattedPrice(),
+    }))
+  } catch (e) {
+    error.value.rentMachines = e
+  } finally {
     isLoading.value.rentMachines = false
   }
-}
 
-const fetchMaintenance = async () => {
-  isLoading.value.maintenance = true
-  error.value.maintenance = null
-  maintenance.value = []
+  // 3. Mantenimiento (Real + Mapeo de Nombres)
   try {
-    const [{ data: requests }, { data: equipment }] = await Promise.all([
-      http.get('/maintenanceRequests'),
-      http.get('/equipments'),
+    const [requests, equipments] = await Promise.all([
+      maintenanceService.getAllRequests(),
+      equipmentService.getClientEquipment(USER_ID), // Reusamos la llamada si fuera necesario optimizar
     ])
-    const equipmentMap = new Map(equipment.map((e) => [e.id, e]))
-    const consolidated = new Map()
-    requests.forEach((req) => {
-      const equip = equipmentMap.get(req.equipmentId)
-      if (equip && !consolidated.has(req.equipmentId)) {
-        consolidated.set(req.equipmentId, {
-          id: req.equipmentId,
-          equipmentName: equip.name,
-          status: normalizeStatus(req.status),
-        })
-      }
-    })
-    equipment
-      .filter((e) => e.status === 'pending_maintenance')
-      .forEach((e) => {
-        consolidated.set(e.id, {
-          id: e.id,
-          equipmentName: e.name,
-          status: normalizeStatus(e.status),
-        })
-      })
-    maintenance.value = Array.from(consolidated.values())
-  } catch (err) {
-    error.value.maintenance = err
+
+    // Creamos un mapa de ID -> Nombre para rápido acceso
+    const eqMap = new Map(equipments.map((e) => [e.id, e.name]))
+
+    maintenance.value = requests
+      .filter((r) => (r.status || '').toLowerCase() === 'pending')
+      .map((r) => ({
+        id: r.id,
+        equipmentName: eqMap.get(r.equipmentId) || `Equipment #${r.equipmentId}`,
+        status: r.status,
+      }))
+  } catch (e) {
+    error.value.maintenance = e
   } finally {
     isLoading.value.maintenance = false
   }
-}
 
-const fetchAccount = async () => {
-  isLoading.value.account = true
-  error.value.account = null
-  account.value = []
+  // 4. Facturación (Real)
   try {
-    const { data: invoices } = await http.get('/billingInvoices')
+    const invoices = await billingService.getInvoicesByUser(USER_ID)
     account.value = invoices
-      .filter((t) => t.userId === USER_ID)
-      .map((t) => ({
-        id: t.id,
-        entity: t.companyName,
-        amount: formatCurrency(t.amount, t.currency),
-        status: normalizeStatus(t.status),
+      .filter((inv) => inv.status.toLowerCase() === 'pending') // Solo pendientes
+      .map((inv) => ({
+        id: inv.id,
+        entity: inv.companyName,
+        amount: formatCurrency(inv.amount, inv.currency),
+        status: inv.status,
       }))
-  } catch (err) {
-    error.value.account = err
+  } catch (e) {
+    error.value.account = e
   } finally {
     isLoading.value.account = false
   }
 }
 
 onMounted(() => {
-  fetchEquipment()
-  fetchMaintenance()
-  fetchAccount()
+  fetchData()
 })
 </script>
 
 <style scoped>
+.dashboard-wrapper {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
 .grid {
   display: grid;
-  gap: 22px;
-  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
 }
+
 .panel {
-  background: var(--panel);
-  padding: 16px;
-  border-radius: 14px;
-  box-shadow: 0 6px 20px rgba(23, 43, 77, 0.08);
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  border: 1px solid #f1f5f9;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 280px;
 }
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 12px;
+}
+
 .panel__title {
-  margin: 6px 0 14px;
-  color: var(--primary);
-  font-size: 1.6rem;
-  font-weight: 800;
+  margin: 0;
+  color: #3b82f6;
+  font-size: 1.25rem;
+  font-weight: 700;
 }
+
+.badge-count {
+  background: #3b82f6;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+.badge-count.orange {
+  background: #f97316;
+}
+.badge-count.green {
+  background: #22c55e;
+}
+
 .cards {
   display: grid;
   gap: 16px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr 1fr;
 }
+
 .list {
   list-style: none;
   padding: 0;
   margin: 0;
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 12px;
 }
+
 .list__item {
   display: grid;
   grid-template-columns: 1fr auto auto;
   align-items: center;
   gap: 12px;
-  background: #fff;
-  border-radius: 10px;
+  background: #f8fafc;
+  border-radius: 8px;
   padding: 12px 14px;
-  box-shadow: 0 6px 20px rgba(23, 43, 77, 0.08);
+  border: 1px solid #e2e8f0;
 }
+
 .list__label {
   font-weight: 600;
+  color: #334155;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
+
 .list__amount {
   font-weight: 700;
+  color: #0f172a;
 }
+
 .badge {
   padding: 4px 10px;
-  border-radius: 999px;
-  background: #f2f4f7;
+  border-radius: 6px;
+  font-size: 0.75rem;
   font-weight: 700;
+  text-transform: uppercase;
 }
+
 .badge--ok {
-  background: #e9f8ee;
-  color: var(--ok);
+  background: #dcfce7;
+  color: #166534;
 }
+
 .badge--warn {
-  background: #ffecec;
-  color: var(--warn);
+  background: #fee2e2;
+  color: #991b1b;
 }
+
 .muted {
-  color: var(--muted);
+  color: #64748b;
+  font-style: italic;
+  text-align: center;
+  margin-top: 20px;
 }
-.spacer {
-  margin-top: 14px;
-}
+
 .panel--link {
   cursor: pointer;
   transition:
-    transform 0.08s ease,
-    box-shadow 0.08s ease;
+    transform 0.2s,
+    box-shadow 0.2s,
+    border-color 0.2s;
 }
+
 .panel--link:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 26px rgba(23, 43, 77, 0.12);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  border-color: #3b82f6;
 }
-.panel--link:focus-visible {
-  outline: 3px solid #7aa6ff;
-  outline-offset: 3px;
+
+.loading-state {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  font-size: 1.5rem;
 }
-.text-red-500 {
-  color: #e74c3c;
-  font-weight: 600;
-}
-@media (max-width: 980px) {
+
+@media (max-width: 768px) {
   .grid {
-    grid-template-columns: 1fr;
-  }
-  .cards {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-@media (max-width: 640px) {
-  .cards {
     grid-template-columns: 1fr;
   }
 }

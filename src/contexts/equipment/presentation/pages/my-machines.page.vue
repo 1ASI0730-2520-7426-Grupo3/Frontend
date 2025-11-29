@@ -148,17 +148,14 @@ const togglePower = async (machineId) => {
     machine.isPoweredOn = newPowerState
 
     // 4. Preparar payload.
-    // IMPORTANTE: El backend usa PUT, lo que suele requerir enviar el objeto completo.
-    // Mapeamos los datos de la entidad actual para enviarlos de vuelta con el cambio.
     const updatePayload = {
       name: machine.name,
       code: machine.code,
       powerWatts: machine.powerWatts,
-      isPoweredOn: newPowerState, // El cambio que queremos
+      isPoweredOn: newPowerState,
       activeStatus: machine.activeStatus || 'Normal',
       notes: machine.notes,
       status: machine.status,
-      // Manejo seguro de la ubicación para enviarla como strings separados al backend
       locationName: machine.location?.name || 'Default Area',
       locationAddress: machine.location?.address || 'Default Address',
       image: machine.image,

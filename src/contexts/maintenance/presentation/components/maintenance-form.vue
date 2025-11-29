@@ -50,12 +50,10 @@ const loading = ref(false)
 const isSubmitting = ref(false)
 const equipments = ref([])
 
-// Form Data
 const selectedId = ref(null)
 const dateStr = ref(new Date().toISOString().slice(0, 10))
 const observation = ref('')
 
-// Fecha mínima (hoy)
 const minDate = new Date().toISOString().slice(0, 10)
 
 const options = computed(() => MaintenanceAssembler.toEquipmentOptions(equipments.value))

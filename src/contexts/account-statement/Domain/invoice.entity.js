@@ -4,7 +4,7 @@ export class BillingInvoice {
     userId = 0,
     companyName = '',
     amount = 0,
-    currency = 'PEN', // Valor por defecto
+    currency = 'PEN',
     status = 'pending',
     issuedAt = '',
     paidAt = null,

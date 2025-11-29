@@ -1,20 +1,17 @@
 import { http } from '@/shared-kernel/infrastructure/http'
+import { MaintenanceAssembler } from '../Domain/maintenance.assembler.js'
 
 export class MaintenanceApiService {
   /**
    * Obtiene la lista de equipos disponibles para mantenimiento.
-   * Usamos el endpoint real /equipments
    */
   async getUserEquipments() {
-    // Nota: El backend actualmente devuelve todos los equipos.
-    // En el futuro, podrías filtrar por usuario aquí o en el backend.
     const response = await http.get('/equipments')
     return response.data
   }
 
   /**
-   * Envía la solicitud de mantenimiento al backend real.
-   * Endpoint: POST /api/v1/maintenanceRequests
+   * Crea una nueva solicitud de mantenimiento.
    */
   async createRequest(payload) {
     const response = await http.post('/maintenanceRequests', payload)
@@ -22,10 +19,24 @@ export class MaintenanceApiService {
   }
 
   /**
-   * Obtiene el historial de precios (Opcional/Simulado por ahora)
-   * Como el backend aún no tiene endpoint de precios, devolvemos un mapa vacío
-   * para que el formulario no falle.
+   * (NUEVO) Obtiene todas las solicitudes de mantenimiento.
+   * Útil para el Dashboard.
    */
+  async getAllRequests() {
+    try {
+      const response = await http.get('/maintenanceRequests')
+      // Usamos el assembler para convertir a entidades si es necesario,
+      // o devolvemos la data directa si solo vamos a contar.
+      // Por consistencia, devolvemos la data cruda o mapeada.
+      // Aquí asumiremos que MaintenanceAssembler tiene un toEntityListFromResources
+      // Si no lo tiene, devolvemos response.data directamente.
+      return MaintenanceAssembler.toEntityListFromResources(response.data)
+    } catch (error) {
+      console.error('Error fetching requests:', error)
+      return []
+    }
+  }
+
   async getPricingMap() {
     return new Map()
   }
