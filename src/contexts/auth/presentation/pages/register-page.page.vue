@@ -94,6 +94,7 @@ import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
 import Message from 'primevue/message'
+import { AuthApiService } from '@/contexts/auth/infrastructure/auth-api.service'
 
 defineOptions({
   name: 'RegisterPage',
@@ -102,6 +103,7 @@ defineOptions({
 const router = useRouter()
 const route = useRoute()
 const toast = useToast()
+const authService = new AuthApiService()
 
 const formData = ref({
   fullName: '',
@@ -177,9 +179,14 @@ const handleRegister = async () => {
   try {
     loading.value = true
 
-    // TODO: Replace with real API call
-    // For now, simulate registration
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    // Call real API with role
+    await authService.signup({
+      fullName: formData.value.fullName,
+      username: formData.value.username,
+      email: formData.value.email,
+      password: formData.value.password,
+      role: userRole.value === 'provider' ? 'Provider' : 'Client',
+    })
 
     toast.add({
       severity: 'success',
@@ -192,7 +199,7 @@ const handleRegister = async () => {
     router.push({ name: 'login', params: { role: userRole.value } })
   } catch (error) {
     console.error('Registration error:', error)
-    registerError.value = 'An error occurred during registration. Please try again.'
+    registerError.value = error.message || 'An error occurred during registration. Please try again.'
   } finally {
     loading.value = false
   }

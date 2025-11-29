@@ -14,30 +14,26 @@ export class AuthApiService {
    */
   async login(email, password) {
     try {
-      // For now, mock authentication
-      // TODO: Replace with real API call when backend is ready , checkinggggg
-      // const response = await http.post('/auth/login', { email, password })
-
-      // Mock: Find user from users endpoint
-      const response = await http.get('/users', {
-        params: { email, password }
+      const response = await http.post('/users/login', {
+        email,
+        password,
       })
 
-      if (response.data && response.data.length > 0) {
-        const userData = response.data[0]
-        // Store authentication
-        localStorage.setItem('isAuthenticated', 'true')
-        localStorage.setItem('userId', userData.id.toString())
-        localStorage.setItem('userEmail', userData.email)
+      // Backend returns: { user: {...}, accessToken: "...", expiresAt: "..." }
+      const { user, accessToken } = response.data
 
-        // Return user entity
-        return AuthAssembler.toEntityFromResource(userData)
-      } else {
-        throw new Error('Invalid credentials')
-      }
+      // Store authentication with JWT token
+      localStorage.setItem('isAuthenticated', 'true')
+      localStorage.setItem('userId', user.id.toString())
+      localStorage.setItem('userEmail', user.email)
+      localStorage.setItem('accessToken', accessToken)
+      localStorage.setItem('userRole', user.role.toLowerCase())
+
+      // Return user entity
+      return AuthAssembler.toEntityFromResource(user)
     } catch (error) {
       console.error('Login error:', error)
-      throw error
+      throw new Error('Invalid credentials')
     }
   }
 
@@ -48,6 +44,8 @@ export class AuthApiService {
     localStorage.removeItem('isAuthenticated')
     localStorage.removeItem('userId')
     localStorage.removeItem('userEmail')
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('userRole')
   }
 
   /**
@@ -68,6 +66,14 @@ export class AuthApiService {
   }
 
   /**
+   * Get stored access token
+   * @returns {string|null}
+   */
+  getAccessToken() {
+    return localStorage.getItem('accessToken')
+  }
+
+  /**
    * Get current user data
    * @returns {Promise<User|null>}
    */
@@ -85,24 +91,24 @@ export class AuthApiService {
   }
 
   /**
-   * Register new user (for future implementation)
+   * Register new user
    * @param {Object} signupData - Signup form data
    * @returns {Promise<User>}
    */
   async signup(signupData) {
     try {
       const resource = AuthAssembler.toSignupResource(signupData)
-      const response = await http.post('/users', resource)
+      const response = await http.post('/users/register', resource)
 
-      // Auto-login after signup
-      localStorage.setItem('isAuthenticated', 'true')
-      localStorage.setItem('userId', response.data.id.toString())
-      localStorage.setItem('userEmail', response.data.email)
-
+      // Backend returns user resource (no auto-login)
       return AuthAssembler.toEntityFromResource(response.data)
     } catch (error) {
       console.error('Signup error:', error)
-      throw error
+      // Handle backend validation errors
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message)
+      }
+      throw new Error('Registration failed. Please try again.')
     }
   }
 }

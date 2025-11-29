@@ -15,12 +15,13 @@
 
       <form @submit.prevent="handleLogin" class="login-form">
         <InputText
-          v-model="username"
-          placeholder="User"
+          v-model="email"
+          type="email"
+          placeholder="Email"
           class="input-field"
-          :class="{ 'p-invalid': errors.username }"
+          :class="{ 'p-invalid': errors.email }"
         />
-        <small v-if="errors.username" class="p-error">{{ errors.username }}</small>
+        <small v-if="errors.email" class="p-error">{{ errors.email }}</small>
 
         <Password
           v-model="password"
@@ -96,7 +97,7 @@ const route = useRoute()
 const toast = useToast()
 const authService = new AuthApiService()
 
-const username = ref('')
+const email = ref('')
 const password = ref('')
 const rememberMe = ref(false)
 const loading = ref(false)
@@ -124,8 +125,10 @@ onMounted(() => {
 const validateForm = () => {
   errors.value = {}
 
-  if (!username.value.trim()) {
-    errors.value.username = 'Username is required'
+  if (!email.value.trim()) {
+    errors.value.email = 'Email is required'
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+    errors.value.email = 'Please enter a valid email'
   }
 
   if (!password.value) {
@@ -145,32 +148,24 @@ const handleLogin = async () => {
   try {
     loading.value = true
 
-    // For now, use mock authentication
-    // TODO: Replace with real API when backend is ready
-    if (username.value === 'admin' && password.value === 'admin') {
-      localStorage.setItem('isAuthenticated', 'true')
-      localStorage.setItem('userId', '1')
-      localStorage.setItem('userEmail', 'juan@ejemplo.com')
-      localStorage.setItem('userRole', userRole.value)
+    // Call real API
+    await authService.login(email.value, password.value)
 
-      if (rememberMe.value) {
-        localStorage.setItem('rememberMe', 'true')
-      }
-
-      toast.add({
-        severity: 'success',
-        summary: 'Login Successful',
-        detail: `Welcome back!`,
-        life: 3000,
-      })
-
-      router.push({ name: 'home' })
-    } else {
-      loginError.value = 'Invalid username or password'
+    if (rememberMe.value) {
+      localStorage.setItem('rememberMe', 'true')
     }
+
+    toast.add({
+      severity: 'success',
+      summary: 'Login Successful',
+      detail: 'Welcome back!',
+      life: 3000,
+    })
+
+    router.push({ name: 'home' })
   } catch (error) {
     console.error('Login error:', error)
-    loginError.value = 'An error occurred during login. Please try again.'
+    loginError.value = error.message || 'Invalid email or password'
   } finally {
     loading.value = false
   }

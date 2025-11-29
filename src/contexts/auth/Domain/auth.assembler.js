@@ -33,13 +33,23 @@ export class AuthAssembler {
    * @returns {Object} - Signup resource
    */
   static toSignupResource(formData) {
-    return {
+    const resource = {
       username: formData.username,
       email: formData.email,
       password: formData.password,
-      name: formData.name,
-      phone: formData.phone || '',
-      type: formData.type || 'individual',
+      name: formData.fullName || formData.name,
+      role: formData.role,
     }
+
+    // Only include optional fields if they have values
+    if (formData.phone) {
+      resource.phone = formData.phone
+    }
+
+    if (formData.type) {
+      resource.type = formData.type
+    }
+
+    return resource
   }
 }
