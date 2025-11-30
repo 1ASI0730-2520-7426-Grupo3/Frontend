@@ -123,6 +123,7 @@ import { useToast } from 'primevue/usetoast'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
+import { ProviderApiService } from '@/contexts/provider/infrastructure/provider-api.service'
 
 defineOptions({
   name: 'ProviderHomePage',
@@ -130,83 +131,114 @@ defineOptions({
 
 const router = useRouter()
 const toast = useToast()
+const providerService = new ProviderApiService()
 
-const gymEquipment = ref([
-  {
-    id: 1,
-    name: 'Treadmill Pro X',
-    image: '/treadmill-pro-x.png',
-  },
-  {
-    id: 2,
-    name: 'Stationary Bike GX',
-    image: '/stationary-bike-gx.png',
-  },
-])
+const gymEquipment = ref([])
+const maintenanceTasks = ref([])
+const maintenanceRequests = ref([])
+const billingPayments = ref([])
+const loading = ref(true)
 
-const maintenanceTasks = ref([
-  {
-    id: 1,
-    equipmentName: 'Treadmill Pro X',
-    status: 'Pending',
-  },
-  {
-    id: 2,
-    equipmentName: 'Stationary Bike GX',
-    status: 'Done',
-  },
-])
+const loadProviderData = async () => {
+  try {
+    loading.value = true
 
-const maintenanceRequests = ref([
-  {
-    id: 1,
-    equipmentName: 'Treadmill Pro X',
-    equipmentImage: '/treadmill-pro-x.png',
-    clientName: 'Nahuel Barrera',
-    duration: '1 year',
-  },
-  {
-    id: 2,
-    equipmentName: 'Stationary Bike GX',
-    equipmentImage: '/stationary-bike-gx.png',
-    clientName: 'Diego Romero',
-    duration: '1 year',
-  },
-])
+    // Load all provider data in parallel
+    const [equipment, rentalRequests, maintenanceReqs, invoices] = await Promise.all([
+      providerService.getProviderEquipment(),
+      providerService.getPendingRentalRequests(),
+      providerService.getAllMaintenanceRequests(),
+      providerService.getAllInvoices(),
+    ])
 
-const billingPayments = ref([
-  {
-    id: 1,
-    companyName: 'FRITMO CORP',
-    amount: 2351.23,
-    status: 'Received',
-  },
-  {
-    id: 2,
-    companyName: 'COOLPROV S.A.C.',
-    amount: 458.5,
-    status: 'Pending',
-  },
-])
+    // Map equipment data
+    gymEquipment.value = equipment.map((eq) => ({
+      id: eq.id,
+      name: eq.name,
+      image: eq.image || '/placeholder-equipment.png',
+    }))
 
-const handleAcceptRequest = (requestId) => {
-  toast.add({
-    severity: 'success',
-    summary: 'Request Accepted',
-    detail: 'Maintenance request has been accepted',
-    life: 3000,
-  })
-  console.log('Accept request:', requestId)
+    // Map maintenance tasks (from maintenance requests)
+    maintenanceTasks.value = maintenanceReqs.map((req) => ({
+      id: req.id,
+      equipmentName: req.equipmentName || `Equipment #${req.equipmentId}`,
+      status: req.status === 'pending' ? 'Pending' : req.status === 'completed' ? 'Done' : 'In Progress',
+    }))
+
+    // Map rental requests for display
+    maintenanceRequests.value = rentalRequests.map((req) => ({
+      id: req.id,
+      equipmentName: req.equipmentName || `Equipment #${req.equipmentId}`,
+      equipmentImage: req.equipmentImage || '/placeholder-equipment.png',
+      clientName: req.clientEmail || `Client #${req.clientId}`,
+      duration: '1 year',
+    }))
+
+    // Map invoices/billing data - Filter by provider ID
+    const providerId = parseInt(localStorage.getItem('userId'))
+    const providerInvoices = invoices.filter((invoice) => invoice.providerId === providerId)
+
+    billingPayments.value = providerInvoices.map((invoice) => ({
+      id: invoice.id,
+      companyName: invoice.companyName,
+      amount: invoice.amount,
+      status: invoice.status === 'paid' ? 'Received' : 'Pending',
+    }))
+  } catch (error) {
+    console.error('Error loading provider data:', error)
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to load provider data',
+      life: 3000,
+    })
+  } finally {
+    loading.value = false
+  }
 }
 
-const handleDenyRequest = (requestId) => {
-  toast.add({
-    severity: 'info',
-    summary: 'Request Denied',
-    detail: 'Maintenance request has been denied',
-    life: 3000,
-  })
-  console.log('Deny request:', requestId)
+const handleAcceptRequest = async (requestId) => {
+  try {
+    await providerService.approveRentalRequest(requestId)
+    toast.add({
+      severity: 'success',
+      summary: 'Request Accepted',
+      detail: 'Rental request has been accepted and invoice created',
+      life: 3000,
+    })
+    // Reload data to reflect changes
+    await loadProviderData()
+  } catch (error) {
+    console.error('Error accepting request:', error)
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to accept rental request',
+      life: 3000,
+    })
+  }
+}
+
+const handleDenyRequest = async (requestId) => {
+  try {
+    await providerService.rejectRentalRequest(requestId)
+    toast.add({
+      severity: 'info',
+      summary: 'Request Denied',
+      detail: 'Rental request has been rejected',
+      life: 3000,
+    })
+    // Reload data to reflect changes
+    await loadProviderData()
+  } catch (error) {
+    console.error('Error denying request:', error)
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to reject rental request',
+      life: 3000,
+    })
+  }
 }
 
 const goToDetails = () => {
@@ -214,7 +246,7 @@ const goToDetails = () => {
 }
 
 onMounted(() => {
-  // TODO: Fetch data from API
+  loadProviderData()
 })
 </script>
 

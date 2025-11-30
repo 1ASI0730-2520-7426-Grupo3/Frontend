@@ -74,12 +74,24 @@ const routes = [
       import('@/contexts/account-statement/presentation/pages/account-statement.page.vue'),
     meta: { requiresAuth: true, role: 'client' },
   },
+  {
+    path: '/notifications',
+    name: 'notifications',
+    component: () => import('@/contexts/rent/presentation/pages/notifications.page.vue'),
+    meta: { requiresAuth: true, role: 'client' },
+  },
 
   // ========== PROVIDER ROUTES ==========
   {
     path: '/provider/home',
     name: 'provider-home',
     component: () => import('@/contexts/provider/presentation/pages/provider-home.page.vue'),
+    meta: { requiresAuth: true, role: 'provider' },
+  },
+  {
+    path: '/provider/requests',
+    name: 'provider-requests',
+    component: () => import('@/contexts/provider/presentation/pages/provider-requests.page.vue'),
     meta: { requiresAuth: true, role: 'provider' },
   },
   {

@@ -157,7 +157,13 @@ const handleLogin = async () => {
       life: 3000,
     })
 
-    router.push({ name: 'home' })
+    // Redirect based on user role
+    const role = localStorage.getItem('userRole')
+    if (role === 'provider') {
+      router.push({ name: 'provider-home' })
+    } else {
+      router.push({ name: 'home' })
+    }
   } catch (error) {
     console.error('Login error:', error)
     loginError.value = error.message || 'Invalid email or password'

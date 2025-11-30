@@ -59,14 +59,37 @@ const fetchRentMachines = async () => {
   }
 }
 
-const handleRentRequest = (machine) => {
-  console.log(`Solicitando renta para: ${machine.name}`)
-  toast.add({
-    severity: 'info',
-    summary: 'Request Sent',
-    detail: `Interest registered for ${machine.name}`,
-    life: 3000,
-  })
+const handleRentRequest = async (machine) => {
+  try {
+    const clientId = localStorage.getItem('userId')
+    if (!clientId) {
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'You must be logged in to request rentals',
+        life: 3000,
+      })
+      return
+    }
+
+    console.log(`Requesting rental for: ${machine.name}`)
+    await rentService.createRentalRequest(machine.id, parseInt(clientId))
+
+    toast.add({
+      severity: 'success',
+      summary: 'Request Sent',
+      detail: `Rental request for ${machine.name} has been submitted successfully!`,
+      life: 3000,
+    })
+  } catch (error) {
+    console.error('Error creating rental request:', error)
+    toast.add({
+      severity: 'error',
+      summary: 'Request Failed',
+      detail: 'Could not submit rental request. Please try again.',
+      life: 3000,
+    })
+  }
 }
 
 onMounted(() => {

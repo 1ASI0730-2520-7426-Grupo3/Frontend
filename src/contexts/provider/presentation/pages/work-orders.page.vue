@@ -58,12 +58,13 @@
 </template>
 
 <script setup>
-import { ref, defineOptions } from 'vue'
+import { ref, onMounted, defineOptions } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
+import { ProviderApiService } from '@/contexts/provider/infrastructure/provider-api.service'
 
 defineOptions({
   name: 'WorkOrdersPage',
@@ -71,27 +72,44 @@ defineOptions({
 
 const router = useRouter()
 const toast = useToast()
+const providerService = new ProviderApiService()
 
-const workOrders = ref([
-  {
-    id: 1,
-    date: '15/04/25',
-    technician: 'Óscar Pinillos',
-    equipment: 'Treadmill Pro X – Running Machine',
-    description: 'Belt alignment and lubrication check',
-    location: 'Cardio Zone',
-    status: 'Done',
-  },
-  {
-    id: 2,
-    date: '10/04/25',
-    technician: 'Juan Rodríguez',
-    equipment: 'Elliptical Trainer – EFX-4500',
-    description: 'Resistance system inspection and software calibration',
-    location: 'South Fitness Room',
-    status: 'Done',
-  },
-])
+const workOrders = ref([])
+const loading = ref(true)
+
+const loadWorkOrders = async () => {
+  try {
+    loading.value = true
+    const providerId = parseInt(localStorage.getItem('userId'))
+    const allRentalRequests = await providerService.getAllRentalRequests()
+
+    // Filter approved rental requests for this provider
+    const approvedRentals = allRentalRequests.filter(
+      (req) => req.status === 'approved' && req.providerId === providerId
+    )
+
+    // Map approved rental requests to work orders
+    workOrders.value = approvedRentals.map((req) => ({
+      id: req.id,
+      date: new Date(req.updatedDate || req.createdDate).toLocaleDateString('en-GB'),
+      technician: req.clientEmail || `Client #${req.clientId}`,
+      equipment: req.equipmentName || `Equipment #${req.equipmentId}`,
+      description: `Rental service - ${req.notes || 'Equipment rental agreement'}`,
+      location: 'Client location',
+      status: 'Active',
+    }))
+  } catch (error) {
+    console.error('Error loading work orders:', error)
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to load work orders',
+      life: 3000,
+    })
+  } finally {
+    loading.value = false
+  }
+}
 
 const getStatusSeverity = (status) => {
   switch (status) {
@@ -107,19 +125,17 @@ const getStatusSeverity = (status) => {
 }
 
 const handleNewWorkOrder = () => {
-  toast.add({
-    severity: 'info',
-    summary: 'New Work Order',
-    detail: 'Opening work order form...',
-    life: 2000,
-  })
-  // TODO: Navigate to new work order form or open modal
-  console.log('Create new work order')
+  // Redirect to requests page where provider can accept rental requests
+  router.push({ name: 'provider-requests' })
 }
 
 const goBack = () => {
   router.push({ name: 'my-teams' })
 }
+
+onMounted(() => {
+  loadWorkOrders()
+})
 </script>
 
 <style scoped>

@@ -60,6 +60,14 @@
           >
             <i class="pi pi-user"></i>
           </button>
+          <button
+            class="icon-button logout-button"
+            aria-label="Logout"
+            @click="handleLogout"
+            title="Logout"
+          >
+            <i class="pi pi-sign-out"></i>
+          </button>
           <div class="language-selector">
             <span
               class="language-option"
@@ -140,7 +148,7 @@ const navigationLinks = computed(() => {
   if (isProvider) {
     links.push(
       { name: 'my-teams', route: 'my-teams', label: 'My Teams', roles: ['provider'] },
-      { name: 'maintenance', route: 'maintenance', label: 'Requests', roles: ['provider'] },
+      { name: 'provider-requests', route: 'provider-requests', label: 'Requests', roles: ['provider'] },
     )
   }
 
@@ -170,11 +178,23 @@ const handleNavigation = (routeName) => {
 }
 
 const handleNotifications = () => {
-  console.log('Show notifications')
+  router.push({ name: 'notifications' })
 }
 
 const handleProfile = () => {
   router.push({ name: 'profile' })
+}
+
+const handleLogout = () => {
+  // Clear all authentication data
+  localStorage.removeItem('isAuthenticated')
+  localStorage.removeItem('userId')
+  localStorage.removeItem('userEmail')
+  localStorage.removeItem('accessToken')
+  localStorage.removeItem('userRole')
+
+  // Redirect to login page
+  router.push({ name: 'login' })
 }
 
 const setLanguage = (lang) => {
@@ -312,6 +332,10 @@ const setLanguage = (lang) => {
 
 .icon-button:hover i {
   color: #2563eb;
+}
+
+.logout-button:hover i {
+  color: #ef4444;
 }
 
 .language-selector {

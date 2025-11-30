@@ -9,9 +9,11 @@ export class AccountStatementApiService {
   }
 
   async markAsPaid(id) {
-    const payload = {
-      paidAt: new Date().toISOString().split('T')[0],
-    }
+    // Send current datetime in ISO format (yyyy-MM-ddTHH:mm:ss)
+    const now = new Date()
+    const paidAt = now.toISOString().split('.')[0] // Remove milliseconds
+
+    const payload = { paidAt }
     const response = await http.put(`/billing/invoices/${id}/pay`, payload)
 
     return InvoiceAssembler.toEntity(response.data)

@@ -54,33 +54,20 @@
 </template>
 
 <script setup>
-import { ref, defineOptions } from 'vue'
+import { ref, onMounted, defineOptions } from 'vue'
 import { useRouter } from 'vue-router'
+import { useToast } from 'primevue/usetoast'
+import { ProviderApiService } from '@/contexts/provider/infrastructure/provider-api.service'
 
 defineOptions({
   name: 'MyClientsTeamsPage',
 })
 
 const router = useRouter()
+const toast = useToast()
+const providerService = new ProviderApiService()
 
-const clients = ref([
-  {
-    id: 1,
-    name: 'FitLife Gym S.A.C.',
-    date: '15/04/25',
-  },
-  {
-    id: 2,
-    name: 'PowerHouse Training SRL',
-    date: '10/04/25',
-  },
-  {
-    id: 3,
-    name: 'UrbanFit Studio S.A.C.',
-    date: '09/04/25',
-  },
-])
-
+const clients = ref([])
 const technicians = ref([
   {
     id: 1,
@@ -94,22 +81,51 @@ const technicians = ref([
     id: 3,
     name: 'Sanchez Quispe Harold',
   },
-])
+]) // Technicians are future feature, keep as mock data
 
-const workOrders = ref([
-  {
-    id: 1,
-    description: 'Order #00087 - Preventive Maintenance - 15/04/2025',
-  },
-  {
-    id: 2,
-    description: 'Order #00086 - Compressor Repair - 10/04/2025',
-  },
-  {
-    id: 3,
-    description: 'Order #00085 - General Inspection - 09/04/2025',
-  },
-])
+const workOrders = ref([])
+const loading = ref(true)
+
+const loadData = async () => {
+  try {
+    loading.value = true
+
+    const providerId = parseInt(localStorage.getItem('userId'))
+
+    // Load clients and all rental requests in parallel
+    const [clientsData, allRentalRequests] = await Promise.all([
+      providerService.getMyClients(),
+      providerService.getAllRentalRequests(),
+    ])
+
+    // Set clients
+    clients.value = clientsData.map((client) => ({
+      id: client.id,
+      name: client.email,
+      date: client.date,
+    }))
+
+    // Filter approved rental requests for this provider and map to work orders
+    const approvedRentals = allRentalRequests.filter(
+      (req) => req.status === 'approved' && req.providerId === providerId
+    )
+
+    workOrders.value = approvedRentals.slice(0, 3).map((req) => ({
+      id: req.id,
+      description: `Rental #${String(req.id).padStart(5, '0')} - ${req.equipmentName || `Equipment #${req.equipmentId}`} - ${new Date(req.updatedDate).toLocaleDateString('en-GB')}`,
+    }))
+  } catch (error) {
+    console.error('Error loading data:', error)
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to load data',
+      life: 3000,
+    })
+  } finally {
+    loading.value = false
+  }
+}
 
 const viewClientHistory = () => {
   console.log('View client history')
@@ -128,6 +144,10 @@ const viewWorkOrders = () => {
 const goBack = () => {
   router.push({ name: 'provider-home' })
 }
+
+onMounted(() => {
+  loadData()
+})
 </script>
 
 <style scoped>
