@@ -1,6 +1,6 @@
 <template>
   <div class="my-machines-container">
-    <h1 class="page-title">My Machines</h1>
+    <h1 class="page-title">{{ $t('equipment.myMachines.title') }}</h1>
 
     <div v-if="loading" class="loading-overlay">
       <ProgressSpinner />
@@ -8,9 +8,9 @@
 
     <div v-if="!loading && machines.length === 0" class="empty-state">
       <i class="pi pi-inbox empty-icon"></i>
-      <h3>No Machines Yet</h3>
-      <p>Add your first equipment to get started</p>
-      <Button label="Add Equipment" icon="pi pi-plus" @click="goToAddEquipment" />
+      <h3>{{ $t('equipment.myMachines.empty.title') }}</h3>
+      <p>{{ $t('equipment.myMachines.empty.description') }}</p>
+      <Button :label="$t('equipment.myMachines.empty.button')" icon="pi pi-plus" @click="goToAddEquipment" />
     </div>
 
     <div v-else class="machines-grid">
@@ -21,7 +21,7 @@
               class="power-button"
               :class="{ active: machine.isPoweredOn }"
               @click="togglePower(machine.id)"
-              :title="machine.isPoweredOn ? 'Power Off' : 'Power On'"
+              :title="machine.isPoweredOn ? $t('equipment.myMachines.card.powerOff') : $t('equipment.myMachines.card.powerOn')"
             >
               <i class="pi pi-power-off"></i>
             </button>
@@ -40,17 +40,17 @@
             <h3 class="machine-name">{{ machine.name }}</h3>
 
             <div class="usage-info">
-              <span class="usage-label">Usage Today:</span>
+              <span class="usage-label">{{ $t('equipment.myMachines.card.usageToday') }}</span>
               <span class="usage-value">{{ machine.usage?.todayMinutes || 0 }} min</span>
               <Tag
-                :value="machine.isPoweredOn ? 'Active' : 'Inactive'"
+                :value="machine.isPoweredOn ? $t('equipment.myMachines.card.active') : $t('equipment.myMachines.card.inactive')"
                 :severity="machine.isPoweredOn ? 'success' : 'secondary'"
                 class="status-tag"
               />
             </div>
 
             <div class="calories-info" v-if="machine.usage?.caloriesToday">
-              <span class="calories-label">Calories Burned:</span>
+              <span class="calories-label">{{ $t('equipment.myMachines.card.caloriesBurned') }}</span>
               <span class="calories-value">{{ machine.usage.caloriesToday }} kcal</span>
             </div>
 
@@ -60,14 +60,14 @@
                 {{ machine.location.name }} - {{ machine.location.address }}
               </span>
               <span v-else>
-                {{ machine.location || 'Location not set' }}
+                {{ machine.location || $t('equipment.myMachines.card.locationNotSet') }}
               </span>
             </div>
 
             <div class="card-actions">
               <Button
                 icon="pi pi-cog"
-                label="Control"
+                :label="$t('equipment.myMachines.card.control')"
                 outlined
                 size="small"
                 @click="goToControls(machine.id)"
@@ -81,7 +81,7 @@
 
     <div class="add-equipment-section" v-if="machines.length > 0">
       <Button
-        label="Add Equipment"
+        :label="$t('equipment.addEquipment.button')"
         icon="pi pi-plus"
         @click="goToAddEquipment"
         class="add-equipment-button"
@@ -94,6 +94,7 @@
 import { ref, onMounted, defineOptions } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
+import { useI18n } from 'vue-i18n'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
@@ -106,6 +107,7 @@ defineOptions({
 
 const router = useRouter()
 const toast = useToast()
+const { t } = useI18n()
 const equipmentService = new EquipmentApiService()
 
 const machines = ref([])
@@ -123,8 +125,8 @@ const loadMachines = async () => {
     console.error('Error loading machines:', error)
     toast.add({
       severity: 'error',
-      summary: 'Error',
-      detail: 'Failed to load machines. Check your connection.',
+      summary: t('equipment.myMachines.toast.error'),
+      detail: t('equipment.myMachines.toast.failedToLoad'),
     })
   } finally {
     loading.value = false
@@ -158,8 +160,8 @@ const togglePower = async (machineId) => {
 
     toast.add({
       severity: 'success',
-      summary: newPowerState ? 'Powered On' : 'Powered Off',
-      detail: `${machine.name} is now ${newPowerState ? 'active' : 'inactive'}`,
+      summary: newPowerState ? t('equipment.myMachines.toast.poweredOn') : t('equipment.myMachines.toast.poweredOff'),
+      detail: `${machine.name} ${newPowerState ? t('equipment.myMachines.toast.nowActive') : t('equipment.myMachines.toast.nowInactive')}`,
       life: 2000,
     })
   } catch (error) {
@@ -169,8 +171,8 @@ const togglePower = async (machineId) => {
 
     toast.add({
       severity: 'error',
-      summary: 'Update Failed',
-      detail: 'Could not update machine status.',
+      summary: t('equipment.myMachines.toast.updateFailed'),
+      detail: t('equipment.myMachines.toast.couldNotUpdate'),
       life: 3000,
     })
   }

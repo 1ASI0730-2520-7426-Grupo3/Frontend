@@ -1,11 +1,11 @@
 <template>
   <section class="panel">
-    <h2 class="panel__title">Rent Machines</h2>
+    <h2 class="panel__title">{{ t('rentals.title') }}</h2>
 
-    <div v-if="isLoading" class="loading-message">Cargando catálogo de renta...</div>
+    <div v-if="isLoading" class="loading-message">{{ t('rentals.loading') }}</div>
 
     <div v-else-if="error" class="error-box">
-      <p class="error-title">Error</p>
+      <p class="error-title">{{ t('common.error') }}</p>
       <p class="error-detail">{{ error }}</p>
     </div>
 
@@ -19,11 +19,13 @@
           :isPrice="true"
         />
 
-        <button @click="handleRentRequest(machine)" class="request-button">Request Rent</button>
+        <button @click="handleRentRequest(machine)" class="request-button">
+          {{ t('rentals.requestButton') }}
+        </button>
       </div>
 
       <p v-if="rentMachines.length === 0" class="no-data-message">
-        No hay máquinas disponibles para renta.
+        {{ t('rentals.noMachines') }}
       </p>
     </div>
   </section>
@@ -33,6 +35,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
+import { useI18n } from 'vue-i18n'
 
 import MachineCard from '@/shared-kernel/presentation/ui/components/machine-card.component.vue'
 
@@ -40,6 +43,7 @@ import { RentApiService } from '../../infrastructure/rent.api.service.js'
 
 const router = useRouter()
 const toast = useToast()
+const { t } = useI18n()
 const rentService = new RentApiService()
 
 const rentMachines = ref([])
@@ -53,7 +57,7 @@ const fetchRentMachines = async () => {
     rentMachines.value = await rentService.getRentalCatalog()
   } catch (err) {
     console.error('Error fetching rental catalog:', err)
-    error.value = 'No se pudo cargar el catálogo.'
+    error.value = t('rentals.errorLoadingCatalog')
   } finally {
     isLoading.value = false
   }
@@ -65,8 +69,8 @@ const handleRentRequest = async (machine) => {
     if (!clientId) {
       toast.add({
         severity: 'error',
-        summary: 'Error',
-        detail: 'You must be logged in to request rentals',
+        summary: t('common.error'),
+        detail: t('rentals.toast.mustBeLoggedIn'),
         life: 3000,
       })
       return
@@ -77,16 +81,20 @@ const handleRentRequest = async (machine) => {
 
     toast.add({
       severity: 'success',
-      summary: 'Request Sent',
-      detail: `Rental request for ${machine.name} has been submitted successfully!`,
+      summary: t('rentals.toast.requestSent'),
+      detail: t('rentals.toast.requestSuccess', { name: machine.name }),
       life: 3000,
     })
-  } catch (error) {
-    console.error('Error creating rental request:', error)
+  } catch (err) {
+    console.error('Error creating rental request:', err)
+
+    // If backend returns a localized error message, use it
+    const errorMessage = err.response?.data?.message || t('rentals.toast.couldNotSubmit')
+
     toast.add({
       severity: 'error',
-      summary: 'Request Failed',
-      detail: 'Could not submit rental request. Please try again.',
+      summary: t('rentals.toast.requestFailed'),
+      detail: errorMessage,
       life: 3000,
     })
   }

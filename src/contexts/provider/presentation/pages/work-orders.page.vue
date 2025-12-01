@@ -1,9 +1,9 @@
 <template>
   <div class="work-orders-page">
     <div class="page-header">
-      <h1 class="page-title">Work orders</h1>
+      <h1 class="page-title">{{ t('provider.workOrders.title') }}</h1>
       <Button
-        label="New Work Order"
+        :label="t('provider.workOrders.newOrder')"
         icon="pi pi-plus"
         @click="handleNewWorkOrder"
         class="new-order-button"
@@ -15,17 +15,17 @@
         <template #content>
           <div class="order-content">
             <div class="order-field">
-              <span class="field-label">Date:</span>
+              <span class="field-label">{{ t('provider.workOrders.fields.date') }}</span>
               <span class="field-value">{{ order.date }}</span>
             </div>
 
             <div class="order-field">
-              <span class="field-label">Technician:</span>
+              <span class="field-label">{{ t('provider.workOrders.fields.technician') }}</span>
               <span class="field-value">{{ order.technician }}</span>
             </div>
 
             <div class="order-field">
-              <span class="field-label">Equipment:</span>
+              <span class="field-label">{{ t('provider.workOrders.fields.equipment') }}</span>
               <div class="equipment-status">
                 <span class="field-value">{{ order.equipment }}</span>
                 <Tag
@@ -37,12 +37,12 @@
             </div>
 
             <div class="order-field">
-              <span class="field-label">Description:</span>
+              <span class="field-label">{{ t('provider.workOrders.fields.description') }}</span>
               <span class="field-value">{{ order.description }}</span>
             </div>
 
             <div class="order-field">
-              <span class="field-label">Location:</span>
+              <span class="field-label">{{ t('provider.workOrders.fields.location') }}</span>
               <span class="field-value">{{ order.location }}</span>
             </div>
           </div>
@@ -51,7 +51,7 @@
     </div>
 
     <!-- Back Navigation Arrow -->
-    <button class="nav-arrow left" @click="goBack" title="Go back">
+    <button class="nav-arrow left" @click="goBack" :title="t('provider.workOrders.goBack')">
       <i class="pi pi-arrow-left"></i>
     </button>
   </div>
@@ -61,6 +61,7 @@
 import { ref, onMounted, defineOptions } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
+import { useI18n } from 'vue-i18n'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
@@ -72,10 +73,24 @@ defineOptions({
 
 const router = useRouter()
 const toast = useToast()
+const { t } = useI18n()
 const providerService = new ProviderApiService()
 
 const workOrders = ref([])
 const loading = ref(true)
+
+// List of available technicians
+const technicians = [
+  'Pinillos Uribe Óscar',
+  'Rodríguez Monteza Juan',
+  'Sanchez Quispe Harold',
+]
+
+// Helper function to randomly select a technician
+const getRandomTechnician = () => {
+  const randomIndex = Math.floor(Math.random() * technicians.length)
+  return technicians[randomIndex]
+}
 
 const loadWorkOrders = async () => {
   try {
@@ -92,18 +107,19 @@ const loadWorkOrders = async () => {
     workOrders.value = approvedRentals.map((req) => ({
       id: req.id,
       date: new Date(req.updatedDate || req.createdDate).toLocaleDateString('en-GB'),
-      technician: req.clientEmail || `Client #${req.clientId}`,
+      technician: getRandomTechnician(),
       equipment: req.equipmentName || `Equipment #${req.equipmentId}`,
       description: `Rental service - ${req.notes || 'Equipment rental agreement'}`,
-      location: 'Client location',
-      status: 'Active',
+      location: t('provider.workOrders.values.clientLocation'),
+      status: t('provider.workOrders.values.active'),
     }))
   } catch (error) {
     console.error('Error loading work orders:', error)
+    const errorMessage = error.response?.data?.message || t('provider.workOrders.toast.failedToLoad')
     toast.add({
       severity: 'error',
-      summary: 'Error',
-      detail: 'Failed to load work orders',
+      summary: t('common.error'),
+      detail: errorMessage,
       life: 3000,
     })
   } finally {

@@ -3,12 +3,12 @@
     <div class="register-content">
       <!-- Left: Form Section -->
       <div class="form-section">
-        <h1 class="register-heading">Sign Up</h1>
+        <h1 class="register-heading">{{ $t('auth.register.title') }}</h1>
 
         <form @submit.prevent="handleRegister" class="register-form">
           <InputText
             v-model="formData.fullName"
-            placeholder="Full Name"
+            :placeholder="$t('auth.register.fullName')"
             class="input-field"
             :class="{ 'p-invalid': errors.fullName }"
           />
@@ -16,7 +16,7 @@
 
           <InputText
             v-model="formData.username"
-            placeholder="User"
+            :placeholder="$t('auth.register.username')"
             class="input-field"
             :class="{ 'p-invalid': errors.username }"
           />
@@ -25,7 +25,7 @@
           <InputText
             v-model="formData.email"
             type="email"
-            placeholder="Email"
+            :placeholder="$t('auth.register.email')"
             class="input-field"
             :class="{ 'p-invalid': errors.email }"
           />
@@ -33,7 +33,7 @@
 
           <Password
             v-model="formData.password"
-            placeholder="Password"
+            :placeholder="$t('auth.register.password')"
             :feedback="true"
             toggleMask
             class="input-field"
@@ -43,7 +43,7 @@
 
           <Password
             v-model="formData.confirmPassword"
-            placeholder="Confirm your password"
+            :placeholder="$t('auth.register.confirmPassword')"
             :feedback="false"
             toggleMask
             class="input-field"
@@ -57,7 +57,7 @@
 
           <Button
             type="submit"
-            label="Create account"
+            :label="$t('auth.register.createAccount')"
             class="create-account-btn"
             :loading="loading"
           />
@@ -79,7 +79,7 @@
         rounded
         text
         class="back-button"
-        aria-label="Back to login"
+        :aria-label="$t('auth.register.backToLogin')"
         @click="goToLogin"
       />
     </div>
@@ -90,6 +90,7 @@
 import { ref, computed, defineOptions, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
@@ -103,6 +104,7 @@ defineOptions({
 const router = useRouter()
 const route = useRoute()
 const toast = useToast()
+const { t } = useI18n()
 const authService = new AuthApiService()
 
 const formData = ref({
@@ -119,12 +121,14 @@ const errors = ref({})
 const userRole = ref('client')
 
 const roleTitle = computed(() => {
-  return userRole.value === 'provider' ? 'Providers' : 'Clients'
+  return userRole.value === 'provider' ? t('auth.register.roleProviders') : t('auth.register.roleClients')
 })
 
 onMounted(() => {
   const storedRole = localStorage.getItem('userRole')
   const routeRole = route.params.role
+
+  console.log('Register Page - Route role:', routeRole, 'Stored role:', storedRole)
 
   if (routeRole) {
     userRole.value = routeRole
@@ -132,37 +136,39 @@ onMounted(() => {
   } else if (storedRole) {
     userRole.value = storedRole
   }
+
+  console.log('Register Page - Final userRole:', userRole.value)
 })
 
 const validateForm = () => {
   errors.value = {}
 
   if (!formData.value.fullName.trim()) {
-    errors.value.fullName = 'Full name is required'
+    errors.value.fullName = t('auth.register.validation.fullNameRequired')
   }
 
   if (!formData.value.username.trim()) {
-    errors.value.username = 'Username is required'
+    errors.value.username = t('auth.register.validation.usernameRequired')
   } else if (formData.value.username.length < 3) {
-    errors.value.username = 'Username must be at least 3 characters'
+    errors.value.username = t('auth.register.validation.usernameMinLength')
   }
 
   if (!formData.value.email.trim()) {
-    errors.value.email = 'Email is required'
+    errors.value.email = t('auth.register.validation.emailRequired')
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.value.email)) {
-    errors.value.email = 'Please enter a valid email'
+    errors.value.email = t('auth.register.validation.emailInvalid')
   }
 
   if (!formData.value.password) {
-    errors.value.password = 'Password is required'
+    errors.value.password = t('auth.register.validation.passwordRequired')
   } else if (formData.value.password.length < 6) {
-    errors.value.password = 'Password must be at least 6 characters'
+    errors.value.password = t('auth.register.validation.passwordMinLength')
   }
 
   if (!formData.value.confirmPassword) {
-    errors.value.confirmPassword = 'Please confirm your password'
+    errors.value.confirmPassword = t('auth.register.validation.confirmPasswordRequired')
   } else if (formData.value.password !== formData.value.confirmPassword) {
-    errors.value.confirmPassword = 'Passwords do not match'
+    errors.value.confirmPassword = t('auth.register.validation.passwordsMustMatch')
   }
 
   return Object.keys(errors.value).length === 0
@@ -178,26 +184,32 @@ const handleRegister = async () => {
   try {
     loading.value = true
 
+    const roleForBackend = userRole.value === 'provider' ? 'Provider' : 'Client'
+    console.log('Registering user with role:', roleForBackend, 'userRole.value:', userRole.value)
+
     await authService.signup({
       fullName: formData.value.fullName,
       username: formData.value.username,
       email: formData.value.email,
       password: formData.value.password,
-      role: userRole.value === 'provider' ? 'Provider' : 'Client',
+      role: roleForBackend,
     })
 
     toast.add({
       severity: 'success',
-      summary: 'Registration Successful',
-      detail: 'Your account has been created. You can now log in.',
+      summary: t('auth.register.toast.success'),
+      detail: t('auth.register.toast.registrationSuccess'),
       life: 3000,
     })
 
+    console.log('Registration successful, redirecting to login with role:', userRole.value)
+
+    // Redirect to login with the same role
     router.push({ name: 'login', params: { role: userRole.value } })
   } catch (error) {
     console.error('Registration error:', error)
     registerError.value =
-      error.message || 'An error occurred during registration. Please try again.'
+      error.message || t('auth.register.toast.error')
   } finally {
     loading.value = false
   }

@@ -20,7 +20,8 @@
       </template>
 
       <template #center>
-        <nav class="navigation-section" role="navigation" aria-label="Main navigation">
+        <!-- Only show navigation when authenticated -->
+        <nav v-if="isAuthenticated" class="navigation-section" role="navigation" aria-label="Main navigation">
           <button
             class="menu-toggle"
             @click="toggleMenu"
@@ -46,28 +47,33 @@
 
       <template #end>
         <div class="actions-section">
-          <button
-            class="icon-button"
-            :aria-label="$t('toolbar.actions.notifications')"
-            @click="handleNotifications"
-          >
-            <i class="pi pi-bell"></i>
-          </button>
-          <button
-            class="icon-button"
-            :aria-label="$t('toolbar.actions.profile')"
-            @click="handleProfile"
-          >
-            <i class="pi pi-user"></i>
-          </button>
-          <button
-            class="icon-button logout-button"
-            aria-label="Logout"
-            @click="handleLogout"
-            title="Logout"
-          >
-            <i class="pi pi-sign-out"></i>
-          </button>
+          <!-- Action buttons only visible when authenticated -->
+          <template v-if="isAuthenticated">
+            <button
+              class="icon-button"
+              :aria-label="$t('toolbar.actions.notifications')"
+              @click="handleNotifications"
+            >
+              <i class="pi pi-bell"></i>
+            </button>
+            <button
+              class="icon-button"
+              :aria-label="$t('toolbar.actions.profile')"
+              @click="handleProfile"
+            >
+              <i class="pi pi-user"></i>
+            </button>
+            <button
+              class="icon-button logout-button"
+              :aria-label="$t('toolbar.actions.logout')"
+              @click="handleLogout"
+              :title="$t('toolbar.actions.logout')"
+            >
+              <i class="pi pi-sign-out"></i>
+            </button>
+          </template>
+
+          <!-- Language selector always visible -->
           <div class="language-selector">
             <span
               class="language-option"
@@ -93,7 +99,8 @@
       </template>
     </pv-toolbar>
 
-    <div v-if="isMenuOpen" class="mobile-menu">
+    <!-- Mobile menu only visible when authenticated -->
+    <div v-if="isAuthenticated && isMenuOpen" class="mobile-menu">
       <a
         v-for="link in navigationLinks"
         :key="link.name"
@@ -122,6 +129,9 @@ const route = useRoute()
 const activeRoute = computed(() => route.name)
 const userRole = ref(localStorage.getItem('userRole') || 'client')
 
+// Check authentication status
+const isAuthenticated = computed(() => localStorage.getItem('isAuthenticated') === 'true')
+
 const navigationLinks = computed(() => {
   const isClient = userRole.value === 'client'
   const isProvider = userRole.value === 'provider'
@@ -132,12 +142,12 @@ const navigationLinks = computed(() => {
 
   if (isClient) {
     links.push(
-      { name: 'my-machines', route: 'my-machines', label: 'My Machines', roles: ['client'] },
-      { name: 'maintenance', route: 'maintenance', label: 'Maintenance', roles: ['client'] },
+      { name: 'my-machines', route: 'my-machines', label: t('toolbar.nav.myMachines'), roles: ['client'] },
+      { name: 'maintenance', route: 'maintenance', label: t('toolbar.nav.maintenance'), roles: ['client'] },
       {
         name: 'account-statement',
         route: 'account-statement',
-        label: 'Billing',
+        label: t('toolbar.nav.billing'),
         roles: ['client'],
       },
     )
@@ -145,11 +155,11 @@ const navigationLinks = computed(() => {
 
   if (isProvider) {
     links.push(
-      { name: 'my-teams', route: 'my-teams', label: 'My Teams', roles: ['provider'] },
+      { name: 'my-teams', route: 'my-teams', label: t('toolbar.nav.myTeams'), roles: ['provider'] },
       {
         name: 'provider-requests',
         route: 'provider-requests',
-        label: 'Requests',
+        label: t('toolbar.nav.requests'),
         roles: ['provider'],
       },
     )

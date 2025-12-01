@@ -21,8 +21,9 @@ const routes = [
     component: RegisterPage,
     meta: { requiresAuth: false },
   },
-  { path: '/rent', name: 'rent', component: RentPage, meta: { requiresAuth: false } },
-  { path: '/contact', name: 'contact', component: ContactPage, meta: { requiresAuth: false } },
+  // Rent and Contact now require authentication
+  { path: '/rent', name: 'rent', component: RentPage, meta: { requiresAuth: true } },
+  { path: '/contact', name: 'contact', component: ContactPage, meta: { requiresAuth: true } },
 
   {
     path: '/home',

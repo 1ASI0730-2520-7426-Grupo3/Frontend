@@ -33,6 +33,10 @@ export class AuthApiService {
       return AuthAssembler.toEntityFromResource(user)
     } catch (error) {
       console.error('Login error:', error)
+      // Pass through backend's localized error message
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message)
+      }
       throw new Error('Invalid credentials')
     }
   }

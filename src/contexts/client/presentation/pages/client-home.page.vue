@@ -3,7 +3,7 @@
     <div class="grid">
       <div class="panel panel--link" role="button" tabindex="0" @click="goTo('my-machines')">
         <div class="panel-header">
-          <h2 class="panel__title">My machines</h2>
+          <h2 class="panel__title">{{ $t('client.home.myMachines.title') }}</h2>
           <span class="badge-count" v-if="!isLoading.myMachines">{{ myMachines.length }}</span>
         </div>
 
@@ -12,7 +12,7 @@
         </template>
 
         <template v-else-if="error.myMachines">
-          <p class="text-red-500 text-sm">Error cargando máquinas</p>
+          <p class="text-red-500 text-sm">{{ $t('client.home.myMachines.errorLoading') }}</p>
         </template>
 
         <div v-else class="cards">
@@ -25,13 +25,13 @@
         </div>
 
         <p v-if="!isLoading.myMachines && myMachines.length === 0" class="muted spacer">
-          No tienes máquinas asignadas.
+          {{ $t('client.home.myMachines.noMachines') }}
         </p>
       </div>
 
       <div class="panel panel--link" role="button" tabindex="0" @click="goTo('rent')">
         <div class="panel-header">
-          <h2 class="panel__title">Rent machines</h2>
+          <h2 class="panel__title">{{ $t('client.home.rentMachines.title') }}</h2>
         </div>
 
         <template v-if="isLoading.rentMachines">
@@ -39,7 +39,7 @@
         </template>
 
         <template v-else-if="error.rentMachines">
-          <p class="text-red-500 text-sm">Catálogo no disponible</p>
+          <p class="text-red-500 text-sm">{{ $t('client.home.rentMachines.catalogUnavailable') }}</p>
         </template>
 
         <div v-else class="cards">
@@ -56,7 +56,7 @@
 
       <div class="panel panel--link" role="button" tabindex="0" @click="goTo('maintenance')">
         <div class="panel-header">
-          <h2 class="panel__title">Maintenance</h2>
+          <h2 class="panel__title">{{ $t('client.home.maintenance.title') }}</h2>
           <span class="badge-count orange" v-if="maintenance.length > 0">{{
             maintenance.length
           }}</span>
@@ -75,12 +75,12 @@
           </li>
         </ul>
 
-        <p v-else class="muted spacer">No hay solicitudes pendientes.</p>
+        <p v-else class="muted spacer">{{ $t('client.home.maintenance.noPending') }}</p>
       </div>
 
       <div class="panel panel--link" role="button" tabindex="0" @click="goTo('account-statement')">
         <div class="panel-header">
-          <h2 class="panel__title">Account statement</h2>
+          <h2 class="panel__title">{{ $t('client.home.accountStatement.title') }}</h2>
           <span class="badge-count green" v-if="account.length > 0">{{ account.length }}</span>
         </div>
 
@@ -101,7 +101,7 @@
           </li>
         </ul>
 
-        <p v-else class="muted spacer">Estás al día en tus pagos.</p>
+        <p v-else class="muted spacer">{{ $t('client.home.accountStatement.upToDate') }}</p>
       </div>
     </div>
   </section>
@@ -135,8 +135,11 @@ const error = ref({ myMachines: null, rentMachines: null, maintenance: null, acc
 
 const USER_ID = localStorage.getItem('userId') || 1
 
-const formatCurrency = (amount, currency = 'PEN') => {
-  return new Intl.NumberFormat('es-PE', { style: 'currency', currency }).format(amount)
+const formatCurrency = (amount) => {
+  // Always use USD
+  const currency = 'USD'
+  const locale = 'en-US'
+  return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(amount)
 }
 
 const getStatusClass = (status) => {

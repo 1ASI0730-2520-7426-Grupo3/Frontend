@@ -1,11 +1,15 @@
 <template>
   <div class="landing-container">
     <div class="landing-content">
-      <h1 class="landing-title">CoolGym</h1>
+      <h1 class="landing-title">{{ t('landing.title') }}</h1>
       <div class="role-selection">
-        <Button label="For Gyms" class="role-button gyms-button" @click="selectRole('client')" />
         <Button
-          label="For Providers"
+          :label="t('landing.forGyms')"
+          class="role-button gyms-button"
+          @click="selectRole('client')"
+        />
+        <Button
+          :label="t('landing.forProviders')"
           class="role-button providers-button"
           @click="selectRole('provider')"
         />
@@ -17,6 +21,7 @@
 <script setup>
 import { defineOptions } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 
 defineOptions({
@@ -24,6 +29,7 @@ defineOptions({
 })
 
 const router = useRouter()
+const { t } = useI18n()
 
 const selectRole = (role) => {
   localStorage.setItem('userRole', role)

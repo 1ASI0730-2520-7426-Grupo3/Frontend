@@ -1,18 +1,18 @@
 <template>
   <section class="panel">
-    <h2 class="panel__title">Rent Machines</h2>
+    <h2 class="panel__title">{{ t('rentals.title') }}</h2>
 
     <!-- Estado de Carga -->
     <div v-if="isLoading" class="loading-message">
-      Cargando máquinas disponibles para renta...
+      {{ t('rentals.loadingAvailable') }}
     </div>
 
     <!-- Mensaje de Error -->
     <div v-else-if="error" class="error-box">
-      <p class="error-title">Error al cargar datos</p>
+      <p class="error-title">{{ t('rentals.errorLoadingData') }}</p>
       <p class="error-detail">
-        No se pudieron obtener las máquinas de renta. Por favor, verifica tu backend/servidor local.
-        <span v-if="error?.message">Detalle: {{ error.message }}</span>
+        {{ t('rentals.errorLoadingMachines') }}
+        <span v-if="error?.message">{{ t('rentals.errorDetail') }} {{ error.message }}</span>
       </p>
     </div>
 
@@ -37,13 +37,13 @@
           @click="handleMachineSelect(m.id)"
           class="request-button"
         >
-          Request
+          {{ t('rentals.request') }}
         </button>
       </div>
 
       <!-- Mensaje si no hay máquinas -->
       <p v-if="!isLoading && rentMachines.length === 0" class="no-data-message">
-        No hay máquinas de renta disponibles en este momento.
+        {{ t('rentals.noMachinesAvailable') }}
       </p>
     </div>
   </section>
@@ -51,10 +51,12 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 // Importamos el componente de Card y el cliente HTTP
 import MachineCard from '@/shared-kernel/presentation/ui/components/machine-card.component.vue'
 import { http } from '@/shared-kernel/infrastructure/http.js'
 
+const { t, locale } = useI18n()
 const rentMachines = ref([])
 const isLoading = ref(false)
 const error = ref(null)
@@ -62,15 +64,20 @@ const error = ref(null)
 
 /**
  * Función auxiliar para formatear el monto a moneda.
+ * Always use USD
  */
-const formatCurrency = (amount, currency = 'USD') => {
+const formatCurrency = (amount) => {
   const numericAmount = parseFloat(amount);
   if (isNaN(numericAmount)) {
-    return 'Precio no disponible';
+    return t('rentals.priceNotAvailable');
   }
 
-  // Formato simple, sin decimales, como en tu imagen.
-  return new Intl.NumberFormat('en-US', {
+  // Always use USD
+  const currency = 'USD'
+
+  // Use current locale for currency formatting
+  const currentLocale = locale.value === 'es' ? 'es-ES' : 'en-US'
+  return new Intl.NumberFormat(currentLocale, {
     style: 'currency',
     currency: currency,
     minimumFractionDigits: 0,
@@ -90,14 +97,14 @@ const fetchRentMachines = async () => {
     if (Array.isArray(response.data)) {
       rentMachines.value = response.data.map(item => ({
         id: item.id || crypto.randomUUID(),
-        title: item.equipmentName || 'Máquina de Renta',
+        title: item.equipmentName || t('rentals.rentalMachine'),
         img: item.imageUrl || 'https://placehold.co/400x300/4169e1/ffffff?text=No+Image',
         // Combina precio y moneda para el subtitle
-        price: formatCurrency(item.monthlyPriceUSD, item.currency || 'USD') + ' / month',
+        price: formatCurrency(item.monthlyPriceUSD, item.currency || 'USD') + ' ' + t('rentals.perMonth'),
       }));
     } else {
       // Si la respuesta no es un array, lanzamos un error claro
-      throw new Error('La respuesta del servidor no devolvió una lista válida de máquinas.');
+      throw new Error(t('rentals.errorInvalidResponse'));
     }
 
   } catch (err) {

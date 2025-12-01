@@ -8,13 +8,13 @@
       @click="goTo('machines')"
       @keydown="onKey($event, 'machines')"
     >
-      <h2 class="panel__title">My machines</h2>
-      <template v-if="isLoading.myMachines"><p class="muted">Cargando tus máquinas…</p></template>
-      <template v-else-if="error.myMachines"><p class="text-red-500">Error: {{ error.myMachines.message }}</p></template>
+      <h2 class="panel__title">{{ t('client.home.myMachines.title') }}</h2>
+      <template v-if="isLoading.myMachines"><p class="muted">{{ t('common.loading') }}</p></template>
+      <template v-else-if="error.myMachines"><p class="text-red-500">{{ t('common.error') }}: {{ error.myMachines.message }}</p></template>
       <div v-else class="cards">
         <MachineCard v-for="m in myMachines" :key="m.id" :img="m.img" :title="m.name" />
       </div>
-      <p v-if="!isLoading.myMachines && myMachines.length === 0" class="muted spacer">No tienes máquinas asignadas.</p>
+      <p v-if="!isLoading.myMachines && myMachines.length === 0" class="muted spacer">{{ t('client.home.myMachines.noMachines') }}</p>
     </div>
 
     <div
@@ -24,9 +24,9 @@
       @click="goTo('rent')"
       @keydown="onKey($event, 'rent')"
     >
-      <h2 class="panel__title">Rent machines</h2>
-      <template v-if="isLoading.rentMachines"><p class="muted">Cargando máquinas de renta…</p></template>
-      <template v-else-if="error.rentMachines"><p class="text-red-500">Error: {{ error.rentMachines.message }}</p></template>
+      <h2 class="panel__title">{{ t('client.home.rentMachines.title') }}</h2>
+      <template v-if="isLoading.rentMachines"><p class="muted">{{ t('common.loading') }}</p></template>
+      <template v-else-if="error.rentMachines"><p class="text-red-500">{{ t('common.error') }}: {{ error.rentMachines.message }}</p></template>
       <div v-else class="cards">
         <MachineCard
           v-for="m in rentMachines"
@@ -37,7 +37,7 @@
           :isPrice="true"
         />
       </div>
-      <p v-if="!isLoading.rentMachines && rentMachines.length === 0" class="muted spacer">No hay máquinas disponibles para renta.</p>
+      <p v-if="!isLoading.rentMachines && rentMachines.length === 0" class="muted spacer">{{ t('rentals.noMachines') }}</p>
     </div>
 
     <div
@@ -47,16 +47,16 @@
       @click="goTo('maintenance')"
       @keydown="onKey($event, 'maintenance')"
     >
-      <h2 class="panel__title">Maintenance</h2>
-      <template v-if="isLoading.maintenance"><p class="muted">Cargando solicitudes…</p></template>
-      <template v-else-if="error.maintenance"><p class="text-red-500">Error: {{ error.maintenance.message }}</p></template>
+      <h2 class="panel__title">{{ t('client.home.maintenance.title') }}</h2>
+      <template v-if="isLoading.maintenance"><p class="muted">{{ t('common.loading') }}</p></template>
+      <template v-else-if="error.maintenance"><p class="text-red-500">{{ t('common.error') }}: {{ error.maintenance.message }}</p></template>
       <ul v-else-if="maintenance.length > 0" class="list">
         <li class="list__item" v-for="i in maintenance" :key="i.id">
           <span class="list__label">{{ i.equipmentName }}</span>
           <span class="badge" :class="i.status === 'Done' ? 'badge--ok' : 'badge--warn'">{{ i.status }}</span>
         </li>
       </ul>
-      <p v-else class="muted spacer">Aquí se mostrarán las solicitudes de mantenimiento de tu equipo.</p>
+      <p v-else class="muted spacer">{{ t('client.home.maintenance.noPending') }}</p>
     </div>
 
     <div
@@ -66,9 +66,9 @@
       @click="goTo('account-statement')"
       @keydown="onKey($event, 'account-statement')"
     >
-      <h2 class="panel__title">Account statement</h2>
-      <template v-if="isLoading.account"><p class="muted">Cargando extracto…</p></template>
-      <template v-else-if="error.account"><p class="text-red-500">Error: {{ error.account.message }}</p></template>
+      <h2 class="panel__title">{{ t('client.home.accountStatement.title') }}</h2>
+      <template v-if="isLoading.account"><p class="muted">{{ t('common.loading') }}</p></template>
+      <template v-else-if="error.account"><p class="text-red-500">{{ t('common.error') }}: {{ error.account.message }}</p></template>
       <ul v-else-if="account.length > 0" class="list">
         <li class="list__item" v-for="t in account" :key="t.id">
           <span class="list__label">{{ t.entity }}</span>
@@ -76,7 +76,7 @@
           <span class="badge" :class="t.status === 'Done' ? 'badge--ok' : 'badge--warn'">{{ t.status }}</span>
         </li>
       </ul>
-      <p v-else class="muted spacer">Aquí se mostrará el estado de cuenta de tus transacciones.</p>
+      <p v-else class="muted spacer">{{ t('client.home.accountStatement.upToDate') }}</p>
     </div>
   </section>
 </template>
@@ -84,10 +84,12 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import MachineCard from '@/shared-kernel/presentation/ui/components/machine-card.component.vue'
 import { http } from '@/shared-kernel/infrastructure/http'
 
 const router = useRouter()
+const { t } = useI18n()
 const goTo = (name) => router.push({ name })
 const onKey = (e, name) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goTo(name) } }
 
@@ -103,9 +105,14 @@ const myMachineIds = [1, 2]
 const rentOrder = [2, 1]
 const USER_ID = 1
 
-const formatCurrency = (amount, currency = 'PEN') => {
+const formatCurrency = (amount) => {
   if (typeof amount !== 'number') return amount
-  return new Intl.NumberFormat('es-PE', { style: 'currency', currency, minimumFractionDigits: 2 }).format(amount)
+
+  // Always use USD
+  const currency = 'USD'
+  const locale = 'en-US'
+
+  return new Intl.NumberFormat(locale, { style: 'currency', currency, minimumFractionDigits: 2 }).format(amount)
 }
 const normalizeStatus = (s) => {
   const v = String(s || '').toLowerCase()

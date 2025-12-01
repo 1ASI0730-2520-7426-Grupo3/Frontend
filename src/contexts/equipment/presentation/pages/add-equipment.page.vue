@@ -1,136 +1,136 @@
 <template>
   <div class="add-equipment-container">
     <div class="add-equipment-content">
-      <h1 class="page-title">Add Equipment</h1>
+      <h1 class="page-title">{{ $t('equipment.addEquipment.title') }}</h1>
 
       <form @submit.prevent="handleSubmit" class="equipment-form">
         <div class="form-grid">
           <div class="form-field">
-            <label for="name">Name:</label>
+            <label for="name">{{ $t('equipment.addEquipment.form.name') }}</label>
             <InputText
               id="name"
               v-model="formData.name"
               :class="{ 'p-invalid': submitted && !formData.name }"
-              placeholder="Enter equipment name"
+              :placeholder="$t('equipment.addEquipment.form.namePlaceholder')"
             />
-            <small v-if="submitted && !formData.name" class="p-error">Name is required</small>
+            <small v-if="submitted && !formData.name" class="p-error">{{ $t('equipment.addEquipment.form.nameRequired') }}</small>
           </div>
 
           <div class="form-field">
-            <label for="type">Type:</label>
+            <label for="type">{{ $t('equipment.addEquipment.form.type') }}</label>
             <InputText
               id="type"
               v-model="formData.type"
               :class="{ 'p-invalid': submitted && !formData.type }"
-              placeholder="e.g., treadmill"
+              :placeholder="$t('equipment.addEquipment.form.typePlaceholder')"
             />
-            <small v-if="submitted && !formData.type" class="p-error">Type is required</small>
+            <small v-if="submitted && !formData.type" class="p-error">{{ $t('equipment.addEquipment.form.typeRequired') }}</small>
           </div>
 
           <div class="form-field">
-            <label for="model">Model:</label>
+            <label for="model">{{ $t('equipment.addEquipment.form.model') }}</label>
             <InputText
               id="model"
               v-model="formData.model"
               :class="{ 'p-invalid': submitted && !formData.model }"
-              placeholder="Enter model"
+              :placeholder="$t('equipment.addEquipment.form.modelPlaceholder')"
             />
-            <small v-if="submitted && !formData.model" class="p-error">Model is required</small>
+            <small v-if="submitted && !formData.model" class="p-error">{{ $t('equipment.addEquipment.form.modelRequired') }}</small>
           </div>
 
           <div class="form-field">
-            <label for="manufacturer">Manufacturer:</label>
+            <label for="manufacturer">{{ $t('equipment.addEquipment.form.manufacturer') }}</label>
             <InputText
               id="manufacturer"
               v-model="formData.manufacturer"
               :class="{ 'p-invalid': submitted && !formData.manufacturer }"
-              placeholder="Enter manufacturer"
+              :placeholder="$t('equipment.addEquipment.form.manufacturerPlaceholder')"
             />
             <small v-if="submitted && !formData.manufacturer" class="p-error"
-              >Manufacturer is required</small
+              >{{ $t('equipment.addEquipment.form.manufacturerRequired') }}</small
             >
           </div>
 
           <div class="form-field">
-            <label for="serialNumber">Serial number:</label>
+            <label for="serialNumber">{{ $t('equipment.addEquipment.form.serialNumber') }}</label>
             <InputText
               id="serialNumber"
               v-model="formData.serialNumber"
               :class="{ 'p-invalid': submitted && !formData.serialNumber }"
-              placeholder="Enter unique serial number"
+              :placeholder="$t('equipment.addEquipment.form.serialNumberPlaceholder')"
             />
             <small v-if="submitted && !formData.serialNumber" class="p-error"
-              >Serial number is required</small
+              >{{ $t('equipment.addEquipment.form.serialNumberRequired') }}</small
             >
           </div>
 
           <div class="form-field">
-            <label for="code">Code:</label>
+            <label for="code">{{ $t('equipment.addEquipment.form.code') }}</label>
             <InputText
               id="code"
               v-model="formData.code"
               :class="{ 'p-invalid': submitted && !formData.code }"
-              placeholder="Enter internal code"
+              :placeholder="$t('equipment.addEquipment.form.codePlaceholder')"
             />
-            <small v-if="submitted && !formData.code" class="p-error">Code is required</small>
+            <small v-if="submitted && !formData.code" class="p-error">{{ $t('equipment.addEquipment.form.codeRequired') }}</small>
           </div>
 
           <div class="form-field">
-            <label for="installationDate">Installation Date:</label>
+            <label for="installationDate">{{ $t('equipment.addEquipment.form.installationDate') }}</label>
             <Calendar
               id="installationDate"
               v-model="formData.installationDate"
               dateFormat="yy-mm-dd"
-              placeholder="Select date"
+              :placeholder="$t('equipment.addEquipment.form.installationDatePlaceholder')"
               showIcon
             />
           </div>
 
           <div class="form-field">
-            <label for="powerWatts">Power (Watts):</label>
+            <label for="powerWatts">{{ $t('equipment.addEquipment.form.powerWatts') }}</label>
             <InputNumber
               id="powerWatts"
               v-model="formData.powerWatts"
               :min="0"
-              placeholder="e.g., 1500"
+              :placeholder="$t('equipment.addEquipment.form.powerWattsPlaceholder')"
             />
           </div>
 
           <div class="form-field">
-            <label for="locationName">Location Name:</label>
+            <label for="locationName">{{ $t('equipment.addEquipment.form.locationName') }}</label>
             <InputText
               id="locationName"
               v-model="formData.locationName"
-              placeholder="e.g., Cardio Zone"
+              :placeholder="$t('equipment.addEquipment.form.locationNamePlaceholder')"
             />
           </div>
 
           <div class="form-field">
-            <label for="locationAddress">Location Address:</label>
+            <label for="locationAddress">{{ $t('equipment.addEquipment.form.locationAddress') }}</label>
             <InputText
               id="locationAddress"
               v-model="formData.locationAddress"
-              placeholder="e.g., Main Hall, Floor 1"
+              :placeholder="$t('equipment.addEquipment.form.locationAddressPlaceholder')"
             />
           </div>
 
           <div class="form-field">
-            <label for="image">Image URL:</label>
-            <InputText id="image" v-model="formData.image" placeholder="http://..." />
+            <label for="image">{{ $t('equipment.addEquipment.form.image') }}</label>
+            <InputText id="image" v-model="formData.image" :placeholder="$t('equipment.addEquipment.form.imagePlaceholder')" />
           </div>
         </div>
 
         <div class="form-actions">
           <Button
             type="submit"
-            label="Add"
+            :label="$t('equipment.addEquipment.form.add')"
             icon="pi pi-check"
             :loading="loading"
             class="submit-button"
           />
           <Button
             type="button"
-            label="Cancel"
+            :label="$t('equipment.addEquipment.form.cancel')"
             icon="pi pi-times"
             severity="secondary"
             @click="handleCancel"
@@ -146,6 +146,7 @@
 import { ref, defineOptions } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
+import { useI18n } from 'vue-i18n'
 import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
 import Calendar from 'primevue/calendar'
@@ -158,6 +159,7 @@ defineOptions({
 
 const router = useRouter()
 const toast = useToast()
+const { t } = useI18n()
 const equipmentService = new EquipmentApiService()
 
 const formData = ref({
@@ -226,8 +228,8 @@ const handleSubmit = async () => {
 
     toast.add({
       severity: 'success',
-      summary: 'Success',
-      detail: 'Equipment added successfully',
+      summary: t('equipment.addEquipment.toast.success'),
+      detail: t('equipment.addEquipment.toast.equipmentAdded'),
       life: 3000,
     })
 
@@ -236,10 +238,10 @@ const handleSubmit = async () => {
     }, 1000)
   } catch (error) {
     console.error('Error adding equipment:', error)
-    const msg = error.response?.data?.message || 'Failed to add equipment. Please check your data.'
+    const msg = error.response?.data?.message || t('equipment.addEquipment.toast.failedToAdd')
     toast.add({
       severity: 'error',
-      summary: 'Error',
+      summary: t('equipment.addEquipment.toast.error'),
       detail: msg,
       life: 5000,
     })

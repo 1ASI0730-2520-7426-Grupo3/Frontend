@@ -5,7 +5,7 @@
       <div class="left-column">
         <!-- My Clients Section -->
         <section class="page-section">
-          <h2 class="section-title">My clients</h2>
+          <h2 class="section-title">{{ t('provider.myClientsTeams.clients.title') }}</h2>
           <div class="clients-list">
             <div v-for="client in clients" :key="client.id" class="client-item">
               <span class="client-name">{{ client.name }}</span>
@@ -13,20 +13,20 @@
             </div>
           </div>
           <a href="#" @click.prevent="viewClientHistory" class="section-link">
-            View client history
+            {{ t('provider.myClientsTeams.clients.viewHistory') }}
           </a>
         </section>
 
         <!-- Technicians Section -->
         <section class="page-section">
-          <h2 class="section-title">Technicians</h2>
+          <h2 class="section-title">{{ t('provider.myClientsTeams.technicians.title') }}</h2>
           <div class="technicians-list">
             <div v-for="technician in technicians" :key="technician.id" class="technician-item">
               <span class="technician-name">{{ technician.name }}</span>
             </div>
           </div>
           <a href="#" @click.prevent="viewTechnicians" class="section-link">
-            View list of technicians
+            {{ t('provider.myClientsTeams.technicians.viewList') }}
           </a>
         </section>
       </div>
@@ -35,19 +35,19 @@
       <div class="right-column">
         <!-- Work Orders Section -->
         <section class="page-section">
-          <h2 class="section-title">Work Orders</h2>
+          <h2 class="section-title">{{ t('provider.myClientsTeams.workOrders.title') }}</h2>
           <div class="work-orders-list">
             <div v-for="order in workOrders" :key="order.id" class="work-order-item">
               <span class="order-text">{{ order.description }}</span>
             </div>
           </div>
-          <a href="#" @click.prevent="viewWorkOrders" class="section-link"> View work orders </a>
+          <a href="#" @click.prevent="viewWorkOrders" class="section-link">{{ t('provider.myClientsTeams.workOrders.viewOrders') }}</a>
         </section>
       </div>
     </div>
 
     <!-- Back Navigation Arrow -->
-    <button class="nav-arrow left" @click="goBack" title="Go back to home">
+    <button class="nav-arrow left" @click="goBack" :title="t('provider.myClientsTeams.goBack')">
       <i class="pi pi-arrow-left"></i>
     </button>
   </div>
@@ -57,6 +57,7 @@
 import { ref, onMounted, defineOptions } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
+import { useI18n } from 'vue-i18n'
 import { ProviderApiService } from '@/contexts/provider/infrastructure/provider-api.service'
 
 defineOptions({
@@ -65,6 +66,7 @@ defineOptions({
 
 const router = useRouter()
 const toast = useToast()
+const { t } = useI18n()
 const providerService = new ProviderApiService()
 
 const clients = ref([])
@@ -113,10 +115,11 @@ const loadData = async () => {
     }))
   } catch (error) {
     console.error('Error loading data:', error)
+    const errorMessage = error.response?.data?.message || t('provider.myClientsTeams.toast.failedToLoad')
     toast.add({
       severity: 'error',
-      summary: 'Error',
-      detail: 'Failed to load data',
+      summary: t('common.error'),
+      detail: errorMessage,
       life: 3000,
     })
   } finally {

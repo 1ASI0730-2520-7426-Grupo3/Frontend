@@ -1,6 +1,13 @@
-export function formatCurrencyPEN(value) {
+export function formatCurrencyByRole(value) {
   if (typeof value !== 'number') return value ?? '';
-  return `S/. ${value.toFixed(2)}`;
+
+  // Always use USD
+  return `$ ${value.toFixed(2)}`
+}
+
+// Keep old function for backwards compatibility but make it use the new one
+export function formatCurrencyPEN(value) {
+  return formatCurrencyByRole(value);
 }
 
 export function isPaid(inv) { return inv?.status === 'paid'; }

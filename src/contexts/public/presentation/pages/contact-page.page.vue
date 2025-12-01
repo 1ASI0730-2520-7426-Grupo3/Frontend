@@ -1,32 +1,35 @@
 <template>
   <section class="panel contact">
-    <h2 class="panel__title">Contact Us</h2>
+    <h2 class="panel__title">{{ t('contact.title') }}</h2>
 
     <form class="contact__form" @submit.prevent="sendMessage">
       <div class="field">
-        <label for="name">Full Name</label>
+        <label for="name">{{ t('contact.form.fullName') }}</label>
         <input v-model="form.name" id="name" type="text" required />
       </div>
 
       <div class="field">
-        <label for="email">Email</label>
+        <label for="email">{{ t('contact.form.email') }}</label>
         <input v-model="form.email" id="email" type="email" required />
       </div>
 
       <div class="field">
-        <label for="message">Message</label>
+        <label for="message">{{ t('contact.form.message') }}</label>
         <textarea v-model="form.message" id="message" rows="4" required></textarea>
       </div>
 
-      <pv-button type="submit" label="Send Message" icon="pi pi-send" />
+      <pv-button type="submit" :label="t('contact.form.sendButton')" icon="pi pi-send" />
     </form>
 
-    <p v-if="submitted" class="success">✅ Message sent successfully!</p>
+    <p v-if="submitted" class="success">✅ {{ t('contact.success') }}</p>
   </section>
 </template>
 
 <script setup>
 import { reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const form = reactive({
   name: '',

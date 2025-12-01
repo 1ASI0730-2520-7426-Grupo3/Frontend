@@ -5,12 +5,12 @@
       icon="pi pi-arrow-left"
       rounded
       text
-      aria-label="Back"
+      :aria-label="t('profile.back')"
       @click="goBack"
       class="back-button"
     />
 
-    <h1 class="page-title">My CoolGym Account</h1>
+    <h1 class="page-title">{{ t('profile.title') }}</h1>
 
     <div v-if="loading" class="loading-container">
       <ProgressSpinner />
@@ -48,7 +48,7 @@
             rounded
             class="upload-photo-btn"
             @click="triggerFileInput"
-            aria-label="Upload profile photo"
+            :aria-label="t('profile.uploadPhoto')"
           />
         </div>
         <h2 class="user-name">{{ userProfile.name }}</h2>
@@ -58,7 +58,7 @@
 
       <div class="current-plan-type">
         <p>
-          Current Plan type: <strong>{{ userProfile.getCurrentPlanType() }}</strong>
+          {{ t('profile.currentPlanType') }} <strong>{{ userProfile.getCurrentPlanType() }}</strong>
         </p>
       </div>
 
@@ -80,6 +80,7 @@
 <script setup>
 import { ref, onMounted, defineOptions } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import Avatar from 'primevue/avatar'
 import ProgressSpinner from 'primevue/progressspinner'
@@ -95,6 +96,7 @@ defineOptions({
 
 const router = useRouter()
 const toast = useToast()
+const { t } = useI18n()
 const profileService = new ProfileApiService()
 const authService = new AuthApiService()
 
@@ -141,8 +143,8 @@ const handleFileSelect = async (event) => {
   if (!file.type.startsWith('image/')) {
     toast.add({
       severity: 'error',
-      summary: 'Invalid File',
-      detail: 'Please select an image file',
+      summary: t('profile.toast.invalidFile'),
+      detail: t('profile.toast.pleaseSelectImage'),
       life: 3000,
     })
     return
@@ -152,8 +154,8 @@ const handleFileSelect = async (event) => {
   if (file.size > maxSize) {
     toast.add({
       severity: 'error',
-      summary: 'File Too Large',
-      detail: 'Image must be less than 5MB',
+      summary: t('profile.toast.fileTooLarge'),
+      detail: t('profile.toast.imageMustBeLessThan5MB'),
       life: 3000,
     })
     return
@@ -173,8 +175,8 @@ const handleFileSelect = async (event) => {
 
       toast.add({
         severity: 'success',
-        summary: 'Photo Updated',
-        detail: 'Your profile photo has been updated successfully',
+        summary: t('profile.toast.photoUpdated'),
+        detail: t('profile.toast.photoUploadSuccess'),
         life: 3000,
       })
 
@@ -184,8 +186,8 @@ const handleFileSelect = async (event) => {
     reader.onerror = () => {
       toast.add({
         severity: 'error',
-        summary: 'Upload Failed',
-        detail: 'Failed to read the image file',
+        summary: t('profile.toast.uploadFailed'),
+        detail: t('profile.toast.failedToReadImage'),
         life: 3000,
       })
       loading.value = false
@@ -194,10 +196,11 @@ const handleFileSelect = async (event) => {
     reader.readAsDataURL(file)
   } catch (err) {
     console.error('Error uploading photo:', err)
+    const errorMessage = err.response?.data?.message || t('profile.toast.failedToUploadPhoto')
     toast.add({
       severity: 'error',
-      summary: 'Upload Failed',
-      detail: 'Failed to upload photo. Please try again.',
+      summary: t('profile.toast.uploadFailed'),
+      detail: errorMessage,
       life: 3000,
     })
     loading.value = false
@@ -216,16 +219,17 @@ const handleUpdatePlan = async (planId) => {
 
     toast.add({
       severity: 'success',
-      summary: 'Plan Updated',
-      detail: 'Your subscription plan has been updated successfully',
+      summary: t('profile.toast.planUpdated'),
+      detail: t('profile.toast.planUpdateSuccess'),
       life: 3000,
     })
   } catch (err) {
     console.error('Error updating plan:', err)
+    const errorMessage = err.response?.data?.message || t('profile.toast.failedToUpdatePlan')
     toast.add({
       severity: 'error',
-      summary: 'Update Failed',
-      detail: 'Failed to update your plan. Please try again.',
+      summary: t('profile.toast.updateFailed'),
+      detail: errorMessage,
       life: 3000,
     })
   } finally {
@@ -246,7 +250,7 @@ const loadProfileData = async () => {
     console.log('User ID from localStorage:', userId)
 
     if (!userId) {
-      error.value = 'User not authenticated'
+      error.value = t('profile.userNotAuthenticated')
       console.error('No user ID found in localStorage')
       return
     }
@@ -264,7 +268,7 @@ const loadProfileData = async () => {
     plans.value = allPlans
   } catch (err) {
     console.error('Error loading profile:', err)
-    error.value = `Failed to load profile data: ${err.message}`
+    error.value = err.response?.data?.message || `${t('profile.toast.failedToLoadProfile')}: ${err.message}`
   } finally {
     loading.value = false
   }

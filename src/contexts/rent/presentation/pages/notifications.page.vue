@@ -1,13 +1,13 @@
 <template>
   <section class="notifications-container">
-    <h1 class="page-title">My Rental Requests</h1>
+    <h1 class="page-title">{{ t('rentals.notifications.title') }}</h1>
 
     <div v-if="loading" class="loading-message">
       <ProgressSpinner />
     </div>
 
     <div v-else-if="error" class="error-box">
-      <p class="error-title">Error</p>
+      <p class="error-title">{{ t('common.error') }}</p>
       <p class="error-detail">{{ error }}</p>
     </div>
 
@@ -15,16 +15,20 @@
       <Card v-if="rentalRequests.length === 0" class="empty-state">
         <template #content>
           <i class="pi pi-inbox empty-icon"></i>
-          <h3>No Rental Requests Yet</h3>
-          <p>You haven't requested any equipment rentals yet.</p>
-          <Button label="Browse Equipment" icon="pi pi-search" @click="goToRentals" />
+          <h3>{{ t('rentals.notifications.empty.title') }}</h3>
+          <p>{{ t('rentals.notifications.empty.description') }}</p>
+          <Button
+            :label="t('rentals.notifications.empty.button')"
+            icon="pi pi-search"
+            @click="goToRentals"
+          />
         </template>
       </Card>
 
       <Card v-for="request in rentalRequests" :key="request.id" class="request-card">
         <template #content>
           <div class="request-header">
-            <h3 class="request-title">Equipment #{{ request.equipmentId }}</h3>
+            <h3 class="request-title">{{ t('rentals.notifications.details.equipment') }} #{{ request.equipmentId }}</h3>
             <Tag
               :value="getStatusLabel(request.status)"
               :severity="getStatusSeverity(request.status)"
@@ -34,12 +38,12 @@
           <div class="request-details">
             <div class="detail-item">
               <i class="pi pi-calendar"></i>
-              <span>Requested: {{ formatDate(request.requestDate) }}</span>
+              <span>{{ t('rentals.notifications.details.requested') }} {{ formatDate(request.requestDate) }}</span>
             </div>
 
             <div class="detail-item">
               <i class="pi pi-dollar"></i>
-              <span>Monthly Price: ${{ request.monthlyPrice }}</span>
+              <span>{{ t('rentals.notifications.details.monthlyPrice') }} ${{ request.monthlyPrice }}</span>
             </div>
 
             <div v-if="request.notes" class="detail-item">
@@ -57,6 +61,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
+import { useI18n } from 'vue-i18n'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
@@ -65,6 +70,7 @@ import { RentApiService } from '../../infrastructure/rent.api.service.js'
 
 const router = useRouter()
 const toast = useToast()
+const { t, locale } = useI18n()
 const rentService = new RentApiService()
 
 const rentalRequests = ref([])
@@ -77,18 +83,22 @@ const loadRentalRequests = async () => {
   try {
     const clientId = localStorage.getItem('userId')
     if (!clientId) {
-      error.value = 'You must be logged in to view notifications'
+      error.value = t('rentals.notifications.mustBeLoggedIn')
       return
     }
 
     rentalRequests.value = await rentService.getRentalRequestsByClientId(parseInt(clientId))
   } catch (err) {
     console.error('Error loading rental requests:', err)
-    error.value = 'Failed to load rental requests'
+
+    // If backend returns a localized error message, use it
+    const errorMessage = err.response?.data?.message || t('rentals.notifications.failedToLoad')
+    error.value = errorMessage
+
     toast.add({
       severity: 'error',
-      summary: 'Error',
-      detail: 'Could not load rental requests',
+      summary: t('common.error'),
+      detail: t('rentals.notifications.couldNotLoad'),
       life: 3000,
     })
   } finally {
@@ -97,7 +107,8 @@ const loadRentalRequests = async () => {
 }
 
 const formatDate = (dateString) => {
-  return new Date(dateString).toLocaleDateString('en-US', {
+  // Use current locale for date formatting
+  return new Date(dateString).toLocaleDateString(locale.value === 'es' ? 'es-ES' : 'en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -105,14 +116,8 @@ const formatDate = (dateString) => {
 }
 
 const getStatusLabel = (status) => {
-  const labels = {
-    pending: 'Pending',
-    approved: 'Approved',
-    rejected: 'Rejected',
-    completed: 'Completed',
-    cancelled: 'Cancelled',
-  }
-  return labels[status] || status
+  const statusKey = status.toLowerCase()
+  return t(`rentals.status.${statusKey}`, status)
 }
 
 const getStatusSeverity = (status) => {
@@ -123,7 +128,7 @@ const getStatusSeverity = (status) => {
     completed: 'info',
     cancelled: 'secondary',
   }
-  return severities[status] || 'secondary'
+  return severities[status.toLowerCase()] || 'secondary'
 }
 
 const goToRentals = () => {

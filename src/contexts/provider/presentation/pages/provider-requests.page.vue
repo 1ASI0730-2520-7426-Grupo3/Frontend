@@ -1,11 +1,11 @@
 <template>
   <div class="provider-requests-page">
-    <h1 class="page-title">Machine Requests</h1>
+    <h1 class="page-title">{{ t('provider.requests.title') }}</h1>
 
-    <div v-if="loading" class="loading-state">Loading requests...</div>
+    <div v-if="loading" class="loading-state">{{ t('provider.requests.loading') }}</div>
 
     <div v-else-if="requests.length === 0" class="empty-state">
-      <p>No pending rental requests at the moment.</p>
+      <p>{{ t('provider.requests.empty') }}</p>
     </div>
 
     <div v-else class="requests-grid">
@@ -15,18 +15,18 @@
         </div>
         <h3 class="equipment-name">{{ request.equipmentName }}</h3>
         <div class="request-details">
-          <p><strong>Requested by:</strong><br />{{ request.clientName }}</p>
-          <p><strong>Time:</strong><br />{{ request.duration }}</p>
+          <p><strong>{{ t('provider.requests.details.requestedBy') }}</strong><br />{{ request.clientName }}</p>
+          <p><strong>{{ t('provider.requests.details.time') }}</strong><br />{{ request.duration }}</p>
         </div>
         <div class="request-actions">
           <Button
-            label="Accept"
+            :label="t('provider.requests.actions.accept')"
             severity="success"
             @click="handleAccept(request.id)"
             class="action-button"
           />
           <Button
-            label="Deny"
+            :label="t('provider.requests.actions.deny')"
             severity="danger"
             @click="handleDeny(request.id)"
             class="action-button"
@@ -36,7 +36,7 @@
     </div>
 
     <!-- Back Navigation Arrow -->
-    <button class="nav-arrow left" @click="goBack" title="Go back">
+    <button class="nav-arrow left" @click="goBack" :title="t('provider.requests.actions.goBack')">
       <i class="pi pi-arrow-left"></i>
     </button>
   </div>
@@ -46,6 +46,7 @@
 import { ref, onMounted, defineOptions } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import { ProviderApiService } from '@/contexts/provider/infrastructure/provider-api.service'
 
@@ -55,6 +56,7 @@ defineOptions({
 
 const router = useRouter()
 const toast = useToast()
+const { t } = useI18n()
 const providerService = new ProviderApiService()
 
 const requests = ref([])
@@ -67,17 +69,21 @@ const loadRequests = async () => {
 
     requests.value = rentalRequests.map((req) => ({
       id: req.id,
-      equipmentName: req.equipmentName || `Equipment #${req.equipmentId}`,
+      equipmentName: req.equipmentName || `${t('provider.requests.details.equipment')} #${req.equipmentId}`,
       equipmentImage: req.equipmentImage || '/placeholder-equipment.png',
       clientName: req.clientEmail || `Client #${req.clientId}`,
       duration: '1 year',
     }))
-  } catch (error) {
-    console.error('Error loading requests:', error)
+  } catch (err) {
+    console.error('Error loading requests:', err)
+
+    // If backend returns a localized error message, use it
+    const errorMessage = err.response?.data?.message || t('provider.requests.toast.failedToLoad')
+
     toast.add({
       severity: 'error',
-      summary: 'Error',
-      detail: 'Failed to load rental requests',
+      summary: t('common.error'),
+      detail: errorMessage,
       life: 3000,
     })
   } finally {
@@ -90,17 +96,21 @@ const handleAccept = async (requestId) => {
     await providerService.approveRentalRequest(requestId)
     toast.add({
       severity: 'success',
-      summary: 'Request Accepted',
-      detail: 'Rental request approved and invoice created',
+      summary: t('provider.requests.toast.requestAccepted'),
+      detail: t('provider.requests.toast.approvalSuccess'),
       life: 3000,
     })
     await loadRequests()
-  } catch (error) {
-    console.error('Error accepting request:', error)
+  } catch (err) {
+    console.error('Error accepting request:', err)
+
+    // If backend returns a localized error message, use it
+    const errorMessage = err.response?.data?.message || t('provider.requests.toast.failedToAccept')
+
     toast.add({
       severity: 'error',
-      summary: 'Error',
-      detail: 'Failed to accept request',
+      summary: t('common.error'),
+      detail: errorMessage,
       life: 3000,
     })
   }
@@ -111,17 +121,21 @@ const handleDeny = async (requestId) => {
     await providerService.rejectRentalRequest(requestId)
     toast.add({
       severity: 'info',
-      summary: 'Request Denied',
-      detail: 'Rental request has been rejected',
+      summary: t('provider.requests.toast.requestDenied'),
+      detail: t('provider.requests.toast.rejectionSuccess'),
       life: 3000,
     })
     await loadRequests()
-  } catch (error) {
-    console.error('Error denying request:', error)
+  } catch (err) {
+    console.error('Error denying request:', err)
+
+    // If backend returns a localized error message, use it
+    const errorMessage = err.response?.data?.message || t('provider.requests.toast.failedToReject')
+
     toast.add({
       severity: 'error',
-      summary: 'Error',
-      detail: 'Failed to reject request',
+      summary: t('common.error'),
+      detail: errorMessage,
       life: 3000,
     })
   }

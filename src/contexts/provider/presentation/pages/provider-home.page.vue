@@ -5,7 +5,7 @@
       <div class="left-column">
         <!-- My Gym Equipment Section -->
         <section class="dashboard-section">
-          <h2 class="section-title">My Gym Equipment</h2>
+          <h2 class="section-title">{{ t('provider.home.gymEquipment.title') }}</h2>
           <div class="equipment-grid">
             <Card v-for="equipment in gymEquipment" :key="equipment.id" class="equipment-card">
               <template #content>
@@ -20,7 +20,7 @@
 
         <!-- Maintenance Section -->
         <section class="dashboard-section">
-          <h2 class="section-title">Maintenance</h2>
+          <h2 class="section-title">{{ t('provider.home.maintenance.title') }}</h2>
           <div class="maintenance-list">
             <div v-for="task in maintenanceTasks" :key="task.id" class="maintenance-item">
               <span class="maintenance-name">{{ task.equipmentName }}</span>
@@ -37,7 +37,7 @@
             </div>
           </div>
           <p class="section-note">
-            Here, the maintenance tasks for your gym machines will be displayed.
+            {{ t('provider.home.maintenance.note') }}
           </p>
         </section>
       </div>
@@ -46,7 +46,7 @@
       <div class="right-column">
         <!-- Requests Section -->
         <section class="dashboard-section">
-          <h2 class="section-title">Requests</h2>
+          <h2 class="section-title">{{ t('provider.home.requests.title') }}</h2>
           <div class="requests-list">
             <Card v-for="request in maintenanceRequests" :key="request.id" class="request-card">
               <template #content>
@@ -60,22 +60,22 @@
                     <div class="request-info">
                       <p class="request-equipment">{{ request.equipmentName }}</p>
                       <p class="request-detail">
-                        <strong>Requested by:</strong><br />{{ request.clientName }}
+                        <strong>{{ t('provider.home.requests.requestedBy') }}</strong><br />{{ request.clientName }}
                       </p>
                       <p class="request-detail">
-                        <strong>Time:</strong><br />{{ request.duration }}
+                        <strong>{{ t('provider.home.requests.time') }}</strong><br />{{ request.duration }}
                       </p>
                     </div>
                   </div>
                   <div class="request-actions">
                     <Button
-                      label="Accept"
+                      :label="t('provider.home.actions.accept')"
                       severity="success"
                       size="small"
                       @click="handleAcceptRequest(request.id)"
                     />
                     <Button
-                      label="Deny"
+                      :label="t('provider.home.actions.deny')"
                       severity="danger"
                       size="small"
                       @click="handleDenyRequest(request.id)"
@@ -89,28 +89,28 @@
 
         <!-- Billing & Payments Section -->
         <section class="dashboard-section">
-          <h2 class="section-title">Billing & Payments</h2>
+          <h2 class="section-title">{{ t('provider.home.billing.title') }}</h2>
           <div class="billing-list">
             <div v-for="payment in billingPayments" :key="payment.id" class="billing-item">
               <div class="billing-info">
                 <span class="billing-company">{{ payment.companyName }}</span>
-                <span class="billing-amount">S/. {{ payment.amount.toFixed(2) }}</span>
+                <span class="billing-amount">$ {{ payment.amount.toFixed(2) }}</span>
               </div>
               <Tag
                 :value="payment.status"
-                :severity="payment.status === 'Received' ? 'success' : 'warning'"
+                :severity="payment.status === t('provider.home.billing.paid') ? 'success' : 'warning'"
               />
             </div>
           </div>
           <p class="section-note">
-            Here, the pending and paid receipts of your clients will be displayed.
+            {{ t('provider.home.billing.note') }}
           </p>
         </section>
       </div>
     </div>
 
     <!-- Navigation Arrow -->
-    <button class="nav-arrow right" @click="goToDetails" title="View more details">
+    <button class="nav-arrow right" @click="goToDetails" :title="t('provider.home.billing.viewMore')">
       <i class="pi pi-arrow-right"></i>
     </button>
   </div>
@@ -120,6 +120,7 @@
 import { ref, onMounted, defineOptions } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
+import { useI18n } from 'vue-i18n'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
@@ -131,6 +132,7 @@ defineOptions({
 
 const router = useRouter()
 const toast = useToast()
+const { t } = useI18n()
 const providerService = new ProviderApiService()
 
 const gymEquipment = ref([])
@@ -178,14 +180,15 @@ const loadProviderData = async () => {
       id: invoice.id,
       companyName: invoice.companyName,
       amount: invoice.amount,
-      status: invoice.status === 'paid' ? 'Received' : 'Pending',
+      status: invoice.status === 'paid' ? t('provider.home.billing.paid') : t('provider.home.billing.pending'),
     }))
   } catch (error) {
     console.error('Error loading provider data:', error)
+    const errorMessage = error.response?.data?.message || t('provider.home.toast.failedToLoad')
     toast.add({
       severity: 'error',
-      summary: 'Error',
-      detail: 'Failed to load provider data',
+      summary: t('common.error'),
+      detail: errorMessage,
       life: 3000,
     })
   } finally {
@@ -198,17 +201,18 @@ const handleAcceptRequest = async (requestId) => {
     await providerService.approveRentalRequest(requestId)
     toast.add({
       severity: 'success',
-      summary: 'Request Accepted',
-      detail: 'Rental request has been accepted and invoice created',
+      summary: t('provider.home.toast.requestAccepted'),
+      detail: t('provider.home.toast.acceptSuccess'),
       life: 3000,
     })
     await loadProviderData()
   } catch (error) {
     console.error('Error accepting request:', error)
+    const errorMessage = error.response?.data?.message || t('provider.home.toast.failedToAccept')
     toast.add({
       severity: 'error',
-      summary: 'Error',
-      detail: 'Failed to accept rental request',
+      summary: t('common.error'),
+      detail: errorMessage,
       life: 3000,
     })
   }
@@ -219,17 +223,18 @@ const handleDenyRequest = async (requestId) => {
     await providerService.rejectRentalRequest(requestId)
     toast.add({
       severity: 'info',
-      summary: 'Request Denied',
-      detail: 'Rental request has been rejected',
+      summary: t('provider.home.toast.requestDenied'),
+      detail: t('provider.home.toast.denySuccess'),
       life: 3000,
     })
     await loadProviderData()
   } catch (error) {
     console.error('Error denying request:', error)
+    const errorMessage = error.response?.data?.message || t('provider.home.toast.failedToDeny')
     toast.add({
       severity: 'error',
-      summary: 'Error',
-      detail: 'Failed to reject rental request',
+      summary: t('common.error'),
+      detail: errorMessage,
       life: 3000,
     })
   }

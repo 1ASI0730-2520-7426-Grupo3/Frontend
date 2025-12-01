@@ -1,28 +1,30 @@
 <template>
   <section class="wrap">
-    <h1 class="title">{{ $t('accountStatement.title') }}</h1>
+    <h1 class="title">{{ t('accountStatement.title') }}</h1>
 
     <div v-if="loading" class="loading-state">
-      <p>Cargando estado de cuenta...</p>
+      <p>{{ t('accountStatement.loading') }}</p>
     </div>
 
     <div v-else-if="error" class="error-box">
-      <p>Error: {{ error }}</p>
+      <p>{{ t('common.error') }}: {{ error }}</p>
     </div>
 
     <div class="list" v-else-if="invoices.length">
       <invoice-item v-for="inv in invoices" :key="inv.id" :invoice="inv" @changed="load" />
     </div>
 
-    <p v-else class="hint">No se encontraron facturas pendientes o pagadas.</p>
+    <p v-else class="hint">{{ t('accountStatement.noInvoices') }}</p>
   </section>
 </template>
 
 <script setup>
 import { onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import InvoiceItem from '../components/invoice-item.vue'
 import { AccountStatementApiService } from '../../infrastructure/account-statement.api-service.js'
 
+const { t } = useI18n()
 const api = new AccountStatementApiService()
 const invoices = ref([])
 const loading = ref(false)
@@ -32,7 +34,7 @@ const userId = localStorage.getItem('userId')
 
 async function load() {
   if (!userId) {
-    error.value = 'Usuario no autenticado.'
+    error.value = t('accountStatement.userNotAuthenticated')
     return
   }
 
@@ -42,8 +44,10 @@ async function load() {
   try {
     invoices.value = await api.getInvoicesByUser(userId)
   } catch (err) {
-    console.error('Error cargando facturas:', err)
-    error.value = 'No se pudieron cargar las facturas.'
+    console.error('Error loading invoices:', err)
+
+    // If backend returns a localized error message, use it
+    error.value = err.response?.data?.message || t('accountStatement.errorLoadingInvoices')
   } finally {
     loading.value = false
   }

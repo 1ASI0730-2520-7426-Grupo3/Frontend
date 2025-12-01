@@ -4,7 +4,7 @@ export class BillingInvoice {
     userId = 0,
     companyName = '',
     amount = 0,
-    currency = 'PEN',
+    currency = 'USD',
     status = 'pending',
     issuedAt = '',
     paidAt = null,
@@ -20,10 +20,10 @@ export class BillingInvoice {
   }
 
   /**
-   * Formatea el monto usando la moneda real del backend (USD, PEN, etc.)
+   * Formatea el monto usando la moneda USD
    */
   getFormattedAmount() {
-    return new Intl.NumberFormat('es-PE', {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: this.currency,
       minimumFractionDigits: 2,

@@ -15,7 +15,7 @@ async function http(url, options = {}) {
   return res.json()
 }
 
-const moneyPEN = (v) => `S/ ${Number(v || 0).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+const moneyUSD = (v) => `$ ${Number(v || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 const todayISO = () => new Date().toISOString().slice(0, 10)
 
 const router = useRouter()
@@ -196,7 +196,7 @@ onMounted(loadAll)
           <div v-for="inv in state.invoices" :key="inv.id" class="invoice-row">
             <div class="inv-left">{{ inv.companyName }}</div>
             <div class="inv-right">
-              <span class="inv-amount">{{ moneyPEN(inv.amount) }}</span>
+              <span class="inv-amount">{{ moneyUSD(inv.amount) }}</span>
               <span class="badge" :class="(inv.statusComputed === 'paid') ? 'bad-success' : 'bad-warning'">
                 {{ (inv.statusComputed === 'paid') ? $t('accountStatement.item.paid') : $t('accountStatement.item.pending') }}
               </span>
