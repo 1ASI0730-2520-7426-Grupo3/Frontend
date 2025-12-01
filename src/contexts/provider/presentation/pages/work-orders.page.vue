@@ -80,11 +80,7 @@ const workOrders = ref([])
 const loading = ref(true)
 
 // List of available technicians
-const technicians = [
-  'Pinillos Uribe Óscar',
-  'Rodríguez Monteza Juan',
-  'Sanchez Quispe Harold',
-]
+const technicians = ['Pinillos Uribe Óscar', 'Rodríguez Monteza Juan', 'Sanchez Quispe Harold']
 
 // Helper function to randomly select a technician
 const getRandomTechnician = () => {
@@ -115,7 +111,8 @@ const loadWorkOrders = async () => {
     }))
   } catch (error) {
     console.error('Error loading work orders:', error)
-    const errorMessage = error.response?.data?.message || t('provider.workOrders.toast.failedToLoad')
+    const errorMessage =
+      error.response?.data?.message || t('provider.workOrders.toast.failedToLoad')
     toast.add({
       severity: 'error',
       summary: t('common.error'),

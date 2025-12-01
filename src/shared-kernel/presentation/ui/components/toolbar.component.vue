@@ -21,7 +21,12 @@
 
       <template #center>
         <!-- Only show navigation when authenticated -->
-        <nav v-if="isAuthenticated" class="navigation-section" role="navigation" aria-label="Main navigation">
+        <nav
+          v-if="isAuthenticated"
+          class="navigation-section"
+          role="navigation"
+          aria-label="Main navigation"
+        >
           <button
             class="menu-toggle"
             @click="toggleMenu"
@@ -142,8 +147,18 @@ const navigationLinks = computed(() => {
 
   if (isClient) {
     links.push(
-      { name: 'my-machines', route: 'my-machines', label: t('toolbar.nav.myMachines'), roles: ['client'] },
-      { name: 'maintenance', route: 'maintenance', label: t('toolbar.nav.maintenance'), roles: ['client'] },
+      {
+        name: 'my-machines',
+        route: 'my-machines',
+        label: t('toolbar.nav.myMachines'),
+        roles: ['client'],
+      },
+      {
+        name: 'maintenance',
+        route: 'maintenance',
+        label: t('toolbar.nav.maintenance'),
+        roles: ['client'],
+      },
       {
         name: 'account-statement',
         route: 'account-statement',

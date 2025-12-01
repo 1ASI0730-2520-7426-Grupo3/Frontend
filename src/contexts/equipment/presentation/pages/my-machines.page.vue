@@ -10,7 +10,11 @@
       <i class="pi pi-inbox empty-icon"></i>
       <h3>{{ $t('equipment.myMachines.empty.title') }}</h3>
       <p>{{ $t('equipment.myMachines.empty.description') }}</p>
-      <Button :label="$t('equipment.myMachines.empty.button')" icon="pi pi-plus" @click="goToAddEquipment" />
+      <Button
+        :label="$t('equipment.myMachines.empty.button')"
+        icon="pi pi-plus"
+        @click="goToAddEquipment"
+      />
     </div>
 
     <div v-else class="machines-grid">
@@ -21,7 +25,11 @@
               class="power-button"
               :class="{ active: machine.isPoweredOn }"
               @click="togglePower(machine.id)"
-              :title="machine.isPoweredOn ? $t('equipment.myMachines.card.powerOff') : $t('equipment.myMachines.card.powerOn')"
+              :title="
+                machine.isPoweredOn
+                  ? $t('equipment.myMachines.card.powerOff')
+                  : $t('equipment.myMachines.card.powerOn')
+              "
             >
               <i class="pi pi-power-off"></i>
             </button>
@@ -43,14 +51,20 @@
               <span class="usage-label">{{ $t('equipment.myMachines.card.usageToday') }}</span>
               <span class="usage-value">{{ machine.usage?.todayMinutes || 0 }} min</span>
               <Tag
-                :value="machine.isPoweredOn ? $t('equipment.myMachines.card.active') : $t('equipment.myMachines.card.inactive')"
+                :value="
+                  machine.isPoweredOn
+                    ? $t('equipment.myMachines.card.active')
+                    : $t('equipment.myMachines.card.inactive')
+                "
                 :severity="machine.isPoweredOn ? 'success' : 'secondary'"
                 class="status-tag"
               />
             </div>
 
             <div class="calories-info" v-if="machine.usage?.caloriesToday">
-              <span class="calories-label">{{ $t('equipment.myMachines.card.caloriesBurned') }}</span>
+              <span class="calories-label">{{
+                $t('equipment.myMachines.card.caloriesBurned')
+              }}</span>
               <span class="calories-value">{{ machine.usage.caloriesToday }} kcal</span>
             </div>
 
@@ -160,7 +174,9 @@ const togglePower = async (machineId) => {
 
     toast.add({
       severity: 'success',
-      summary: newPowerState ? t('equipment.myMachines.toast.poweredOn') : t('equipment.myMachines.toast.poweredOff'),
+      summary: newPowerState
+        ? t('equipment.myMachines.toast.poweredOn')
+        : t('equipment.myMachines.toast.poweredOff'),
       detail: `${machine.name} ${newPowerState ? t('equipment.myMachines.toast.nowActive') : t('equipment.myMachines.toast.nowInactive')}`,
       life: 2000,
     })

@@ -15,8 +15,14 @@
         </div>
         <h3 class="equipment-name">{{ request.equipmentName }}</h3>
         <div class="request-details">
-          <p><strong>{{ t('provider.requests.details.requestedBy') }}</strong><br />{{ request.clientName }}</p>
-          <p><strong>{{ t('provider.requests.details.time') }}</strong><br />{{ request.duration }}</p>
+          <p>
+            <strong>{{ t('provider.requests.details.requestedBy') }}</strong
+            ><br />{{ request.clientName }}
+          </p>
+          <p>
+            <strong>{{ t('provider.requests.details.time') }}</strong
+            ><br />{{ request.duration }}
+          </p>
         </div>
         <div class="request-actions">
           <Button
@@ -69,7 +75,8 @@ const loadRequests = async () => {
 
     requests.value = rentalRequests.map((req) => ({
       id: req.id,
-      equipmentName: req.equipmentName || `${t('provider.requests.details.equipment')} #${req.equipmentId}`,
+      equipmentName:
+        req.equipmentName || `${t('provider.requests.details.equipment')} #${req.equipmentId}`,
       equipmentImage: req.equipmentImage || '/placeholder-equipment.png',
       clientName: req.clientEmail || `Client #${req.clientId}`,
       duration: '1 year',

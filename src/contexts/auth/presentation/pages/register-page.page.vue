@@ -121,7 +121,9 @@ const errors = ref({})
 const userRole = ref('client')
 
 const roleTitle = computed(() => {
-  return userRole.value === 'provider' ? t('auth.register.roleProviders') : t('auth.register.roleClients')
+  return userRole.value === 'provider'
+    ? t('auth.register.roleProviders')
+    : t('auth.register.roleClients')
 })
 
 onMounted(() => {
@@ -208,8 +210,7 @@ const handleRegister = async () => {
     router.push({ name: 'login', params: { role: userRole.value } })
   } catch (error) {
     console.error('Registration error:', error)
-    registerError.value =
-      error.message || t('auth.register.toast.error')
+    registerError.value = error.message || t('auth.register.toast.error')
   } finally {
     loading.value = false
   }

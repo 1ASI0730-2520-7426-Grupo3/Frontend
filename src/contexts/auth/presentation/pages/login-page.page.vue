@@ -48,7 +48,12 @@
         </Message>
 
         <div class="button-group">
-          <Button type="submit" :label="$t('auth.login.loginButton')" class="login-btn" :loading="loading" />
+          <Button
+            type="submit"
+            :label="$t('auth.login.loginButton')"
+            class="login-btn"
+            :loading="loading"
+          />
           <Button
             type="button"
             :label="$t('auth.login.registerButton')"
@@ -103,7 +108,9 @@ const errors = ref({})
 const userRole = ref('client')
 
 const roleTitle = computed(() => {
-  return userRole.value === 'provider' ? t('auth.register.roleProviders') : t('auth.register.roleClients')
+  return userRole.value === 'provider'
+    ? t('auth.register.roleProviders')
+    : t('auth.register.roleClients')
 })
 
 onMounted(() => {

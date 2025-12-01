@@ -13,7 +13,9 @@
               :class="{ 'p-invalid': submitted && !formData.name }"
               :placeholder="$t('equipment.addEquipment.form.namePlaceholder')"
             />
-            <small v-if="submitted && !formData.name" class="p-error">{{ $t('equipment.addEquipment.form.nameRequired') }}</small>
+            <small v-if="submitted && !formData.name" class="p-error">{{
+              $t('equipment.addEquipment.form.nameRequired')
+            }}</small>
           </div>
 
           <div class="form-field">
@@ -24,7 +26,9 @@
               :class="{ 'p-invalid': submitted && !formData.type }"
               :placeholder="$t('equipment.addEquipment.form.typePlaceholder')"
             />
-            <small v-if="submitted && !formData.type" class="p-error">{{ $t('equipment.addEquipment.form.typeRequired') }}</small>
+            <small v-if="submitted && !formData.type" class="p-error">{{
+              $t('equipment.addEquipment.form.typeRequired')
+            }}</small>
           </div>
 
           <div class="form-field">
@@ -35,7 +39,9 @@
               :class="{ 'p-invalid': submitted && !formData.model }"
               :placeholder="$t('equipment.addEquipment.form.modelPlaceholder')"
             />
-            <small v-if="submitted && !formData.model" class="p-error">{{ $t('equipment.addEquipment.form.modelRequired') }}</small>
+            <small v-if="submitted && !formData.model" class="p-error">{{
+              $t('equipment.addEquipment.form.modelRequired')
+            }}</small>
           </div>
 
           <div class="form-field">
@@ -46,9 +52,9 @@
               :class="{ 'p-invalid': submitted && !formData.manufacturer }"
               :placeholder="$t('equipment.addEquipment.form.manufacturerPlaceholder')"
             />
-            <small v-if="submitted && !formData.manufacturer" class="p-error"
-              >{{ $t('equipment.addEquipment.form.manufacturerRequired') }}</small
-            >
+            <small v-if="submitted && !formData.manufacturer" class="p-error">{{
+              $t('equipment.addEquipment.form.manufacturerRequired')
+            }}</small>
           </div>
 
           <div class="form-field">
@@ -59,9 +65,9 @@
               :class="{ 'p-invalid': submitted && !formData.serialNumber }"
               :placeholder="$t('equipment.addEquipment.form.serialNumberPlaceholder')"
             />
-            <small v-if="submitted && !formData.serialNumber" class="p-error"
-              >{{ $t('equipment.addEquipment.form.serialNumberRequired') }}</small
-            >
+            <small v-if="submitted && !formData.serialNumber" class="p-error">{{
+              $t('equipment.addEquipment.form.serialNumberRequired')
+            }}</small>
           </div>
 
           <div class="form-field">
@@ -72,11 +78,15 @@
               :class="{ 'p-invalid': submitted && !formData.code }"
               :placeholder="$t('equipment.addEquipment.form.codePlaceholder')"
             />
-            <small v-if="submitted && !formData.code" class="p-error">{{ $t('equipment.addEquipment.form.codeRequired') }}</small>
+            <small v-if="submitted && !formData.code" class="p-error">{{
+              $t('equipment.addEquipment.form.codeRequired')
+            }}</small>
           </div>
 
           <div class="form-field">
-            <label for="installationDate">{{ $t('equipment.addEquipment.form.installationDate') }}</label>
+            <label for="installationDate">{{
+              $t('equipment.addEquipment.form.installationDate')
+            }}</label>
             <Calendar
               id="installationDate"
               v-model="formData.installationDate"
@@ -106,7 +116,9 @@
           </div>
 
           <div class="form-field">
-            <label for="locationAddress">{{ $t('equipment.addEquipment.form.locationAddress') }}</label>
+            <label for="locationAddress">{{
+              $t('equipment.addEquipment.form.locationAddress')
+            }}</label>
             <InputText
               id="locationAddress"
               v-model="formData.locationAddress"
@@ -116,7 +128,11 @@
 
           <div class="form-field">
             <label for="image">{{ $t('equipment.addEquipment.form.image') }}</label>
-            <InputText id="image" v-model="formData.image" :placeholder="$t('equipment.addEquipment.form.imagePlaceholder')" />
+            <InputText
+              id="image"
+              v-model="formData.image"
+              :placeholder="$t('equipment.addEquipment.form.imagePlaceholder')"
+            />
           </div>
         </div>
 

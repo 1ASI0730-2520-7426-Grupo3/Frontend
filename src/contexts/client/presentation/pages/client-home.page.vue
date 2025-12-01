@@ -39,7 +39,9 @@
         </template>
 
         <template v-else-if="error.rentMachines">
-          <p class="text-red-500 text-sm">{{ $t('client.home.rentMachines.catalogUnavailable') }}</p>
+          <p class="text-red-500 text-sm">
+            {{ $t('client.home.rentMachines.catalogUnavailable') }}
+          </p>
         </template>
 
         <div v-else class="cards">

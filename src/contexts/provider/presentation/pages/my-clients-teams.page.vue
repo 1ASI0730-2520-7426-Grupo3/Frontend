@@ -41,7 +41,9 @@
               <span class="order-text">{{ order.description }}</span>
             </div>
           </div>
-          <a href="#" @click.prevent="viewWorkOrders" class="section-link">{{ t('provider.myClientsTeams.workOrders.viewOrders') }}</a>
+          <a href="#" @click.prevent="viewWorkOrders" class="section-link">{{
+            t('provider.myClientsTeams.workOrders.viewOrders')
+          }}</a>
         </section>
       </div>
     </div>
@@ -115,7 +117,8 @@ const loadData = async () => {
     }))
   } catch (error) {
     console.error('Error loading data:', error)
-    const errorMessage = error.response?.data?.message || t('provider.myClientsTeams.toast.failedToLoad')
+    const errorMessage =
+      error.response?.data?.message || t('provider.myClientsTeams.toast.failedToLoad')
     toast.add({
       severity: 'error',
       summary: t('common.error'),

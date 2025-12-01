@@ -268,7 +268,8 @@ const loadProfileData = async () => {
     plans.value = allPlans
   } catch (err) {
     console.error('Error loading profile:', err)
-    error.value = err.response?.data?.message || `${t('profile.toast.failedToLoadProfile')}: ${err.message}`
+    error.value =
+      err.response?.data?.message || `${t('profile.toast.failedToLoadProfile')}: ${err.message}`
   } finally {
     loading.value = false
   }

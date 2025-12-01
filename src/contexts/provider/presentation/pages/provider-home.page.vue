@@ -60,10 +60,12 @@
                     <div class="request-info">
                       <p class="request-equipment">{{ request.equipmentName }}</p>
                       <p class="request-detail">
-                        <strong>{{ t('provider.home.requests.requestedBy') }}</strong><br />{{ request.clientName }}
+                        <strong>{{ t('provider.home.requests.requestedBy') }}</strong
+                        ><br />{{ request.clientName }}
                       </p>
                       <p class="request-detail">
-                        <strong>{{ t('provider.home.requests.time') }}</strong><br />{{ request.duration }}
+                        <strong>{{ t('provider.home.requests.time') }}</strong
+                        ><br />{{ request.duration }}
                       </p>
                     </div>
                   </div>
@@ -98,7 +100,9 @@
               </div>
               <Tag
                 :value="payment.status"
-                :severity="payment.status === t('provider.home.billing.paid') ? 'success' : 'warning'"
+                :severity="
+                  payment.status === t('provider.home.billing.paid') ? 'success' : 'warning'
+                "
               />
             </div>
           </div>
@@ -110,7 +114,11 @@
     </div>
 
     <!-- Navigation Arrow -->
-    <button class="nav-arrow right" @click="goToDetails" :title="t('provider.home.billing.viewMore')">
+    <button
+      class="nav-arrow right"
+      @click="goToDetails"
+      :title="t('provider.home.billing.viewMore')"
+    >
       <i class="pi pi-arrow-right"></i>
     </button>
   </div>
@@ -180,7 +188,10 @@ const loadProviderData = async () => {
       id: invoice.id,
       companyName: invoice.companyName,
       amount: invoice.amount,
-      status: invoice.status === 'paid' ? t('provider.home.billing.paid') : t('provider.home.billing.pending'),
+      status:
+        invoice.status === 'paid'
+          ? t('provider.home.billing.paid')
+          : t('provider.home.billing.pending'),
     }))
   } catch (error) {
     console.error('Error loading provider data:', error)

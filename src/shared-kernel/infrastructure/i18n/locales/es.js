@@ -357,7 +357,8 @@ export default {
     noMachinesAvailable: 'No hay máquinas de renta disponibles en este momento.',
     errorLoadingCatalog: 'No se pudo cargar el catálogo.',
     errorLoadingData: 'Error al cargar datos',
-    errorLoadingMachines: 'No se pudieron obtener las máquinas de renta. Por favor, verifica tu backend/servidor local.',
+    errorLoadingMachines:
+      'No se pudieron obtener las máquinas de renta. Por favor, verifica tu backend/servidor local.',
     errorDetail: 'Detalle:',
     errorInvalidResponse: 'La respuesta del servidor no devolvió una lista válida de máquinas.',
     priceNotAvailable: 'Precio no disponible',
@@ -397,14 +398,16 @@ export default {
       requestFailed: 'Solicitud Fallida',
       couldNotSubmit: 'No se pudo enviar la solicitud de alquiler. Intente de nuevo.',
       onlyClientsCanCreate: 'Solo los clientes pueden crear solicitudes de alquiler.',
-      onlyProvidersCanUpdate: 'Solo los proveedores pueden actualizar el estado de las solicitudes de alquiler.',
+      onlyProvidersCanUpdate:
+        'Solo los proveedores pueden actualizar el estado de las solicitudes de alquiler.',
       onlyProvidersCanApprove: 'Solo los proveedores pueden aprobar las solicitudes de alquiler.',
       requestNotFound: 'No se encontró la solicitud de alquiler.',
       errorCreating: 'Ocurrió un error al crear la solicitud de alquiler.',
       errorUpdating: 'Ocurrió un error al actualizar la solicitud de alquiler.',
       errorApproving: 'Ocurrió un error al aprobar la solicitud de alquiler.',
       invalidStatus: 'El estado de la solicitud de alquiler no es válido.',
-      onlyPendingCanBeApproved: 'Solo se pueden aprobar solicitudes de alquiler en estado pendiente.',
+      onlyPendingCanBeApproved:
+        'Solo se pueden aprobar solicitudes de alquiler en estado pendiente.',
       operationFailed: 'No se pudo completar la operación sobre la solicitud de alquiler.',
     },
   },

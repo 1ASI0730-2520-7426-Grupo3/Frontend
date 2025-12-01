@@ -28,7 +28,9 @@
       <Card v-for="request in rentalRequests" :key="request.id" class="request-card">
         <template #content>
           <div class="request-header">
-            <h3 class="request-title">{{ t('rentals.notifications.details.equipment') }} #{{ request.equipmentId }}</h3>
+            <h3 class="request-title">
+              {{ t('rentals.notifications.details.equipment') }} #{{ request.equipmentId }}
+            </h3>
             <Tag
               :value="getStatusLabel(request.status)"
               :severity="getStatusSeverity(request.status)"
@@ -38,12 +40,19 @@
           <div class="request-details">
             <div class="detail-item">
               <i class="pi pi-calendar"></i>
-              <span>{{ t('rentals.notifications.details.requested') }} {{ formatDate(request.requestDate) }}</span>
+              <span
+                >{{ t('rentals.notifications.details.requested') }}
+                {{ formatDate(request.requestDate) }}</span
+              >
             </div>
 
             <div class="detail-item">
               <i class="pi pi-dollar"></i>
-              <span>{{ t('rentals.notifications.details.monthlyPrice') }} ${{ request.monthlyPrice }}</span>
+              <span
+                >{{ t('rentals.notifications.details.monthlyPrice') }} ${{
+                  request.monthlyPrice
+                }}</span
+              >
             </div>
 
             <div v-if="request.notes" class="detail-item">
