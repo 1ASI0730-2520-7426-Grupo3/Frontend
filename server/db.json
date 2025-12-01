@@ -16,9 +16,9 @@
       "companyName": "COOLPROV S.A.C.",
       "amount": 458.5,
       "currency": "PEN",
-      "status": "pending",
+      "status": "paid",
       "issuedAt": "2025-09-25",
-      "paidAt": null
+      "paidAt": "2025-11-25"
     },
     {
       "id": 3,
@@ -26,7 +26,7 @@
       "companyName": "COOLGYMPROV S.A.C.",
       "amount": 5000,
       "currency": "PEN",
-      "status": "paid",
+      "status": "pending",
       "issuedAt": "2025-09-25",
       "paidAt": "2025-10-04"
     }
@@ -74,7 +74,7 @@
       "providerPlanId": 2
     }
   ],
-  "equipment": [
+  "equipments": [
     {
       "id": 1,
       "name": "Treadmill Pro X-500",
@@ -114,9 +114,7 @@
         "last": "2025-03-15",
         "next": null
       },
-      "images": [
-        "/assets/images/treadmill-pro-x.png"
-      ]
+      "image": "/treadmill-pro-x.png"
     },
     {
       "id": 2,
@@ -157,9 +155,7 @@
         "last": "2025-05-02",
         "next": "2025-11-02"
       },
-      "images": [
-        "/assets/images/stationary-bike-gx.png"
-      ]
+      "image": "/stationary-bike-gx.png"
     },
     {
       "id": 3,
@@ -175,11 +171,31 @@
       "isPoweredOn": false,
       "activeStatus": "Attention",
       "notes": "Noise from flywheel",
-      "location": { "name": "Cross Area", "address": "Av. Principal 123, Lima" },
-      "usage": { "totalMinutes": 3120, "todayMinutes": 0 },
-      "controls": { "power": "off", "level": { "current": 2, "set": 6, "range": [1, 8] }, "status": "pending" },
-      "maintenanceInfo": { "last": "2024-12-10", "next": null },
-      "images": ["/assets/images/rowing-r300.jpg"]
+      "location": {
+        "name": "Cross Area",
+        "address": "Av. Principal 123, Lima"
+      },
+      "usage": {
+        "totalMinutes": 3120,
+        "todayMinutes": 0
+      },
+      "controls": {
+        "power": "off",
+        "level": {
+          "current": 2,
+          "set": 6,
+          "range": [
+            1,
+            8
+          ]
+        },
+        "status": "pending"
+      },
+      "maintenanceInfo": {
+        "last": "2024-12-10",
+        "next": null
+      },
+      "image": "/rowing-r300.jpg"
     },
     {
       "id": 4,
@@ -195,11 +211,32 @@
       "isPoweredOn": true,
       "activeStatus": "Normal",
       "notes": "",
-      "location": { "name": "Cardio Area", "address": "Av. Principal 123, Lima" },
-      "usage": { "totalMinutes": 7400, "todayMinutes": 18, "caloriesToday": 210 },
-      "controls": { "power": "on", "level": { "current": 4, "set": 5, "range": [1, 10] }, "status": "normal" },
-      "maintenanceInfo": { "last": "2025-04-05", "next": "2025-10-05" },
-      "images": ["/assets/images/elliptical-e500.jpg"]
+      "location": {
+        "name": "Cardio Area",
+        "address": "Av. Principal 123, Lima"
+      },
+      "usage": {
+        "totalMinutes": 7400,
+        "todayMinutes": 18,
+        "caloriesToday": 210
+      },
+      "controls": {
+        "power": "on",
+        "level": {
+          "current": 4,
+          "set": 5,
+          "range": [
+            1,
+            10
+          ]
+        },
+        "status": "normal"
+      },
+      "maintenanceInfo": {
+        "last": "2025-04-05",
+        "next": "2025-10-05"
+      },
+      "image": "/elliptical-e500.jpg"
     }
   ],
   "maintenanceHistory": [
@@ -277,6 +314,18 @@
       "notes": "",
       "assignedTechnicianId": null,
       "id": 3
+    },
+    {
+      "userId": 1,
+      "equipmentId": 4,
+      "type": "corrective",
+      "status": "pending",
+      "costUSD": 30,
+      "selectedDate": "2025-10-08",
+      "createdAt": "2025-10-09T02:58:55.213Z",
+      "notes": "",
+      "assignedTechnicianId": null,
+      "id": 4
     }
   ],
   "notifications": [
@@ -455,10 +504,46 @@
     }
   ],
   "rentalCatalog": [
-    { "id": 1, "equipmentName": "Treadmill Pro X", "type": "treadmill", "model": "TRX-300", "monthlyPriceUSD": 200, "currency": "USD", "imageUrl": "/assets/images/treadmill-pro-x.png", "isAvailable": true },
-    { "id": 2, "equipmentName": "Stationary Bike GX", "type": "bike", "model": "SB-GX", "monthlyPriceUSD": 99, "currency": "USD", "imageUrl": "/assets/images/stationary-bike-gx.png", "isAvailable": true },
-    { "id": 3, "equipmentName": "Rowing Machine R-300", "type": "rower", "model": "R-300", "monthlyPriceUSD": 200, "currency": "USD", "imageUrl": "/assets/images/rowing-r300.jpg", "isAvailable": true },
-    { "id": 4, "equipmentName": "Elliptical Trainer E-500", "type": "elliptical", "model": "E-500", "monthlyPriceUSD": 99, "currency": "USD", "imageUrl": "/assets/images/elliptical-e500.jpg", "isAvailable": true }
+    {
+      "id": 1,
+      "equipmentName": "Treadmill Pro X",
+      "type": "treadmill",
+      "model": "TRX-300",
+      "monthlyPriceUSD": 200,
+      "currency": "USD",
+      "imageUrl": "/treadmill-pro-x.png",
+      "isAvailable": true
+    },
+    {
+      "id": 2,
+      "equipmentName": "Stationary Bike GX",
+      "type": "bike",
+      "model": "SB-GX",
+      "monthlyPriceUSD": 99,
+      "currency": "USD",
+      "imageUrl": "/stationary-bike-gx.png",
+      "isAvailable": true
+    },
+    {
+      "id": 3,
+      "equipmentName": "Rowing Machine R-300",
+      "type": "rower",
+      "model": "R-300",
+      "monthlyPriceUSD": 200,
+      "currency": "USD",
+      "imageUrl": "/rowing-r300.jpg",
+      "isAvailable": true
+    },
+    {
+      "id": 4,
+      "equipmentName": "Elliptical Trainer E-500",
+      "type": "elliptical",
+      "model": "E-500",
+      "monthlyPriceUSD": 99,
+      "currency": "USD",
+      "imageUrl": "/elliptical-e500.jpg",
+      "isAvailable": true
+    }
   ],
   "technicians": [
     {
@@ -489,7 +574,8 @@
       "username": "juanp",
       "phone": "987654321",
       "type": "individual",
-      "clientPlanId": 1
+      "clientPlanId": 1,
+      "profilePhoto": null
     },
     {
       "id": 2,
@@ -499,7 +585,8 @@
       "username": "mariar",
       "phone": "987654322",
       "type": "individual",
-      "clientPlanId": 1
+      "clientPlanId": 1,
+      "profilePhoto": null
     }
   ]
 }

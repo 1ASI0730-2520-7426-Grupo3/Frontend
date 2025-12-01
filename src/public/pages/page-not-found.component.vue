@@ -1,15 +1,14 @@
 <script>
-
 export default {
-  name: "page-not-found",
+  name: 'page-not-found',
   data() {
     return {
       unavailableRoute: null,
     }
   },
   created() {
-    this.unavailableRoute = this.$route.path;
-  }
+    this.unavailableRoute = this.$route.path
+  },
 }
 </script>
 
@@ -21,6 +20,4 @@ export default {
   </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

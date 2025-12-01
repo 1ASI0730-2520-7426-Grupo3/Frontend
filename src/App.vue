@@ -1,5 +1,6 @@
 <template>
   <div class="app-container">
+    <Toast />
     <ToolbarComponent v-if="!isLoginPage" />
     <main :class="isLoginPage ? 'login-content' : 'main-content'">
       <RouterView />
@@ -11,6 +12,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import Toast from 'primevue/toast'
 import ToolbarComponent from './shared-kernel/presentation/ui/components/toolbar.component.vue'
 import FooterComponent from './shared-kernel/presentation/ui/components/footer.component.vue'
 

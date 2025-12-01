@@ -1,5 +1,4 @@
 <template>
-  <!-- MODIFICACIÓN 1: Añadir @click para emitir el evento 'select-machine' junto con el ID. -->
   <div class="card" @click="$emit('select-machine', machineId)">
     <img :src="img" alt="" class="card__img" />
     <div class="card__body">
@@ -12,15 +11,13 @@
 </template>
 
 <script setup>
-// MODIFICACIÓN 2: Añadir machineId a las props para que el componente padre lo pase.
 defineProps({
   img: String,
   title: String,
   subtitle: String,
   isPrice: Boolean,
-  machineId: [Number, String], // El ID necesario para la navegación
+  machineId: [Number, String],
 })
-// MODIFICACIÓN 3: Declarar el evento que se emitirá al hacer clic.
 defineEmits(['select-machine'])
 </script>
 
@@ -33,7 +30,6 @@ defineEmits(['select-machine'])
   display: flex;
   flex-direction: column;
   padding: 10px;
-  /* MODIFICACIÓN 4: Añadir interactividad visual */
   cursor: pointer;
   transition:
     transform 0.2s,
@@ -41,7 +37,7 @@ defineEmits(['select-machine'])
 }
 
 .card:hover {
-  transform: translateY(-3px); /* Efecto de elevación al pasar el mouse */
+  transform: translateY(-3px);
   box-shadow: 0 10px 30px rgba(23, 43, 77, 0.15);
 }
 
