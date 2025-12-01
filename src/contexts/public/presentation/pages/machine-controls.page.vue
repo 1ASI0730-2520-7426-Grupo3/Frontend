@@ -1,7 +1,7 @@
 <template>
   <div class="machine-controls-container">
-    <h1 class="main-title centered">Machine Controls</h1>
-    <h2 class="machine-name">{{ machine.name || 'Cargando Máquina...' }}</h2>
+    <h1 class="main-title centered">{{ t('machineControls.title') }}</h1>
+    <h2 class="machine-name">{{ machine.name || t('machineControls.loading.machine') }}</h2>
 
     <div v-if="isLoading" class="text-center p-4">
       <ProgressSpinner
@@ -9,16 +9,15 @@
         strokeWidth="4"
         fill="var(--panel)"
         animationDuration=".8s"
-        aria-label="Cargando data"
+        :aria-label="t('machineControls.loading.data')"
       />
-      <p class="text-gray-600 mt-3">Obteniendo detalles de la máquina...</p>
+      <p class="text-gray-600 mt-3">{{ t('machineControls.loading.details') }}</p>
     </div>
 
     <div v-else-if="error" class="p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-      <p class="font-bold">Error al cargar la máquina</p>
+      <p class="font-bold">{{ t('machineControls.error.title') }}</p>
       <p class="text-sm">
-        No se pudo obtener la información de la máquina con ID: {{ machineId }}. Asegúrate de que el
-        backend esté activo en la ruta correcta.
+        {{ t('machineControls.error.message', { id: machineId }) }}
       </p>
     </div>
 
@@ -26,24 +25,32 @@
       v-else-if="!machine.id"
       class="p-4 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded-lg"
     >
-      <p class="font-bold">Máquina no encontrada</p>
-      <p class="text-sm">No se encontró la máquina con ID: {{ machineId }}.</p>
+      <p class="font-bold">{{ t('machineControls.error.notFound') }}</p>
+      <p class="text-sm">{{ t('machineControls.error.notFoundMessage', { id: machineId }) }}</p>
     </div>
 
     <div v-if="machine.id && !isLoading" class="content-grid">
       <div class="panel equipment-control-panel">
-        <h3 class="panel__title">Equipment Control</h3>
+        <h3 class="panel__title">{{ t('machineControls.equipmentControl.title') }}</h3>
 
         <div class="control-section">
-          <p class="control-label">Power Control</p>
+          <p class="control-label">{{ t('machineControls.equipmentControl.powerControl') }}</p>
           <div class="power-status-display">
             <span :class="['status-text', isPoweredOn ? 'on' : 'off']">
-              {{ isPoweredOn ? 'ON' : 'OFF' }}
+              {{
+                isPoweredOn
+                  ? t('machineControls.equipmentControl.on')
+                  : t('machineControls.equipmentControl.off')
+              }}
             </span>
             <button
               @click="togglePower"
               :class="['power-button', isPoweredOn ? 'on' : 'off']"
-              :aria-label="isPoweredOn ? 'Turn Off' : 'Turn On'"
+              :aria-label="
+                isPoweredOn
+                  ? t('machineControls.equipmentControl.turnOff')
+                  : t('machineControls.equipmentControl.turnOn')
+              "
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -66,33 +73,34 @@
         <div class="control-divider"></div>
 
         <div class="control-section">
-          <p class="control-label">Speed Level</p>
+          <p class="control-label">{{ t('machineControls.speedLevel.title') }}</p>
           <div class="level-display-grid">
             <div class="level-item">
-              <span class="level-label">Current:</span>
+              <span class="level-label">{{ t('machineControls.speedLevel.current') }}</span>
               <span class="level-value current">{{ currentSpeedLevel }}</span>
             </div>
             <div class="level-item">
-              <span class="level-label">Set:</span>
+              <span class="level-label">{{ t('machineControls.speedLevel.set') }}</span>
               <span class="level-value set">{{ currentSetLevel }}</span>
             </div>
           </div>
 
           <p class="range-info">
-            Optimal range: {{ machine.controls?.level?.range?.[0] || 'N/A' }}-{{
-              machine.controls?.level?.range?.[1] || 'N/A'
+            {{ t('machineControls.speedLevel.optimalRange') }}
+            {{ machine.controls?.level?.range?.[0] || t('machineControls.equipmentInfo.notAvailable') }}-{{
+              machine.controls?.level?.range?.[1] || t('machineControls.equipmentInfo.notAvailable')
             }}
-            RPM
+            {{ t('machineControls.speedLevel.rpm') }}
           </p>
 
           <p
             :class="['status-info', machine.controls?.status === 'normal' ? 'normal' : 'attention']"
           >
-            Status:
+            {{ t('machineControls.speedLevel.status') }}
             {{
               machine.controls?.status
                 ? machine.controls.status.charAt(0).toUpperCase() + machine.controls.status.slice(1)
-                : 'N/A'
+                : t('machineControls.equipmentInfo.notAvailable')
             }}
           </p>
         </div>
@@ -100,8 +108,8 @@
         <div class="control-divider"></div>
 
         <div class="analytics-section">
-          <h4 class="analytics-title">Performance Analytics</h4>
-          <p class="usage-text">Operating Temperature Trend (Past 12h)</p>
+          <h4 class="analytics-title">{{ t('machineControls.analytics.title') }}</h4>
+          <p class="usage-text">{{ t('machineControls.analytics.temperatureTrend') }}</p>
 
           <div class="chart-container">
             <svg viewBox="0 0 300 120" class="line-chart">
@@ -135,88 +143,84 @@
 
           <div class="flex justify-between items-center mt-3">
             <span class="legend-item">
-              <span class="legend-color temp-color"></span> Current Temperature
+              <span class="legend-color temp-color"></span> {{ t('machineControls.analytics.currentTemperature') }}
             </span>
             <span class="legend-item">
-              <span class="legend-color optimal-color"></span> Optimal Range (60-80°C)
+              <span class="legend-color optimal-color"></span> {{ t('machineControls.analytics.optimalRange') }}
             </span>
           </div>
-
-          <pv-button class="analytics-button mt-4" severity="primary"
-            >View Full Analytics</pv-button
-          >
         </div>
       </div>
 
       <div class="panel equipment-info-panel">
-        <h3 class="panel__title">Equipment Information</h3>
+        <h3 class="panel__title">{{ t('machineControls.equipmentInfo.title') }}</h3>
 
         <div class="info-grid">
           <div class="info-item">
-            <span class="info-label">Name:</span>
+            <span class="info-label">{{ t('machineControls.equipmentInfo.name') }}</span>
             <span class="info-value">{{ machine.name }}</span>
           </div>
           <div class="info-item">
-            <span class="info-label">Type:</span>
+            <span class="info-label">{{ t('machineControls.equipmentInfo.type') }}</span>
             <span class="info-value">{{
-              machine.type ? machine.type.charAt(0).toUpperCase() + machine.type.slice(1) : 'N/A'
+              machine.type ? machine.type.charAt(0).toUpperCase() + machine.type.slice(1) : t('machineControls.equipmentInfo.notAvailable')
             }}</span>
           </div>
 
           <div class="info-item">
-            <span class="info-label">Model:</span>
+            <span class="info-label">{{ t('machineControls.equipmentInfo.model') }}</span>
             <span class="info-value">{{ machine.model }}</span>
           </div>
           <div class="info-item">
-            <span class="info-label">Manufacturer:</span>
+            <span class="info-label">{{ t('machineControls.equipmentInfo.manufacturer') }}</span>
             <span class="info-value">{{ machine.manufacturer }}</span>
           </div>
 
           <div class="info-item">
-            <span class="info-label">Serial:</span>
+            <span class="info-label">{{ t('machineControls.equipmentInfo.serial') }}</span>
             <span class="info-value">{{ machine.serialNumber }}</span>
           </div>
           <div class="info-item">
-            <span class="info-label">Code:</span>
+            <span class="info-label">{{ t('machineControls.equipmentInfo.code') }}</span>
             <span class="info-value">{{ machine.code }}</span>
           </div>
 
           <div class="info-item">
-            <span class="info-label">Installation Date:</span>
+            <span class="info-label">{{ t('machineControls.equipmentInfo.installationDate') }}</span>
             <span class="info-value">{{
               machine.installationDate
                 ? machine.installationDate.split('-').reverse().join('/')
-                : 'N/A'
+                : t('machineControls.equipmentInfo.notAvailable')
             }}</span>
           </div>
           <div class="info-item">
-            <span class="info-label">Power:</span>
-            <span class="info-value">{{ machine.powerWatts || 'N/A' }} W</span>
+            <span class="info-label">{{ t('machineControls.equipmentInfo.power') }}</span>
+            <span class="info-value">{{ machine.powerWatts || t('machineControls.equipmentInfo.notAvailable') }} W</span>
           </div>
 
           <div class="info-item location-item">
-            <span class="info-label">Location:</span>
-            <span class="info-value">{{ machine.location?.name || 'N/A' }}</span>
+            <span class="info-label">{{ t('machineControls.equipmentInfo.location') }}</span>
+            <span class="info-value">{{ machine.location?.name || t('machineControls.equipmentInfo.notAvailable') }}</span>
           </div>
 
           <div class="info-item location-item">
-            <span class="info-label">Address:</span>
-            <span class="info-value">{{ machine.location?.address || 'N/A' }}</span>
+            <span class="info-label">{{ t('machineControls.equipmentInfo.address') }}</span>
+            <span class="info-value">{{ machine.location?.address || t('machineControls.equipmentInfo.notAvailable') }}</span>
           </div>
 
           <div class="info-item maintenance-item">
-            <span class="info-label">Maintenance:</span>
+            <span class="info-label">{{ t('machineControls.equipmentInfo.maintenance') }}</span>
             <div class="maintenance-details">
-              <span class="detail-label">Last:</span>
-              <span class="detail-value">{{ machine.maintenanceInfo?.last || 'N/A' }}</span>
-              <span class="detail-label">Next:</span>
-              <span class="detail-value">{{ machine.maintenanceInfo?.next || 'Pending' }}</span>
+              <span class="detail-label">{{ t('machineControls.equipmentInfo.last') }}</span>
+              <span class="detail-value">{{ machine.maintenanceInfo?.last || t('machineControls.equipmentInfo.notAvailable') }}</span>
+              <span class="detail-label">{{ t('machineControls.equipmentInfo.next') }}</span>
+              <span class="detail-value">{{ machine.maintenanceInfo?.next || t('machineControls.equipmentInfo.pending') }}</span>
             </div>
           </div>
 
           <div class="info-item notes-item">
-            <span class="info-label">Notes:</span>
-            <span class="info-value notes-text">{{ machine.notes || 'No notes.' }}</span>
+            <span class="info-label">{{ t('machineControls.equipmentInfo.notes') }}</span>
+            <span class="info-value notes-text">{{ machine.notes || t('machineControls.equipmentInfo.noNotes') }}</span>
           </div>
         </div>
       </div>
@@ -238,7 +242,7 @@
         <path d="M19 12H5" />
         <path d="m12 19-7-7 7-7" />
       </svg>
-      Back to My Machines
+      {{ t('machineControls.actions.backToMachines') }}
     </pv-button>
   </div>
 </template>
@@ -246,11 +250,13 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { http } from '@/shared-kernel/infrastructure/http.js'
 import ProgressSpinner from 'primevue/progressspinner'
 
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
 
 const machineId = computed(() => route.params.id)
 
@@ -374,10 +380,6 @@ const togglePower = () => {
 
 .back-button-bottom {
   margin: 40px auto 20px auto;
-}
-
-.analytics-button {
-  width: 100%;
 }
 
 .p-button.p-button-primary {
