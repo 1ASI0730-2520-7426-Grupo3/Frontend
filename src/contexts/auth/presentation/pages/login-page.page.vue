@@ -1,26 +1,189 @@
-<!--
-  Summary: Login page for CoolGym application
-  Displays a centered login button that redirects to home page
--->
 <template>
   <div class="login-container">
     <div class="login-content">
-      <img src="@/assets/CoolGymImage.png" alt="CoolGym logo - Exercise bike" class="login-logo" />
-      <h1 class="login-title">CoolGym</h1>
-      <p class="login-subtitle">Intelligent management of fitness equipment</p>
-      <button class="login-button" @click="handleLogin">Login</button>
+      <!-- Logo and Title -->
+      <div class="logo-section">
+        <img src="@/assets/CoolGymImage.png" alt="CoolGym logo" class="login-logo" />
+        <div class="title-section">
+          <h1 class="app-title">CoolGym</h1>
+          <p class="role-subtitle">{{ roleTitle }}</p>
+        </div>
+      </div>
+
+      <!-- Login Form -->
+      <h2 class="login-heading">Login</h2>
+
+      <form @submit.prevent="handleLogin" class="login-form">
+        <InputText
+          v-model="email"
+          type="email"
+          placeholder="Email"
+          class="input-field"
+          :class="{ 'p-invalid': errors.email }"
+        />
+        <small v-if="errors.email" class="p-error">{{ errors.email }}</small>
+
+        <Password
+          v-model="password"
+          placeholder="Password"
+          :feedback="false"
+          toggleMask
+          class="input-field"
+          :class="{ 'p-invalid': errors.password }"
+        />
+        <small v-if="errors.password" class="p-error">{{ errors.password }}</small>
+
+        <div class="form-options">
+          <div class="checkbox-wrapper">
+            <Checkbox v-model="rememberMe" :binary="true" inputId="remember" />
+            <label for="remember" class="checkbox-label">Remember me</label>
+          </div>
+          <a href="#" class="forgot-password" @click.prevent="handleForgotPassword">
+            Forgot your password?
+          </a>
+        </div>
+
+        <Message v-if="loginError" severity="error" :closable="false">
+          {{ loginError }}
+        </Message>
+
+        <div class="button-group">
+          <Button type="submit" label="Login" class="login-btn" :loading="loading" />
+          <Button
+            type="button"
+            label="Register"
+            outlined
+            class="register-btn"
+            @click="goToRegister"
+          />
+        </div>
+      </form>
+
+      <!-- Back to Landing -->
+      <Button
+        icon="pi pi-arrow-left"
+        rounded
+        text
+        class="back-button"
+        aria-label="Back to home"
+        @click="goToLanding"
+      />
     </div>
   </div>
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
+import { ref, computed, defineOptions, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { useToast } from 'primevue/usetoast'
+import Button from 'primevue/button'
+import InputText from 'primevue/inputtext'
+import Password from 'primevue/password'
+import Checkbox from 'primevue/checkbox'
+import Message from 'primevue/message'
+import { AuthApiService } from '../../infrastructure/auth-api.service.js'
+
+defineOptions({
+  name: 'LoginPage',
+})
 
 const router = useRouter()
+const route = useRoute()
+const toast = useToast()
+const authService = new AuthApiService()
 
-const handleLogin = () => {
-  localStorage.setItem('isAuthenticated', 'true')
-  router.push({ name: 'home' })
+const email = ref('')
+const password = ref('')
+const rememberMe = ref(false)
+const loading = ref(false)
+const loginError = ref('')
+const errors = ref({})
+const userRole = ref('client')
+
+const roleTitle = computed(() => {
+  return userRole.value === 'provider' ? 'Providers' : 'Clients'
+})
+
+onMounted(() => {
+  const storedRole = localStorage.getItem('userRole')
+  const routeRole = route.params.role
+
+  if (routeRole) {
+    userRole.value = routeRole
+    localStorage.setItem('userRole', routeRole)
+  } else if (storedRole) {
+    userRole.value = storedRole
+  }
+})
+
+const validateForm = () => {
+  errors.value = {}
+
+  if (!email.value.trim()) {
+    errors.value.email = 'Email is required'
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+    errors.value.email = 'Please enter a valid email'
+  }
+
+  if (!password.value) {
+    errors.value.password = 'Password is required'
+  }
+
+  return Object.keys(errors.value).length === 0
+}
+
+const handleLogin = async () => {
+  loginError.value = ''
+
+  if (!validateForm()) {
+    return
+  }
+
+  try {
+    loading.value = true
+
+    await authService.login(email.value, password.value)
+
+    if (rememberMe.value) {
+      localStorage.setItem('rememberMe', 'true')
+    }
+
+    toast.add({
+      severity: 'success',
+      summary: 'Login Successful',
+      detail: 'Welcome back!',
+      life: 3000,
+    })
+
+    const role = localStorage.getItem('userRole')
+    if (role === 'provider') {
+      router.push({ name: 'provider-home' })
+    } else {
+      router.push({ name: 'home' })
+    }
+  } catch (error) {
+    console.error('Login error:', error)
+    loginError.value = error.message || 'Invalid email or password'
+  } finally {
+    loading.value = false
+  }
+}
+
+const goToRegister = () => {
+  router.push({ name: 'register', params: { role: userRole.value } })
+}
+
+const handleForgotPassword = () => {
+  toast.add({
+    severity: 'info',
+    summary: 'Password Recovery',
+    detail: 'Password recovery feature coming soon!',
+    life: 3000,
+  })
+}
+
+const goToLanding = () => {
+  router.push({ name: 'landing' })
 }
 </script>
 
@@ -30,86 +193,174 @@ const handleLogin = () => {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: #f8fafc;
+  background: linear-gradient(135deg, #e3f2fd 0%, #f8f9fa 100%);
+  position: relative;
 }
 
 .login-content {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
+  gap: 1.5rem;
   padding: 3rem;
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  max-width: 500px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  max-width: 450px;
   width: 100%;
+  position: relative;
+}
+
+.back-button {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .login-logo {
-  width: 120px;
-  height: 120px;
+  width: 80px;
+  height: 80px;
   object-fit: contain;
 }
 
-.login-title {
-  color: #2563eb;
-  font-size: 2.5rem;
+.title-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.app-title {
+  color: #0ea5e9;
+  font-size: 2rem;
   font-weight: 700;
   margin: 0;
+  line-height: 1;
 }
 
-.login-subtitle {
-  color: #4b5563;
-  font-size: 1rem;
-  text-align: center;
-  margin: 0;
+.role-subtitle {
+  color: #1f2937;
+  font-size: 0.875rem;
+  margin: 0.25rem 0 0 0;
+  font-weight: 500;
 }
 
-.login-button {
-  background-color: #0ea5e9;
-  color: white;
-  border: none;
-  padding: 1rem 3rem;
-  font-size: 1.25rem;
+.login-heading {
+  color: #0ea5e9;
+  font-size: 1.75rem;
   font-weight: 600;
-  border-radius: 8px;
+  margin: 0;
+  align-self: flex-start;
+  width: 100%;
+  text-align: center;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.input-field {
+  width: 100%;
+}
+
+.input-field:deep(.p-inputtext),
+.input-field:deep(.p-password-input) {
+  width: 100%;
+}
+
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.checkbox-label {
+  font-size: 0.875rem;
+  color: #4b5563;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.3);
+  user-select: none;
 }
 
-.login-button:hover {
-  background-color: #0284c7;
-  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4);
-  transform: translateY(-2px);
+.forgot-password {
+  color: #0ea5e9;
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: color 0.2s;
 }
 
-.login-button:active {
-  transform: translateY(0);
+.forgot-password:hover {
+  color: #0284c7;
+  text-decoration: underline;
+}
+
+.button-group {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.login-btn,
+.register-btn {
+  flex: 1;
+  padding: 0.875rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.p-error {
+  color: #ef4444;
+  font-size: 0.75rem;
+  margin-top: -0.5rem;
 }
 
 @media (max-width: 640px) {
   .login-content {
     padding: 2rem 1.5rem;
+    max-width: 90%;
   }
 
-  .login-logo {
-    width: 100px;
-    height: 100px;
+  .logo-section {
+    flex-direction: column;
+    text-align: center;
   }
 
-  .login-title {
-    font-size: 2rem;
+  .title-section {
+    align-items: center;
   }
 
-  .login-subtitle {
-    font-size: 0.9rem;
+  .app-title {
+    font-size: 1.75rem;
   }
 
-  .login-button {
-    padding: 0.875rem 2.5rem;
-    font-size: 1.125rem;
+  .login-heading {
+    font-size: 1.5rem;
+  }
+
+  .form-options {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .button-group {
+    flex-direction: column;
   }
 }
 </style>

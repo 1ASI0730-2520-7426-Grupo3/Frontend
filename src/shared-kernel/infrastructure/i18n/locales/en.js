@@ -33,6 +33,32 @@ export default {
       pay: 'Pay',
     },
   },
+  company: {
+    myTeams: {
+      title: 'My Teams',
+      machines: {
+        title: 'My machines',
+        loading: 'Loading equipment...',
+        error: 'Error loading machines',
+        empty: 'No equipment found for this company.',
+        reload: 'Reload',
+      },
+      maintenance: {
+        title: 'Maintenance',
+        loading: 'Loading maintenance requests...',
+        error: 'Error loading requests',
+        empty: 'No maintenance requests found.',
+        reload: 'Reload',
+        client: 'Client',
+        status: {
+          pending: 'Pending',
+          completed: 'Completed',
+          inProgress: 'In Progress',
+        },
+        submit: 'Submit',
+      },
+    },
+  },
   footer: {
     copyright: '© 2025 CoolGym. All rights reserved.',
     links: {
@@ -41,4 +67,4 @@ export default {
       cookie: 'Cookie Policy',
     },
   },
-};
+}
