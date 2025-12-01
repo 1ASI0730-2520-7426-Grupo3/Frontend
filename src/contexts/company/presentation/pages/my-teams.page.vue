@@ -29,7 +29,6 @@
           </div>
         </section>
 
-        <!-- Right Section: Maintenance Requests -->
         <section class="maintenance-section">
           <h2 class="section-title">Maintenance</h2>
 
@@ -71,15 +70,12 @@ import { CompanyApiService } from '../../infrastructure/company-api.service.js'
 
 const api = new CompanyApiService()
 
-// For now, hardcode company ID. In production, get from auth context
 const COMPANY_ID = 1
 
-// Machines state
 const companyMachines = ref([])
 const isLoadingMachines = ref(true)
 const machinesError = ref(null)
 
-// Maintenance requests state
 const maintenanceRequests = ref([])
 const isLoadingRequests = ref(true)
 const requestsError = ref(null)
@@ -92,10 +88,8 @@ const fetchCompanyMachines = async () => {
   machinesError.value = null
 
   try {
-    // API now returns CompanyMachine entities
     const machines = await api.getCompanyEquipment(COMPANY_ID)
 
-    // Transform entities for the view
     companyMachines.value = machines.map((machine) => ({
       id: machine.id,
       name: machine.name,
@@ -154,7 +148,6 @@ const handleSubmitRequest = (requestId) => {
   alert(`Submitting maintenance request #${requestId}`)
 }
 
-// Load data on mount
 onMounted(() => {
   fetchCompanyMachines()
   fetchMaintenanceRequests()

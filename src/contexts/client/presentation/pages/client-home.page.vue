@@ -146,7 +146,6 @@ const getStatusClass = (status) => {
 }
 
 const fetchData = async () => {
-  // 1. Equipos (Real)
   try {
     const data = await equipmentService.getClientEquipment(USER_ID)
     myMachines.value = data.map((e) => ({
@@ -160,7 +159,6 @@ const fetchData = async () => {
     isLoading.value.myMachines = false
   }
 
-  // 2. Renta (Mock Service)
   try {
     const data = await rentService.getRentalCatalog()
     rentMachines.value = data.map((m) => ({
@@ -175,14 +173,12 @@ const fetchData = async () => {
     isLoading.value.rentMachines = false
   }
 
-  // 3. Mantenimiento (Real + Mapeo de Nombres)
   try {
     const [requests, equipments] = await Promise.all([
       maintenanceService.getAllRequests(),
-      equipmentService.getClientEquipment(USER_ID), // Reusamos la llamada si fuera necesario optimizar
+      equipmentService.getClientEquipment(USER_ID),
     ])
 
-    // Creamos un mapa de ID -> Nombre para rápido acceso
     const eqMap = new Map(equipments.map((e) => [e.id, e.name]))
 
     maintenance.value = requests
@@ -198,11 +194,10 @@ const fetchData = async () => {
     isLoading.value.maintenance = false
   }
 
-  // 4. Facturación (Real)
   try {
     const invoices = await billingService.getInvoicesByUser(USER_ID)
     account.value = invoices
-      .filter((inv) => inv.status.toLowerCase() === 'pending') // Solo pendientes
+      .filter((inv) => inv.status.toLowerCase() === 'pending')
       .map((inv) => ({
         id: inv.id,
         entity: inv.companyName,

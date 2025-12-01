@@ -109,7 +109,7 @@ export class ProviderApiService {
 
       // Filter approved requests for this provider and extract unique clients
       const approvedRequests = response.data.filter(
-        (req) => req.status === 'approved' && req.providerId === providerId
+        (req) => req.status === 'approved' && req.providerId === providerId,
       )
 
       // Get unique clients

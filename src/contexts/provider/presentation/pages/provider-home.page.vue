@@ -143,7 +143,6 @@ const loadProviderData = async () => {
   try {
     loading.value = true
 
-    // Load all provider data in parallel
     const [equipment, rentalRequests, maintenanceReqs, invoices] = await Promise.all([
       providerService.getProviderEquipment(),
       providerService.getPendingRentalRequests(),
@@ -151,21 +150,19 @@ const loadProviderData = async () => {
       providerService.getAllInvoices(),
     ])
 
-    // Map equipment data
     gymEquipment.value = equipment.map((eq) => ({
       id: eq.id,
       name: eq.name,
       image: eq.image || '/placeholder-equipment.png',
     }))
 
-    // Map maintenance tasks (from maintenance requests)
     maintenanceTasks.value = maintenanceReqs.map((req) => ({
       id: req.id,
       equipmentName: req.equipmentName || `Equipment #${req.equipmentId}`,
-      status: req.status === 'pending' ? 'Pending' : req.status === 'completed' ? 'Done' : 'In Progress',
+      status:
+        req.status === 'pending' ? 'Pending' : req.status === 'completed' ? 'Done' : 'In Progress',
     }))
 
-    // Map rental requests for display
     maintenanceRequests.value = rentalRequests.map((req) => ({
       id: req.id,
       equipmentName: req.equipmentName || `Equipment #${req.equipmentId}`,
@@ -174,7 +171,6 @@ const loadProviderData = async () => {
       duration: '1 year',
     }))
 
-    // Map invoices/billing data - Filter by provider ID
     const providerId = parseInt(localStorage.getItem('userId'))
     const providerInvoices = invoices.filter((invoice) => invoice.providerId === providerId)
 
@@ -206,7 +202,6 @@ const handleAcceptRequest = async (requestId) => {
       detail: 'Rental request has been accepted and invoice created',
       life: 3000,
     })
-    // Reload data to reflect changes
     await loadProviderData()
   } catch (error) {
     console.error('Error accepting request:', error)
@@ -228,7 +223,6 @@ const handleDenyRequest = async (requestId) => {
       detail: 'Rental request has been rejected',
       life: 3000,
     })
-    // Reload data to reflect changes
     await loadProviderData()
   } catch (error) {
     console.error('Error denying request:', error)
@@ -273,7 +267,6 @@ onMounted(() => {
   gap: 2rem;
 }
 
-/* Section Styles */
 .dashboard-section {
   background: white;
   border-radius: 12px;
@@ -295,7 +288,6 @@ onMounted(() => {
   font-style: italic;
 }
 
-/* Equipment Grid */
 .equipment-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -336,7 +328,6 @@ onMounted(() => {
   font-size: 0.9rem;
 }
 
-/* Maintenance List */
 .maintenance-list {
   display: flex;
   flex-direction: column;
@@ -358,7 +349,6 @@ onMounted(() => {
   color: #1f2937;
 }
 
-/* Requests List */
 .requests-list {
   display: flex;
   flex-direction: column;
@@ -424,7 +414,6 @@ onMounted(() => {
   min-width: 100px;
 }
 
-/* Billing List */
 .billing-list {
   display: flex;
   flex-direction: column;
@@ -457,7 +446,6 @@ onMounted(() => {
   font-size: 0.875rem;
 }
 
-/* Navigation Arrow */
 .nav-arrow {
   position: fixed;
   right: 2rem;

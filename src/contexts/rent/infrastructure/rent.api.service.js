@@ -8,9 +8,7 @@ export class RentApiService {
    */
   async getRentalCatalog() {
     try {
-      // Fetch all equipment - frontend can filter which to show
       const response = await http.get('/equipments')
-      // Map equipment to rental machines with pricing
       const rentData = response.data.map((equipment) => ({
         id: equipment.id,
         name: equipment.name,

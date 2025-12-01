@@ -33,9 +33,9 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
-// Importamos el componente visual compartido
+
 import MachineCard from '@/shared-kernel/presentation/ui/components/machine-card.component.vue'
-// Importamos el servicio DESDE ESTE CONTEXTO (rent)
+
 import { RentApiService } from '../../infrastructure/rent.api.service.js'
 
 const router = useRouter()

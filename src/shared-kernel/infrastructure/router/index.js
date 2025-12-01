@@ -11,10 +11,8 @@ const MachineControls = () =>
   import('@/contexts/public/presentation/pages/machine-controls.page.vue')
 
 const routes = [
-  // Root redirect to landing
   { path: '/', redirect: { name: 'landing' } },
 
-  // ========== PUBLIC ROUTES (No auth required) ==========
   { path: '/landing', name: 'landing', component: LandingPage, meta: { requiresAuth: false } },
   { path: '/login/:role?', name: 'login', component: LoginPage, meta: { requiresAuth: false } },
   {
@@ -26,7 +24,6 @@ const routes = [
   { path: '/rent', name: 'rent', component: RentPage, meta: { requiresAuth: false } },
   { path: '/contact', name: 'contact', component: ContactPage, meta: { requiresAuth: false } },
 
-  // ========== DYNAMIC HOME (Redirects based on role) ==========
   {
     path: '/home',
     name: 'home',
@@ -36,7 +33,6 @@ const routes = [
     },
   },
 
-  // ========== CLIENT ROUTES ==========
   {
     path: '/client/home',
     name: 'client-home',
@@ -81,7 +77,6 @@ const routes = [
     meta: { requiresAuth: true, role: 'client' },
   },
 
-  // ========== PROVIDER ROUTES ==========
   {
     path: '/provider/home',
     name: 'provider-home',
@@ -107,7 +102,6 @@ const routes = [
     meta: { requiresAuth: true, role: 'provider' },
   },
 
-  // ========== SHARED ROUTES (Both roles) ==========
   {
     path: '/profile',
     name: 'profile',
@@ -115,7 +109,6 @@ const routes = [
     meta: { requiresAuth: true },
   },
 
-  // ========== 404 NOT FOUND ==========
   {
     path: '/:pathMatch(.*)*',
     name: 'not-found',

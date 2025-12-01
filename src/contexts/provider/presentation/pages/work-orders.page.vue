@@ -85,7 +85,7 @@ const loadWorkOrders = async () => {
 
     // Filter approved rental requests for this provider
     const approvedRentals = allRentalRequests.filter(
-      (req) => req.status === 'approved' && req.providerId === providerId
+      (req) => req.status === 'approved' && req.providerId === providerId,
     )
 
     // Map approved rental requests to work orders
@@ -238,7 +238,6 @@ onMounted(() => {
   font-weight: 600;
 }
 
-/* Navigation Arrow */
 .nav-arrow {
   position: fixed;
   left: 2rem;

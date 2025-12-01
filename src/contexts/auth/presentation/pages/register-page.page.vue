@@ -123,7 +123,6 @@ const roleTitle = computed(() => {
 })
 
 onMounted(() => {
-  // Get role from localStorage or route params
   const storedRole = localStorage.getItem('userRole')
   const routeRole = route.params.role
 
@@ -179,7 +178,6 @@ const handleRegister = async () => {
   try {
     loading.value = true
 
-    // Call real API with role
     await authService.signup({
       fullName: formData.value.fullName,
       username: formData.value.username,
@@ -195,7 +193,6 @@ const handleRegister = async () => {
       life: 3000,
     })
 
-    // Redirect to login
     router.push({ name: 'login', params: { role: userRole.value } })
   } catch (error) {
     console.error('Registration error:', error)

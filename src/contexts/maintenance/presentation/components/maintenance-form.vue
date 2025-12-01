@@ -63,20 +63,16 @@ const canSubmit = computed(() => !!selectedId.value && !!dateStr.value && !!obse
 async function load() {
   loading.value = true
   try {
-    // 1. Cargar equipos desde el backend real
     const eqs = await api.getUserEquipments()
     equipments.value = eqs
 
-    // 2. Verificar si venimos redirigidos con un ID específico
     const queryId = route.query.equipmentId
     if (queryId) {
-      // Convertimos a número para asegurar coincidencia
       const found = eqs.find((e) => e.id === Number(queryId))
       if (found) {
         selectedId.value = found.id
       }
     } else if (eqs.length > 0) {
-      // Default al primero si no hay pre-selección
       selectedId.value = eqs[0].id
     }
   } catch (error) {
@@ -93,11 +89,10 @@ async function submit() {
   isSubmitting.value = true
 
   try {
-    // Preparamos el payload usando el Assembler corregido
     const payload = MaintenanceAssembler.toCreateResource({
       equipmentId: selectedId.value,
       selectedDate: dateStr.value,
-      notes: observation.value, // El assembler lo renombrará a 'observation'
+      notes: observation.value,
     })
 
     await api.createRequest(payload)
@@ -108,7 +103,6 @@ async function submit() {
       detail: 'Maintenance request created successfully',
     })
 
-    // Redirigir al home o limpiar
     setTimeout(() => router.push({ name: 'my-machines' }), 1500)
   } catch (error) {
     console.error('Error creating request:', error)

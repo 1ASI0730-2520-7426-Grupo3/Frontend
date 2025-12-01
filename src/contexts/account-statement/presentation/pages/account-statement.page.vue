@@ -28,7 +28,6 @@ const invoices = ref([])
 const loading = ref(false)
 const error = ref(null)
 
-// Obtener el ID del usuario real autenticado
 const userId = localStorage.getItem('userId')
 
 async function load() {

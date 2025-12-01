@@ -26,10 +26,8 @@ defineOptions({
 const router = useRouter()
 
 const selectRole = (role) => {
-  // Store the selected role in localStorage
   localStorage.setItem('userRole', role)
 
-  // Navigate to login page with role
   router.push({ name: 'login', params: { role } })
 }
 </script>

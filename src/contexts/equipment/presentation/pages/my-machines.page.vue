@@ -111,13 +111,11 @@ const equipmentService = new EquipmentApiService()
 const machines = ref([])
 const loading = ref(true)
 
-// Función para cargar máquinas usando el servicio real
 const loadMachines = async () => {
   loading.value = true
   try {
     const clientId = localStorage.getItem('userId')
 
-    // Llamada correcta al servicio conectado al Backend .NET
     const data = await equipmentService.getClientEquipment(clientId)
 
     machines.value = data
@@ -133,21 +131,16 @@ const loadMachines = async () => {
   }
 }
 
-// Función para cambiar el estado de encendido
 const togglePower = async (machineId) => {
-  // 1. Encontrar la máquina localmente
   const machine = machines.value.find((m) => m.id === machineId)
   if (!machine) return
 
-  // 2. Guardar estado anterior por si falla
   const originalState = machine.isPoweredOn
   const newPowerState = !originalState
 
   try {
-    // 3. Actualización optimista (cambiar visualmente antes de que responda el servidor)
     machine.isPoweredOn = newPowerState
 
-    // 4. Preparar payload.
     const updatePayload = {
       name: machine.name,
       code: machine.code,
@@ -161,7 +154,6 @@ const togglePower = async (machineId) => {
       image: machine.image,
     }
 
-    // 5. Llamar al servicio
     await equipmentService.updateEquipment(machineId, updatePayload)
 
     toast.add({
@@ -173,7 +165,6 @@ const togglePower = async (machineId) => {
   } catch (error) {
     console.error('Error toggling power:', error)
 
-    // 6. Revertir cambio si hubo error
     machine.isPoweredOn = originalState
 
     toast.add({

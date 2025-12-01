@@ -105,7 +105,6 @@ const roleTitle = computed(() => {
 })
 
 onMounted(() => {
-  // Get role from localStorage or route params
   const storedRole = localStorage.getItem('userRole')
   const routeRole = route.params.role
 
@@ -143,7 +142,6 @@ const handleLogin = async () => {
   try {
     loading.value = true
 
-    // Call real API
     await authService.login(email.value, password.value)
 
     if (rememberMe.value) {
@@ -157,7 +155,6 @@ const handleLogin = async () => {
       life: 3000,
     })
 
-    // Redirect based on user role
     const role = localStorage.getItem('userRole')
     if (role === 'provider') {
       router.push({ name: 'provider-home' })

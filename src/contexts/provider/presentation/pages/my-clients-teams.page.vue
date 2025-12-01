@@ -81,7 +81,7 @@ const technicians = ref([
     id: 3,
     name: 'Sanchez Quispe Harold',
   },
-]) // Technicians are future feature, keep as mock data
+])
 
 const workOrders = ref([])
 const loading = ref(true)
@@ -92,22 +92,19 @@ const loadData = async () => {
 
     const providerId = parseInt(localStorage.getItem('userId'))
 
-    // Load clients and all rental requests in parallel
     const [clientsData, allRentalRequests] = await Promise.all([
       providerService.getMyClients(),
       providerService.getAllRentalRequests(),
     ])
 
-    // Set clients
     clients.value = clientsData.map((client) => ({
       id: client.id,
       name: client.email,
       date: client.date,
     }))
 
-    // Filter approved rental requests for this provider and map to work orders
     const approvedRentals = allRentalRequests.filter(
-      (req) => req.status === 'approved' && req.providerId === providerId
+      (req) => req.status === 'approved' && req.providerId === providerId,
     )
 
     workOrders.value = approvedRentals.slice(0, 3).map((req) => ({
@@ -172,7 +169,6 @@ onMounted(() => {
   gap: 2rem;
 }
 
-/* Section Styles */
 .page-section {
   background: white;
   border-radius: 12px;
@@ -202,7 +198,6 @@ onMounted(() => {
   text-decoration: underline;
 }
 
-/* Clients List */
 .clients-list {
   display: flex;
   flex-direction: column;
@@ -229,7 +224,6 @@ onMounted(() => {
   font-size: 0.9rem;
 }
 
-/* Technicians List */
 .technicians-list {
   display: flex;
   flex-direction: column;
@@ -248,7 +242,6 @@ onMounted(() => {
   color: #1f2937;
 }
 
-/* Work Orders List */
 .work-orders-list {
   display: flex;
   flex-direction: column;
@@ -267,7 +260,6 @@ onMounted(() => {
   font-size: 0.95rem;
 }
 
-/* Navigation Arrow */
 .nav-arrow {
   position: fixed;
   left: 2rem;

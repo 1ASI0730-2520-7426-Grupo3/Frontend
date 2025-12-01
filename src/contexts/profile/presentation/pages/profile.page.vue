@@ -10,22 +10,17 @@
       class="back-button"
     />
 
-    <!-- Page Title -->
     <h1 class="page-title">My CoolGym Account</h1>
 
-    <!-- Loading State -->
     <div v-if="loading" class="loading-container">
       <ProgressSpinner />
     </div>
 
-    <!-- Error State -->
     <Message v-else-if="error" severity="error" :closable="false">
       {{ error }}
     </Message>
 
-    <!-- Profile Content -->
     <div v-else-if="userProfile" class="profile-content">
-      <!-- User Info Section -->
       <div class="user-info">
         <div class="avatar-section">
           <Avatar
@@ -61,14 +56,12 @@
         <p class="user-username">{{ userProfile.username }}</p>
       </div>
 
-      <!-- Current Plan Type -->
       <div class="current-plan-type">
         <p>
           Current Plan type: <strong>{{ userProfile.getCurrentPlanType() }}</strong>
         </p>
       </div>
 
-      <!-- Plans Section -->
       <div class="plans-section">
         <div class="plans-grid">
           <PlanCard
@@ -155,7 +148,6 @@ const handleFileSelect = async (event) => {
     return
   }
 
-  // Validate file size (max 5MB)
   const maxSize = 5 * 1024 * 1024
   if (file.size > maxSize) {
     toast.add({
@@ -170,16 +162,13 @@ const handleFileSelect = async (event) => {
   try {
     loading.value = true
 
-    // Convert file to base64 for display and storage
     const reader = new FileReader()
     reader.onload = async (e) => {
       const base64Image = e.target?.result
 
-      // Update profile photo via API
       const userId = authService.getCurrentUserId()
       await profileService.updateProfilePhoto(userId, base64Image)
 
-      // Update local state
       userProfile.value.profilePhoto = base64Image
 
       toast.add({
@@ -262,7 +251,6 @@ const loadProfileData = async () => {
       return
     }
 
-    // Load user profile and plans in parallel
     console.log('Fetching user profile and plans...')
     const [profile, allPlans] = await Promise.all([
       profileService.getUserProfile(userId),

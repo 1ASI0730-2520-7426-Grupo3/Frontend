@@ -93,7 +93,6 @@
       </template>
     </pv-toolbar>
 
-    <!-- Mobile Menu -->
     <div v-if="isMenuOpen" class="mobile-menu">
       <a
         v-for="link in navigationLinks"
@@ -123,7 +122,6 @@ const route = useRoute()
 const activeRoute = computed(() => route.name)
 const userRole = ref(localStorage.getItem('userRole') || 'client')
 
-// Navigation links based on user role
 const navigationLinks = computed(() => {
   const isClient = userRole.value === 'client'
   const isProvider = userRole.value === 'provider'
@@ -148,16 +146,19 @@ const navigationLinks = computed(() => {
   if (isProvider) {
     links.push(
       { name: 'my-teams', route: 'my-teams', label: 'My Teams', roles: ['provider'] },
-      { name: 'provider-requests', route: 'provider-requests', label: 'Requests', roles: ['provider'] },
+      {
+        name: 'provider-requests',
+        route: 'provider-requests',
+        label: 'Requests',
+        roles: ['provider'],
+      },
     )
   }
 
-  // Rent is only for clients (they rent equipment from providers)
   if (isClient) {
     links.push({ name: 'rent', route: 'rent', label: t('toolbar.nav.rent'), roles: ['client'] })
   }
 
-  // Contact is available for all users
   links.push({
     name: 'contact',
     route: 'contact',
@@ -257,7 +258,6 @@ const setLanguage = (lang) => {
   line-height: 1;
 }
 
-/* Navigation Section */
 .navigation-section {
   display: flex;
   align-items: center;
@@ -307,7 +307,6 @@ const setLanguage = (lang) => {
   font-weight: 600;
 }
 
-/* Actions Section */
 .actions-section {
   display: flex;
   align-items: center;
@@ -367,7 +366,6 @@ const setLanguage = (lang) => {
   font-size: 0.875rem;
 }
 
-/* Responsive */
 @media (max-width: 1200px) {
   .navigation-section {
     gap: 24px;

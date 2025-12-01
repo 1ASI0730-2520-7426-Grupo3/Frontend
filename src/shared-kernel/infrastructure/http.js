@@ -1,14 +1,13 @@
 import axios from 'axios'
 
 export const http = axios.create({
-  baseURL: 'http://localhost:5022/api/v1',
+  baseURL: 'https://app-coolgym-2025-02-b3g0b5f4gyghhhbh.chilecentral-01.azurewebsites.net/api/v1',
   headers: {
     'Content-Type': 'application/json',
   },
   timeout: 8000,
 })
 
-// Add request interceptor to include JWT token
 http.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('accessToken')
@@ -31,8 +30,6 @@ http.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem('isAuthenticated')
       localStorage.removeItem('accessToken')
-      // Optionally redirect to login
-      // window.location.href = '/login'
     }
 
     return Promise.reject(error)
