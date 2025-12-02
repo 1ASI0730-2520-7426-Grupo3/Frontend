@@ -2,11 +2,11 @@ import axios from 'axios'
 import i18n from './i18n'
 
 export const http = axios.create({
-  baseURL: 'https://app-coolgym-2025-02-b3g0b5f4gyghhhbh.chilecentral-01.azurewebsites.net/api/v1',
+  baseURL: 'http://localhost:5022/api/v1', // Local backend for testing
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 30000, // 30 seconds - handles Azure cold starts
+  timeout: 30000,
 })
 
 http.interceptors.request.use(

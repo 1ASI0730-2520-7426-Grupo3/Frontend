@@ -207,6 +207,11 @@ export default {
     back: 'Back',
     uploadPhoto: 'Upload profile photo',
     currentPlanType: 'Current Plan type:',
+    currentUsage: 'Current Usage',
+    planCard: {
+      current: 'Current',
+      update: 'Update',
+    },
     toast: {
       invalidFile: 'Invalid File',
       pleaseSelectImage: 'Please select an image file',
@@ -332,6 +337,8 @@ export default {
         requestedBy: 'Requested by:',
         time: 'Time:',
         equipment: 'Equipment',
+        clientUsage: 'Client Usage:',
+        planLimitReached: 'Plan Limit Reached',
       },
       actions: {
         accept: 'Accept',
@@ -346,6 +353,9 @@ export default {
         failedToLoad: 'Failed to load rental requests',
         failedToAccept: 'Failed to accept request',
         failedToReject: 'Failed to reject request',
+        clientPlanLimitReached: 'Client Plan Limit Reached',
+        clientPlanLimitExceeded: 'This client has reached their plan limit of {limit} machines ({current}/{limit}). They must upgrade their plan before you can accept this request.',
+        cannotAcceptRequest: 'Cannot Accept Request',
       },
     },
   },
@@ -406,6 +416,13 @@ export default {
       invalidStatus: 'The rental request status is invalid.',
       onlyPendingCanBeApproved: 'Only pending rental requests can be approved.',
       operationFailed: 'The rental request operation could not be completed.',
+      planLimitReached: 'Plan Limit Reached',
+      planLimitExceeded: 'You have reached your plan limit of {limit} machines. Please upgrade your plan to request more equipment.',
+    },
+    alert: {
+      planLimitReached: 'Plan Limit Reached',
+      planLimitMessage: 'You are currently using {current} of {limit} machines allowed in your plan. You cannot request additional equipment until you upgrade your plan.',
+      upgradePlan: 'Upgrade your plan to add more machines',
     },
   },
   billing: {

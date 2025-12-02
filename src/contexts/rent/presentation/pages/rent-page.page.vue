@@ -2,6 +2,19 @@
   <section class="panel">
     <h2 class="panel__title">{{ t('rentals.title') }}</h2>
 
+    <!-- Plan Limit Alert -->
+    <Message v-if="isPlanLimitReached" severity="warn" :closable="false" class="plan-limit-alert">
+      <template #default>
+        <div class="alert-content">
+          <strong>{{ t('rentals.alert.planLimitReached') }}</strong>
+          <p>{{ t('rentals.alert.planLimitMessage', { current: usageStatistics?.currentUsage, limit: usageStatistics?.planLimit }) }}</p>
+          <router-link to="/profile" class="upgrade-link">
+            {{ t('rentals.alert.upgradePlan') }}
+          </router-link>
+        </div>
+      </template>
+    </Message>
+
     <div v-if="isLoading" class="loading-message">{{ t('rentals.loading') }}</div>
 
     <div v-else-if="error" class="error-box">
@@ -19,7 +32,12 @@
           :isPrice="true"
         />
 
-        <button @click="handleRentRequest(machine)" class="request-button">
+        <button
+          @click="handleRentRequest(machine)"
+          class="request-button"
+          :disabled="isPlanLimitReached"
+          :class="{ 'request-button-disabled': isPlanLimitReached }"
+        >
           {{ t('rentals.requestButton') }}
         </button>
       </div>
@@ -32,23 +50,33 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, computed } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import { useI18n } from 'vue-i18n'
+import Message from 'primevue/message'
 
 import MachineCard from '@/shared-kernel/presentation/ui/components/machine-card.component.vue'
 
 import { RentApiService } from '../../infrastructure/rent.api.service.js'
+import { ProfileApiService } from '@/contexts/profile/infrastructure/profile-api.service.js'
+import { AuthApiService } from '@/contexts/auth/infrastructure/auth-api.service.js'
 
-const router = useRouter()
 const toast = useToast()
 const { t } = useI18n()
 const rentService = new RentApiService()
+const profileService = new ProfileApiService()
+const authService = new AuthApiService()
 
 const rentMachines = ref([])
 const isLoading = ref(true)
 const error = ref(null)
+const usageStatistics = ref(null)
+
+// Computed property to check if plan limit is reached
+const isPlanLimitReached = computed(() => {
+  if (!usageStatistics.value) return false
+  return usageStatistics.value.currentUsage >= usageStatistics.value.planLimit
+})
 
 const fetchRentMachines = async () => {
   isLoading.value = true
@@ -72,6 +100,17 @@ const handleRentRequest = async (machine) => {
         summary: t('common.error'),
         detail: t('rentals.toast.mustBeLoggedIn'),
         life: 3000,
+      })
+      return
+    }
+
+    // Check plan limit before making request
+    if (isPlanLimitReached.value) {
+      toast.add({
+        severity: 'warn',
+        summary: t('rentals.toast.planLimitReached'),
+        detail: t('rentals.toast.planLimitExceeded', { limit: usageStatistics.value.planLimit }),
+        life: 5000,
       })
       return
     }
@@ -100,8 +139,21 @@ const handleRentRequest = async (machine) => {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
+  // Fetch rental machines
   fetchRentMachines()
+
+  // Fetch user usage statistics
+  try {
+    const userId = authService.getCurrentUserId()
+    if (userId) {
+      usageStatistics.value = await profileService.getUserUsageStatistics(userId)
+      console.log('User usage statistics:', usageStatistics.value)
+    }
+  } catch (err) {
+    console.error('Error fetching usage statistics:', err)
+    // Don't block the page if usage stats fail to load
+  }
 })
 </script>
 
@@ -158,10 +210,25 @@ onMounted(() => {
   box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
 }
 
-.request-button:hover {
+.request-button:hover:not(:disabled) {
   background-color: #059669;
   transform: translateY(-2px);
   box-shadow: 0 6px 15px rgba(16, 185, 129, 0.4);
+}
+
+.request-button:disabled,
+.request-button-disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+  box-shadow: none;
+  opacity: 0.6;
+}
+
+.request-button:disabled:hover,
+.request-button-disabled:hover {
+  background-color: #9ca3af;
+  transform: none;
+  box-shadow: none;
 }
 
 .loading-message,
@@ -178,5 +245,38 @@ onMounted(() => {
   padding: 1rem;
   border-radius: 8px;
   text-align: center;
+}
+
+.plan-limit-alert {
+  margin-bottom: 20px;
+}
+
+.alert-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.alert-content strong {
+  font-size: 1.1rem;
+  color: #d97706;
+}
+
+.alert-content p {
+  margin: 0;
+  color: #92400e;
+}
+
+.upgrade-link {
+  color: #0ea5e9;
+  font-weight: 600;
+  text-decoration: none;
+  margin-top: 0.5rem;
+  transition: color 0.2s;
+}
+
+.upgrade-link:hover {
+  color: #0284c7;
+  text-decoration: underline;
 }
 </style>

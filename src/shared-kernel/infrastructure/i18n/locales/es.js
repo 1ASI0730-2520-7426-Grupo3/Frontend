@@ -207,6 +207,11 @@ export default {
     back: 'Volver',
     uploadPhoto: 'Subir foto de perfil',
     currentPlanType: 'Tipo de plan actual:',
+    currentUsage: 'Uso Actual',
+    planCard: {
+      current: 'Actual',
+      update: 'Actualizar',
+    },
     toast: {
       invalidFile: 'Archivo Inválido',
       pleaseSelectImage: 'Por favor seleccione un archivo de imagen',
@@ -332,6 +337,8 @@ export default {
         requestedBy: 'Solicitado por:',
         time: 'Tiempo:',
         equipment: 'Equipo',
+        clientUsage: 'Uso del Cliente:',
+        planLimitReached: 'Límite del Plan Alcanzado',
       },
       actions: {
         accept: 'Aceptar',
@@ -346,6 +353,9 @@ export default {
         failedToLoad: 'Error al cargar las solicitudes de alquiler',
         failedToAccept: 'Error al aceptar la solicitud',
         failedToReject: 'Error al rechazar la solicitud',
+        clientPlanLimitReached: 'Límite del Plan del Cliente Alcanzado',
+        clientPlanLimitExceeded: 'Este cliente ha alcanzado su límite de {limit} máquinas ({current}/{limit}). Debe actualizar su plan antes de que puedas aceptar esta solicitud.',
+        cannotAcceptRequest: 'No se Puede Aceptar la Solicitud',
       },
     },
   },
@@ -409,6 +419,13 @@ export default {
       onlyPendingCanBeApproved:
         'Solo se pueden aprobar solicitudes de alquiler en estado pendiente.',
       operationFailed: 'No se pudo completar la operación sobre la solicitud de alquiler.',
+      planLimitReached: 'Límite del Plan Alcanzado',
+      planLimitExceeded: 'Has alcanzado tu límite de {limit} máquinas. Por favor actualiza tu plan para solicitar más equipos.',
+    },
+    alert: {
+      planLimitReached: 'Límite del Plan Alcanzado',
+      planLimitMessage: 'Actualmente estás usando {current} de {limit} máquinas permitidas en tu plan. No puedes solicitar equipos adicionales hasta que actualices tu plan.',
+      upgradePlan: 'Actualiza tu plan para agregar más máquinas',
     },
   },
   billing: {
