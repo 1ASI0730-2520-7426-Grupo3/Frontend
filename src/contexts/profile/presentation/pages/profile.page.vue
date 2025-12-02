@@ -58,19 +58,30 @@
 
       <div class="current-plan-type">
         <p>
-          {{ t('profile.currentPlanType') }} <strong>{{ userProfile.getCurrentPlanType() }}</strong>
+          {{ t('profile.currentPlanType') }}: <strong>{{ userProfile.currentPlan?.name || t('profile.noPlan') }}</strong>
         </p>
       </div>
 
       <div class="plans-section">
+        <h2 class="plans-title">{{ t('profile.availablePlans') }}</h2>
         <div class="plans-grid">
-          <PlanCard
-            v-for="plan in plans"
+          <div
+            v-for="plan in filteredPlans"
             :key="plan.id"
-            :plan="plan"
-            :current-plan-id="userProfile.clientPlanId"
-            @update-plan="handleUpdatePlan"
-          />
+            class="plan-card"
+            :class="{ 'current-plan': userProfile.clientPlanId === plan.id }"
+          >
+            <h3 class="plan-name">{{ plan.name }}</h3>
+            <p class="plan-machines">{{ plan.getMaxMachinesText() }}</p>
+            <p class="plan-price">{{ plan.getFormattedPrice() }}</p>
+            <Button
+              :label="userProfile.clientPlanId === plan.id ? t('profile.currentPlan') : t('profile.selectPlan')"
+              :disabled="userProfile.clientPlanId === plan.id"
+              @click="handleSelectPlan(plan.id)"
+              class="select-plan-btn"
+              :class="{ 'current-plan-btn': userProfile.clientPlanId === plan.id }"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -78,7 +89,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, defineOptions } from 'vue'
+import { ref, computed, onMounted, defineOptions } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
@@ -86,7 +97,6 @@ import Avatar from 'primevue/avatar'
 import ProgressSpinner from 'primevue/progressspinner'
 import Message from 'primevue/message'
 import { useToast } from 'primevue/usetoast'
-import PlanCard from '../components/plan-card.component.vue'
 import { ProfileApiService } from '../../infrastructure/profile-api.service.js'
 import { AuthApiService } from '@/contexts/auth/infrastructure/auth-api.service.js'
 
@@ -105,6 +115,29 @@ const plans = ref([])
 const loading = ref(true)
 const error = ref(null)
 const fileInput = ref(null)
+
+/**
+ * Filter plans based on user role
+ * Clients: Basic, Standard, Premium
+ * Providers: Small Company, Medium Company, Enterprise Premium
+ */
+const filteredPlans = computed(() => {
+  const userRole = localStorage.getItem('userRole')?.toLowerCase()
+
+  if (userRole === 'client') {
+    // Show only Basic, Standard, Premium (first 3 plans for individuals)
+    return plans.value.filter(plan =>
+      plan.name === 'Basic' || plan.name === 'Standard' || plan.name === 'Premium'
+    )
+  } else if (userRole === 'provider') {
+    // Show only Small Company, Medium Company, Enterprise Premium
+    return plans.value.filter(plan =>
+      plan.name === 'Small Company' || plan.name === 'Medium Company' || plan.name === 'Enterprise Premium'
+    )
+  }
+
+  return plans.value
+})
 
 /**
  * Get user initials for avatar
@@ -208,9 +241,9 @@ const handleFileSelect = async (event) => {
 }
 
 /**
- * Handle plan update
+ * Handle plan selection
  */
-const handleUpdatePlan = async (planId) => {
+const handleSelectPlan = async (planId) => {
   try {
     loading.value = true
     const userId = authService.getCurrentUserId()
@@ -393,15 +426,81 @@ onMounted(() => {
 }
 
 .plans-section {
-  padding: 1rem 0;
+  padding: 2rem 0;
+}
+
+.plans-title {
+  text-align: center;
+  color: #0288d1;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .plans-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 1.5rem;
-  max-width: 800px;
+  max-width: 1000px;
   margin: 0 auto;
+}
+
+.plan-card {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.plan-card.current-plan {
+  border-color: #0288d1;
+  background: #e3f2fd;
+  box-shadow: 0 4px 12px rgba(2, 136, 209, 0.2);
+}
+
+.plan-name {
+  color: #2c3e50;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+}
+
+.plan-card.current-plan .plan-name {
+  color: #0288d1;
+}
+
+.plan-machines {
+  color: #666;
+  font-size: 0.875rem;
+  margin: 0.5rem 0;
+}
+
+.plan-price {
+  color: #0288d1;
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 1rem 0 0 0;
+}
+
+.select-plan-btn {
+  margin-top: 1rem;
+  width: 100%;
+  background: #0288d1;
+  border-color: #0288d1;
+  color: white;
+}
+
+.select-plan-btn:hover:not(:disabled) {
+  background: #0277bd;
+  border-color: #0277bd;
+}
+
+.select-plan-btn.current-plan-btn {
+  background: #e3f2fd;
+  border-color: #0288d1;
+  color: #0288d1;
+  cursor: not-allowed;
 }
 
 @media (max-width: 768px) {
