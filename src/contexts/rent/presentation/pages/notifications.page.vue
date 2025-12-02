@@ -55,9 +55,13 @@
               >
             </div>
 
-            <div v-if="request.notes" class="detail-item">
-              <i class="pi pi-info-circle"></i>
-              <span>{{ request.notes }}</span>
+            <div v-if="request.status === 'approved' && request.providerName" class="detail-item provider-info">
+              <i class="pi pi-check-circle"></i>
+              <span>
+                {{ t('rentals.notifications.details.acceptedBy') }}
+                <strong>{{ request.providerName }}</strong>
+                ({{ request.providerEmail }})
+              </span>
             </div>
           </div>
         </template>
@@ -252,6 +256,21 @@ onMounted(() => {
 .detail-item i {
   color: #2563eb;
   font-size: 1rem;
+}
+
+.provider-info {
+  background-color: #f0fdf4;
+  padding: 0.75rem;
+  border-radius: 6px;
+  border-left: 3px solid #22c55e;
+}
+
+.provider-info i {
+  color: #22c55e;
+}
+
+.provider-info strong {
+  color: #16a34a;
 }
 
 .empty-state {

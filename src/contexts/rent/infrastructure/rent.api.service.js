@@ -1,5 +1,6 @@
 import { http } from '@/shared-kernel/infrastructure/http'
 import { RentAssembler } from '../Domain/rent.assembler.js'
+import i18n from '@/shared-kernel/infrastructure/i18n'
 
 export class RentApiService {
   /**

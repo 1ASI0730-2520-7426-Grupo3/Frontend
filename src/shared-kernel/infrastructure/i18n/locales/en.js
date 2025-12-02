@@ -206,7 +206,11 @@ export default {
     title: 'My CoolGym Account',
     back: 'Back',
     uploadPhoto: 'Upload profile photo',
-    currentPlanType: 'Current Plan type:',
+    currentPlanType: 'Current Plan Type',
+    noPlan: 'No Plan',
+    availablePlans: 'Available Plans',
+    currentPlan: 'Current Plan',
+    selectPlan: 'Select',
     toast: {
       invalidFile: 'Invalid File',
       pleaseSelectImage: 'Please select an image file',
@@ -376,6 +380,7 @@ export default {
         requested: 'Requested:',
         monthlyPrice: 'Monthly Price:',
         equipment: 'Equipment',
+        acceptedBy: 'Accepted by',
       },
       mustBeLoggedIn: 'You must be logged in to view notifications',
       failedToLoad: 'Failed to load rental requests',
@@ -389,6 +394,7 @@ export default {
       completed: 'Completed',
       cancelled: 'Cancelled',
     },
+    requestNotes: 'Rental request for equipment {equipmentId}',
     toast: {
       authenticationRequired: 'Authentication required.',
       mustBeLoggedIn: 'You must be logged in to request rentals',
@@ -503,5 +509,10 @@ export default {
     back: 'Back',
     confirm: 'Confirm',
     close: 'Close',
+  },
+  pageNotFound: {
+    title: 'Page Not Found',
+    message: 'The path {path} is not available.',
+    goHome: 'Go to Home',
   },
 }

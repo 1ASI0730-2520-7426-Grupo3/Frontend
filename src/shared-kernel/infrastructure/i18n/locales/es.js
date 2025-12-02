@@ -206,7 +206,11 @@ export default {
     title: 'Mi Cuenta CoolGym',
     back: 'Volver',
     uploadPhoto: 'Subir foto de perfil',
-    currentPlanType: 'Tipo de plan actual:',
+    currentPlanType: 'Tipo de Plan Actual',
+    noPlan: 'Sin Plan',
+    availablePlans: 'Planes Disponibles',
+    currentPlan: 'Plan Actual',
+    selectPlan: 'Seleccionar',
     toast: {
       invalidFile: 'Archivo Inválido',
       pleaseSelectImage: 'Por favor seleccione un archivo de imagen',
@@ -377,6 +381,7 @@ export default {
         requested: 'Solicitado:',
         monthlyPrice: 'Precio Mensual:',
         equipment: 'Equipo',
+        acceptedBy: 'Aceptado por',
       },
       mustBeLoggedIn: 'Debes iniciar sesión para ver las notificaciones',
       failedToLoad: 'Error al cargar solicitudes de alquiler',
@@ -390,6 +395,7 @@ export default {
       completed: 'Completado',
       cancelled: 'Cancelado',
     },
+    requestNotes: 'Solicitud de alquiler para equipo {equipmentId}',
     toast: {
       authenticationRequired: 'Autenticación requerida.',
       mustBeLoggedIn: 'Debes iniciar sesión para solicitar alquileres',
@@ -507,5 +513,10 @@ export default {
     back: 'Volver',
     confirm: 'Confirmar',
     close: 'Cerrar',
+  },
+  pageNotFound: {
+    title: 'Página No Encontrada',
+    message: 'La ruta {path} no está disponible.',
+    goHome: 'Ir al Inicio',
   },
 }
