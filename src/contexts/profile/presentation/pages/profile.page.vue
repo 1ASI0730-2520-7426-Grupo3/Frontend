@@ -71,9 +71,17 @@
             class="plan-card"
             :class="{ 'current-plan': userProfile.clientPlanId === plan.id }"
           >
-            <h3 class="plan-name">{{ plan.name }}</h3>
-            <p class="plan-machines">{{ plan.getMaxMachinesText() }}</p>
-            <p class="plan-price">{{ plan.getFormattedPrice() }}</p>
+            <h3 class="plan-name">{{ t(`profile.plans.${plan.id}.name`) }}</h3>
+            <p class="plan-machines">
+              {{
+                plan.maxMachines >= 999
+                  ? t('profile.plans.unlimitedClients')
+                  : plan.id <= 3
+                    ? t('profile.plans.upToMachines', { count: plan.maxMachines })
+                    : t('profile.plans.upToClients', { count: plan.maxMachines })
+              }}
+            </p>
+            <p class="plan-price">${{ plan.price.toFixed(2) }} USD / {{ t('profile.plans.monthly') }}</p>
             <Button
               :label="userProfile.clientPlanId === plan.id ? t('profile.currentPlan') : t('profile.selectPlan')"
               :disabled="userProfile.clientPlanId === plan.id"
@@ -118,22 +126,18 @@ const fileInput = ref(null)
 
 /**
  * Filter plans based on user role
- * Clients: Basic, Standard, Premium
- * Providers: Small Company, Medium Company, Enterprise Premium
+ * Clients: Basic, Standard, Premium (IDs 1, 2, 3)
+ * Providers: Small Company, Medium Company, Enterprise Premium (IDs 4, 5, 6)
  */
 const filteredPlans = computed(() => {
   const userRole = localStorage.getItem('userRole')?.toLowerCase()
 
   if (userRole === 'client') {
-    // Show only Basic, Standard, Premium (first 3 plans for individuals)
-    return plans.value.filter(plan =>
-      plan.name === 'Basic' || plan.name === 'Standard' || plan.name === 'Premium'
-    )
+    // Show only Basic, Standard, Premium (IDs 1-3)
+    return plans.value.filter(plan => plan.id >= 1 && plan.id <= 3)
   } else if (userRole === 'provider') {
-    // Show only Small Company, Medium Company, Enterprise Premium
-    return plans.value.filter(plan =>
-      plan.name === 'Small Company' || plan.name === 'Medium Company' || plan.name === 'Enterprise Premium'
-    )
+    // Show only Small Company, Medium Company, Enterprise Premium (IDs 4-6)
+    return plans.value.filter(plan => plan.id >= 4 && plan.id <= 6)
   }
 
   return plans.value

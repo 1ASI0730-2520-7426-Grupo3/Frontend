@@ -228,6 +228,36 @@ export default {
       error: 'Error',
       failedToLoadProfile: 'Error al cargar los datos del perfil',
     },
+    plans: {
+      1: {
+        name: 'Básico',
+        description: 'Perfecto para usuarios individuales. Acceso a hasta 6 máquinas.',
+      },
+      2: {
+        name: 'Estándar',
+        description: 'Para usuarios activos. Acceso a hasta 12 máquinas con soporte de mantenimiento.',
+      },
+      3: {
+        name: 'Premium',
+        description: 'Para usuarios avanzados. Acceso a hasta 24 máquinas con soporte completo.',
+      },
+      4: {
+        name: 'Empresa Pequeña',
+        description: 'Perfecto para pequeñas empresas. Gestiona hasta 10 clientes.',
+      },
+      5: {
+        name: 'Empresa Mediana',
+        description: 'Ideal para empresas en crecimiento. Gestiona hasta 30 clientes con soporte de mantenimiento.',
+      },
+      6: {
+        name: 'Empresa Premium',
+        description: 'Solución definitiva para grandes empresas. Clientes ilimitados con soporte prioritario.',
+      },
+      upToMachines: 'Hasta {count} máquinas',
+      upToClients: 'Hasta {count} clientes',
+      unlimitedClients: 'Hasta 999 clientes',
+      monthly: 'mensual',
+    },
     userNotAuthenticated: 'Usuario no autenticado',
   },
   client: {
