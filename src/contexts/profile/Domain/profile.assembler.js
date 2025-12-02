@@ -15,9 +15,10 @@ export class ProfileAssembler {
     return new ClientPlan({
       id: resource.id,
       name: resource.name,
-      price: resource.price,
-      billingCycle: resource.billingCycle,
-      maxMachines: resource.maxMachines,
+      price: resource.monthlyPrice,
+      billingCycle: 'month',
+      maxMachines: resource.maxEquipmentAccess,
+      targetUserRole: resource.targetUserRole,
     })
   }
 
@@ -37,6 +38,7 @@ export class ProfileAssembler {
       type: resource.type,
       clientPlanId: resource.clientPlanId,
       currentPlan: planResource ? this.toPlanEntity(planResource) : null,
+      profilePhoto: resource.profilePhoto,
     })
   }
 

@@ -3,12 +3,13 @@
  * Represents a subscription plan for clients
  */
 export class ClientPlan {
-  constructor({ id = 0, name = '', price = 0, billingCycle = 'monthly', maxMachines = 0 }) {
+  constructor({ id = 0, name = '', price = 0, billingCycle = 'monthly', maxMachines = 0, targetUserRole = 'Client' }) {
     this.id = id
     this.name = name
     this.price = price
     this.billingCycle = billingCycle
     this.maxMachines = maxMachines
+    this.targetUserRole = targetUserRole
   }
 
   /**
@@ -25,7 +26,13 @@ export class ClientPlan {
    * @returns {string}
    */
   getMaxMachinesText() {
-    return `Up to ${this.maxMachines} machines`
+    const isProvider = this.targetUserRole === 'Provider'
+    const unit = isProvider ? 'clients' : 'machines'
+
+    if (this.maxMachines >= 999) {
+      return `Unlimited ${unit}`
+    }
+    return `Up to ${this.maxMachines} ${unit}`
   }
 
   /**

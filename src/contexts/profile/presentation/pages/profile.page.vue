@@ -62,6 +62,39 @@
         </p>
       </div>
 
+      <!-- Usage Statistics -->
+      <div v-if="usageStatistics && usageStatistics.usageType !== 'unknown'" class="usage-statistics">
+        <h3>{{ t('profile.currentUsage') }}</h3>
+        <div class="usage-bar-container">
+          <div class="usage-info">
+            <span class="usage-text"
+              >{{ usageStatistics.currentUsage }} / {{ usageStatistics.planLimit }}
+              {{ usageStatistics.usageType }}</span
+            >
+            <span
+              class="usage-percentage"
+              :class="{
+                'usage-warning': (usageStatistics.currentUsage / usageStatistics.planLimit) * 100 >= 80,
+                'usage-danger': usageStatistics.currentUsage >= usageStatistics.planLimit,
+              }"
+              >{{ Math.round((usageStatistics.currentUsage / usageStatistics.planLimit) * 100) }}%</span
+            >
+          </div>
+          <div class="usage-bar">
+            <div
+              class="usage-bar-fill"
+              :class="{
+                'usage-bar-warning': (usageStatistics.currentUsage / usageStatistics.planLimit) * 100 >= 80,
+                'usage-bar-danger': usageStatistics.currentUsage >= usageStatistics.planLimit,
+              }"
+              :style="{
+                width: `${Math.min((usageStatistics.currentUsage / usageStatistics.planLimit) * 100, 100)}%`,
+              }"
+            ></div>
+          </div>
+        </div>
+      </div>
+
       <div class="plans-section">
         <div class="plans-grid">
           <PlanCard
@@ -105,6 +138,7 @@ const plans = ref([])
 const loading = ref(true)
 const error = ref(null)
 const fileInput = ref(null)
+const usageStatistics = ref(null)
 
 /**
  * Get user initials for avatar
@@ -161,16 +195,17 @@ const handleFileSelect = async (event) => {
     return
   }
 
-  try {
-    loading.value = true
+  loading.value = true
 
-    const reader = new FileReader()
-    reader.onload = async (e) => {
+  const reader = new FileReader()
+  reader.onload = async (e) => {
+    try {
       const base64Image = e.target?.result
 
       const userId = authService.getCurrentUserId()
       await profileService.updateProfilePhoto(userId, base64Image)
 
+      // Only update local state after successful upload
       userProfile.value.profilePhoto = base64Image
 
       toast.add({
@@ -179,32 +214,31 @@ const handleFileSelect = async (event) => {
         detail: t('profile.toast.photoUploadSuccess'),
         life: 3000,
       })
-
-      loading.value = false
-    }
-
-    reader.onerror = () => {
+    } catch (err) {
+      console.error('Error uploading photo:', err)
+      const errorMessage = err.response?.data?.message || t('profile.toast.failedToUploadPhoto')
       toast.add({
         severity: 'error',
         summary: t('profile.toast.uploadFailed'),
-        detail: t('profile.toast.failedToReadImage'),
+        detail: errorMessage,
         life: 3000,
       })
+    } finally {
       loading.value = false
     }
+  }
 
-    reader.readAsDataURL(file)
-  } catch (err) {
-    console.error('Error uploading photo:', err)
-    const errorMessage = err.response?.data?.message || t('profile.toast.failedToUploadPhoto')
+  reader.onerror = () => {
     toast.add({
       severity: 'error',
       summary: t('profile.toast.uploadFailed'),
-      detail: errorMessage,
+      detail: t('profile.toast.failedToReadImage'),
       life: 3000,
     })
     loading.value = false
   }
+
+  reader.readAsDataURL(file)
 }
 
 /**
@@ -215,7 +249,7 @@ const handleUpdatePlan = async (planId) => {
     loading.value = true
     const userId = authService.getCurrentUserId()
 
-    userProfile.value = await profileService.updateUserPlan(userId, planId)
+    await profileService.updateUserPlan(userId, planId)
 
     toast.add({
       severity: 'success',
@@ -223,6 +257,9 @@ const handleUpdatePlan = async (planId) => {
       detail: t('profile.toast.planUpdateSuccess'),
       life: 3000,
     })
+
+    // Reload all profile data to update usage statistics and plan info
+    await loadProfileData()
   } catch (err) {
     console.error('Error updating plan:', err)
     const errorMessage = err.response?.data?.message || t('profile.toast.failedToUpdatePlan')
@@ -232,7 +269,6 @@ const handleUpdatePlan = async (planId) => {
       detail: errorMessage,
       life: 3000,
     })
-  } finally {
     loading.value = false
   }
 }
@@ -255,17 +291,33 @@ const loadProfileData = async () => {
       return
     }
 
-    console.log('Fetching user profile and plans...')
-    const [profile, allPlans] = await Promise.all([
+    console.log('Fetching user profile, plans, and usage statistics...')
+    const [profile, allPlans, usage] = await Promise.all([
       profileService.getUserProfile(userId),
       profileService.getAllPlans(),
+      profileService.getUserUsageStatistics(userId),
     ])
 
     console.log('User profile loaded:', profile)
-    console.log('Plans loaded:', allPlans)
+    console.log('All plans loaded:', allPlans)
+    console.log('Usage statistics loaded:', usage)
+
+    // Get user role from localStorage
+    const userRole = localStorage.getItem('userRole')
+    console.log('User role from localStorage:', userRole)
+
+    // Filter plans based on user role (case-insensitive)
+    const userRoleNormalized = userRole?.toLowerCase()
+    const filteredPlans = allPlans.filter((plan) => {
+      const planRole = plan.targetUserRole?.toLowerCase()
+      return planRole === userRoleNormalized
+    })
+
+    console.log('Filtered plans for role:', userRoleNormalized, filteredPlans)
 
     userProfile.value = profile
-    plans.value = allPlans
+    plans.value = filteredPlans
+    usageStatistics.value = usage
   } catch (err) {
     console.error('Error loading profile:', err)
     error.value =
@@ -408,5 +460,74 @@ onMounted(() => {
   .plans-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.usage-statistics {
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+}
+
+.usage-statistics h3 {
+  font-size: 1.125rem;
+  color: #2c3e50;
+  margin: 0 0 1rem 0;
+  font-weight: 600;
+}
+
+.usage-bar-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.usage-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.usage-text {
+  font-size: 1rem;
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.usage-percentage {
+  font-size: 1rem;
+  color: #0288d1;
+  font-weight: 600;
+}
+
+.usage-percentage.usage-warning {
+  color: #ff9800;
+}
+
+.usage-percentage.usage-danger {
+  color: #f44336;
+}
+
+.usage-bar {
+  width: 100%;
+  height: 24px;
+  background: #e0e0e0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.usage-bar-fill {
+  height: 100%;
+  background: #0288d1;
+  transition: width 0.3s ease, background-color 0.3s ease;
+  border-radius: 12px;
+}
+
+.usage-bar-fill.usage-bar-warning {
+  background: #ff9800;
+}
+
+.usage-bar-fill.usage-bar-danger {
+  background: #f44336;
 }
 </style>

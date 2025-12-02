@@ -83,4 +83,19 @@ export class ProfileApiService {
       throw error
     }
   }
+
+  /**
+   * Get user's current usage statistics
+   * @param {number} userId - User ID
+   * @returns {Promise<{currentUsage: number, planLimit: number, usageType: string}>}
+   */
+  async getUserUsageStatistics(userId) {
+    try {
+      const response = await http.get(`/users/${userId}/usage`)
+      return response.data
+    } catch (error) {
+      console.error('Error fetching usage statistics:', error)
+      throw error
+    }
+  }
 }
