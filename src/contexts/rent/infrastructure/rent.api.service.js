@@ -1,6 +1,5 @@
 import { http } from '@/shared-kernel/infrastructure/http'
 import { RentAssembler } from '../Domain/rent.assembler.js'
-import i18n from '@/shared-kernel/infrastructure/i18n'
 
 export class RentApiService {
   /**
@@ -8,6 +7,7 @@ export class RentApiService {
    * @returns {Promise<RentMachine[]>}
    */
   async getRentalCatalog() {
+    // eslint-disable-next-line no-useless-catch
     try {
       const response = await http.get('/equipments')
       const rentData = response.data.map((equipment) => ({
@@ -22,7 +22,6 @@ export class RentApiService {
       }))
       return RentAssembler.toEntityList(rentData)
     } catch (err) {
-      console.error('Error fetching rental catalog:', err)
       throw err
     }
   }

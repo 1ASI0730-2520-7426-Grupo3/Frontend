@@ -33,7 +33,6 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
 import { useI18n } from 'vue-i18n'
 
@@ -41,7 +40,6 @@ import MachineCard from '@/shared-kernel/presentation/ui/components/machine-card
 
 import { RentApiService } from '../../infrastructure/rent.api.service.js'
 
-const router = useRouter()
 const toast = useToast()
 const { t } = useI18n()
 const rentService = new RentApiService()
@@ -55,8 +53,8 @@ const fetchRentMachines = async () => {
   error.value = null
   try {
     rentMachines.value = await rentService.getRentalCatalog()
+    // eslint-disable-next-line no-unused-vars
   } catch (err) {
-    console.error('Error fetching rental catalog:', err)
     error.value = t('rentals.errorLoadingCatalog')
   } finally {
     isLoading.value = false
@@ -76,7 +74,6 @@ const handleRentRequest = async (machine) => {
       return
     }
 
-    console.log(`Requesting rental for: ${machine.name}`)
     await rentService.createRentalRequest(machine.id, parseInt(clientId))
 
     toast.add({
@@ -86,7 +83,6 @@ const handleRentRequest = async (machine) => {
       life: 3000,
     })
   } catch (err) {
-    console.error('Error creating rental request:', err)
 
     // If backend returns a localized error message, use it
     const errorMessage = err.response?.data?.message || t('rentals.toast.couldNotSubmit')

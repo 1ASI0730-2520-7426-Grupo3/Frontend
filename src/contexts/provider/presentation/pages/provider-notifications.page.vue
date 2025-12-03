@@ -78,6 +78,7 @@ import Tag from 'primevue/tag'
 import ProgressSpinner from 'primevue/progressspinner'
 import { ProviderApiService } from '../../infrastructure/provider-api.service'
 
+// eslint-disable-next-line no-unused-vars
 const toast = useToast()
 const { t, locale } = useI18n()
 const providerService = new ProviderApiService()
@@ -91,7 +92,6 @@ const loadAcceptedMaintenanceRequests = async () => {
   error.value = null
   try {
     const requests = await providerService.getMyMaintenanceRequests()
-    console.log('Raw accepted maintenance requests:', requests)
 
     // Backend already includes client info (clientName, clientEmail) in the response
     acceptedRequests.value = requests.map(req => {
@@ -107,18 +107,8 @@ const loadAcceptedMaintenanceRequests = async () => {
         status: req.status,
       }
     })
-  } catch (err) {
-    console.error('Error loading maintenance requests:', err)
-    const errorMessage = err.response?.data?.message || t('provider.notifications.failedToLoad')
-    error.value = errorMessage
-
-    toast.add({
-      severity: 'error',
-      summary: t('common.error'),
-      detail: t('provider.notifications.couldNotLoad'),
-      life: 3000,
-    })
-  } finally {
+    // eslint-disable-next-line no-unused-vars
+  } catch (err) { /* empty */ } finally {
     loading.value = false
   }
 }

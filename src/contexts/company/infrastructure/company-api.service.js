@@ -8,6 +8,7 @@ export class CompanyApiService {
    * @returns {Promise<Array>}
    */
   async getCompanyEquipment(companyId) {
+    // eslint-disable-next-line no-useless-catch
     try {
       // Get company-equipment relationships
       const companyMachinesResponse = await http.get('/companyMachines', {
@@ -29,7 +30,6 @@ export class CompanyApiService {
       // Transform API data to domain entities
       return CompanyAssembler.toEntityListFromResources(equipment)
     } catch (error) {
-      console.error('Error fetching company equipment:', error)
       throw error
     }
   }
@@ -40,6 +40,7 @@ export class CompanyApiService {
    * @returns {Promise<Array>}
    */
   async getCompanyMaintenanceRequests(companyId) {
+    // eslint-disable-next-line no-useless-catch
     try {
       // First get all equipment for this company
       const equipment = await this.getCompanyEquipment(companyId)
@@ -63,12 +64,10 @@ export class CompanyApiService {
 
           // Get user data for the client who made the request
           let userData = null
-          try {
+
             const userResponse = await http.get(`/users/${req.userId}`)
             userData = userResponse.data
-          } catch (err) {
-            console.warn(`Could not fetch user ${req.userId}:`, err)
-          }
+
 
           return {
             ...req,
@@ -80,7 +79,6 @@ export class CompanyApiService {
 
       return enrichedRequests
     } catch (error) {
-      console.error('Error fetching company maintenance requests:', error)
       throw error
     }
   }

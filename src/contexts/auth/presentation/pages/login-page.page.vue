@@ -117,8 +117,6 @@ onMounted(() => {
   const storedRole = localStorage.getItem('userRole')
   const routeRole = route.params.role
 
-  console.log('Login Page - Route role:', routeRole, 'Stored role:', storedRole)
-  console.log('Login Page - Current route path:', route.path)
 
   if (routeRole) {
     userRole.value = routeRole
@@ -127,7 +125,6 @@ onMounted(() => {
     userRole.value = storedRole
   }
 
-  console.log('Login Page - Final userRole:', userRole.value)
 })
 
 const validateForm = () => {
@@ -173,7 +170,6 @@ const handleLogin = async () => {
     // IMPORTANT: Get role from localStorage AFTER login
     // (authService.login sets it from backend response)
     const role = localStorage.getItem('userRole')
-    console.log('User logged in with role:', role)
 
     // Redirect based on the BACKEND-provided role
     if (role === 'provider') {
@@ -182,7 +178,7 @@ const handleLogin = async () => {
       router.push({ name: 'client-home' })
     }
   } catch (error) {
-    console.error('Login error:', error)
+
     loginError.value = error.message || t('auth.login.toast.invalidCredentials')
   } finally {
     loading.value = false

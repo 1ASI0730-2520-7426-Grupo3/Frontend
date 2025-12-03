@@ -130,7 +130,6 @@ onMounted(() => {
   const storedRole = localStorage.getItem('userRole')
   const routeRole = route.params.role
 
-  console.log('Register Page - Route role:', routeRole, 'Stored role:', storedRole)
 
   if (routeRole) {
     userRole.value = routeRole
@@ -139,7 +138,6 @@ onMounted(() => {
     userRole.value = storedRole
   }
 
-  console.log('Register Page - Final userRole:', userRole.value)
 })
 
 const validateForm = () => {
@@ -187,7 +185,6 @@ const handleRegister = async () => {
     loading.value = true
 
     const roleForBackend = userRole.value === 'provider' ? 'Provider' : 'Client'
-    console.log('Registering user with role:', roleForBackend, 'userRole.value:', userRole.value)
 
     await authService.signup({
       fullName: formData.value.fullName,
@@ -204,12 +201,11 @@ const handleRegister = async () => {
       life: 3000,
     })
 
-    console.log('Registration successful, redirecting to login with role:', userRole.value)
 
     // Redirect to login with the same role
     router.push({ name: 'login', params: { role: userRole.value } })
   } catch (error) {
-    console.error('Registration error:', error)
+
     registerError.value = error.message || t('auth.register.toast.error')
   } finally {
     loading.value = false

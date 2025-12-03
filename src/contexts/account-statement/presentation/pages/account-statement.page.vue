@@ -44,8 +44,6 @@ async function load() {
   try {
     invoices.value = await api.getInvoicesByUser(userId)
   } catch (err) {
-    console.error('Error loading invoices:', err)
-
     // If backend returns a localized error message, use it
     error.value = err.response?.data?.message || t('accountStatement.errorLoadingInvoices')
   } finally {

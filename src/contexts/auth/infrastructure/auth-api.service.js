@@ -32,7 +32,6 @@ export class AuthApiService {
       // Return user entity
       return AuthAssembler.toEntityFromResource(user)
     } catch (error) {
-      console.error('Login error:', error)
       // Pass through backend's localized error message
       if (error.response?.data?.message) {
         throw new Error(error.response.data.message)
@@ -82,16 +81,13 @@ export class AuthApiService {
    * @returns {Promise<User|null>}
    */
   async getCurrentUser() {
-    try {
+
       const userId = this.getCurrentUserId()
       if (!userId) return null
 
       const response = await http.get(`/users/${userId}`)
       return AuthAssembler.toEntityFromResource(response.data)
-    } catch (error) {
-      console.error('Get current user error:', error)
-      return null
-    }
+
   }
 
   /**
@@ -107,12 +103,12 @@ export class AuthApiService {
       // Backend returns user resource (no auto-login)
       return AuthAssembler.toEntityFromResource(response.data)
     } catch (error) {
-      console.error('Signup error:', error)
+
       // Handle backend validation errors
       if (error.response?.data?.message) {
         throw new Error(error.response.data.message)
       }
-      throw new Error('Registration failed. Please try again.')
+
     }
   }
 }

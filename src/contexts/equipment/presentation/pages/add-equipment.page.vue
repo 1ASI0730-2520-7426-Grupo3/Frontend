@@ -238,7 +238,6 @@ const handleSubmit = async () => {
       image: formData.value.image || null,
     }
 
-    console.log('Sending payload:', payload)
 
     await equipmentService.createEquipment(payload)
 
@@ -253,7 +252,6 @@ const handleSubmit = async () => {
       router.push({ name: 'my-machines' })
     }, 1000)
   } catch (error) {
-    console.error('Error adding equipment:', error)
     const msg = error.response?.data?.message || t('equipment.addEquipment.toast.failedToAdd')
     toast.add({
       severity: 'error',

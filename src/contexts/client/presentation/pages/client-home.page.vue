@@ -74,7 +74,8 @@
               <span class="list__label">{{ item.equipmentName }}</span>
               <span v-if="item.assignedProviderName" class="provider-accepted">
                 <i class="pi pi-check-circle"></i>
-                {{ $t('client.home.maintenance.acceptedBy') }} <strong>{{ item.assignedProviderName }}</strong>
+                {{ $t('client.home.maintenance.acceptedBy') }}
+                <strong>{{ item.assignedProviderName }}</strong>
               </span>
             </div>
             <span class="badge" :class="getStatusClass(item.status)">
@@ -116,8 +117,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onActivated, watch } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { onActivated, onMounted, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import MachineCard from '@/shared-kernel/presentation/ui/components/machine-card.component.vue'
 
 import { EquipmentApiService } from '../../../equipment/infrastructure/equipment-api.service.js'
@@ -194,50 +195,36 @@ const fetchData = async () => {
       equipmentService.getClientEquipment(USER_ID),
     ])
 
-    console.log('All maintenance requests:', requests)
-    console.log('Current user ID:', USER_ID, 'Type:', typeof USER_ID)
-
-    // Debug: Log each request to see its structure
-    requests.forEach((r, index) => {
-      console.log(`Request ${index}:`, {
-        id: r.id,
-        requestedByUserId: r.requestedByUserId,
-        userId: r.userId,
-        equipmentId: r.equipmentId,
-        status: r.status
-      })
-    })
-
     // SECURITY FIX: Filter to only show requests created by the current user
     // Convert USER_ID to number to ensure type matching
     const userIdNum = Number(USER_ID)
-    const myRequests = requests.filter(r => {
-      const match = Number(r.requestedByUserId) === userIdNum || Number(r.userId) === userIdNum
-      console.log(`Checking request ${r.id}: requestedByUserId=${r.requestedByUserId}, userId=${r.userId}, matches=${match}`)
-      return match
+    const myRequests = requests.filter((r) => {
+      return Number(r.requestedByUserId) === userIdNum || Number(r.userId) === userIdNum
     })
-    console.log('My maintenance requests:', myRequests)
 
     const eqMap = new Map(equipments.map((e) => [e.id, e.name]))
 
     // Fetch provider information for assigned maintenance requests
-    const providerIds = [...new Set(myRequests.filter(r => r.assignedToProviderId).map(r => r.assignedToProviderId))]
-    console.log('Provider IDs to fetch:', providerIds)
+    const providerIds = [
+      ...new Set(
+        myRequests.filter((r) => r.assignedToProviderId).map((r) => r.assignedToProviderId),
+      ),
+    ]
 
     const providerMap = await userService.getUsersByIds(providerIds)
-    console.log('Provider map:', providerMap)
 
     // Convert user objects to names
     const providerNameMap = new Map(
       Array.from(providerMap.entries()).map(([id, user]) => {
-        console.log(`Provider ${id}:`, user)
         return [id, user.name || user.username || `Provider #${id}`]
-      })
+      }),
     )
 
     maintenance.value = myRequests.map((r) => {
-      const providerName = r.assignedToProviderId ? providerNameMap.get(r.assignedToProviderId) : null
-      console.log(`Request ${r.id}: assignedToProviderId=${r.assignedToProviderId}, providerName=${providerName}`)
+      const providerName = r.assignedToProviderId
+        ? providerNameMap.get(r.assignedToProviderId)
+        : null
+
       return {
         id: r.id,
         equipmentName: eqMap.get(r.equipmentId) || `Equipment #${r.equipmentId}`,
@@ -274,17 +261,18 @@ onMounted(() => {
 
 // Refresh data when navigating back to this page (e.g., after creating a maintenance request)
 onActivated(() => {
-  console.log('Home page activated - refreshing data...')
   fetchData()
 })
 
 // Watch for route changes to refresh data
-watch(() => route.path, (newPath) => {
-  if (newPath === '/home' || newPath === '/') {
-    console.log('Navigated to home - refreshing data...')
-    fetchData()
-  }
-})
+watch(
+  () => route.path,
+  (newPath) => {
+    if (newPath === '/home' || newPath === '/') {
+      fetchData()
+    }
+  },
+)
 </script>
 
 <style scoped>

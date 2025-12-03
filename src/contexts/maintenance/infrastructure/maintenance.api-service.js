@@ -31,8 +31,8 @@ export class MaintenanceApiService {
       // Aquí asumiremos que MaintenanceAssembler tiene un toEntityListFromResources
       // Si no lo tiene, devolvemos response.data directamente.
       return MaintenanceAssembler.toEntityListFromResources(response.data)
+      // eslint-disable-next-line no-unused-vars
     } catch (error) {
-      console.error('Error fetching requests:', error)
       return []
     }
   }

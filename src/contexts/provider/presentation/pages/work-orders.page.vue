@@ -110,7 +110,6 @@ const loadWorkOrders = async () => {
       status: t('provider.workOrders.values.active'),
     }))
   } catch (error) {
-    console.error('Error loading work orders:', error)
     const errorMessage =
       error.response?.data?.message || t('provider.workOrders.toast.failedToLoad')
     toast.add({

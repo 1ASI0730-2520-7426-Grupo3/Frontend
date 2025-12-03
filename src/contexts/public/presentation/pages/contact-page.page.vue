@@ -39,7 +39,6 @@ const form = reactive({
 const submitted = ref(false)
 
 function sendMessage() {
-  console.log('Form data:', form)
   submitted.value = true
   setTimeout(() => (submitted.value = false), 3000)
   form.name = ''

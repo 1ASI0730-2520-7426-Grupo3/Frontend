@@ -14,8 +14,8 @@ export class ProviderApiService {
       const response = await http.get('/rentalRequests')
       // Filter only pending requests
       return response.data.filter((request) => request.status === 'pending')
+      // eslint-disable-next-line no-unused-vars
     } catch (error) {
-      console.error('Error fetching rental requests:', error)
       return []
     }
   }
@@ -50,8 +50,8 @@ export class ProviderApiService {
     try {
       const response = await http.get('/maintenanceRequests')
       return response.data
+      // eslint-disable-next-line no-unused-vars
     } catch (error) {
-      console.error('Error fetching maintenance requests:', error)
       return []
     }
   }
@@ -64,8 +64,8 @@ export class ProviderApiService {
     try {
       const response = await http.get('/equipments')
       return response.data
+      // eslint-disable-next-line no-unused-vars
     } catch (error) {
-      console.error('Error fetching equipment:', error)
       return []
     }
   }
@@ -78,8 +78,8 @@ export class ProviderApiService {
     try {
       const response = await http.get('/billing/invoices/all')
       return response.data
+      // eslint-disable-next-line no-unused-vars
     } catch (error) {
-      console.error('Error fetching invoices:', error)
       return []
     }
   }
@@ -92,8 +92,8 @@ export class ProviderApiService {
     try {
       const response = await http.get('/rentalRequests')
       return response.data
+      // eslint-disable-next-line no-unused-vars
     } catch (error) {
-      console.error('Error fetching all rental requests:', error)
       return []
     }
   }
@@ -125,8 +125,8 @@ export class ProviderApiService {
       })
 
       return Array.from(clientsMap.values())
+      // eslint-disable-next-line no-unused-vars
     } catch (error) {
-      console.error('Error fetching clients:', error)
       return []
     }
   }
@@ -138,19 +138,14 @@ export class ProviderApiService {
   async getPendingMaintenanceRequests() {
     try {
       const response = await http.get('/maintenanceRequests')
-      console.log('Raw maintenance requests from API:', response.data)
-      console.log('Total requests count:', response.data.length)
+
 
       // Filter only pending requests that aren't assigned yet
       const filtered = response.data.filter((request) => {
         const isPending = request.status && request.status.toLowerCase() === 'pending'
         const notAssigned = !request.assignedToProviderId
-        console.log(`Request ${request.id}: status="${request.status}", isPending=${isPending}, assignedToProviderId=${request.assignedToProviderId}, notAssigned=${notAssigned}`)
         return isPending && notAssigned
       })
-
-      console.log('Filtered pending requests:', filtered)
-      console.log('Filtered count:', filtered.length)
 
       // Map the response to ensure clientId is set
       const mapped = filtered.map(req => {
@@ -158,13 +153,12 @@ export class ProviderApiService {
           ...req,
           clientId: req.requestedByUserId || req.clientId || null
         }
-        console.log('Mapped request:', result)
         return result
       })
 
       return mapped
+      // eslint-disable-next-line no-unused-vars
     } catch (error) {
-      console.error('Error fetching maintenance requests:', error)
       return []
     }
   }
@@ -188,8 +182,8 @@ export class ProviderApiService {
       const providerId = parseInt(localStorage.getItem('userId'))
       const response = await http.get(`/maintenanceRequests/provider/${providerId}`)
       return response.data
+      // eslint-disable-next-line no-unused-vars
     } catch (error) {
-      console.error('Error fetching my maintenance requests:', error)
       return []
     }
   }

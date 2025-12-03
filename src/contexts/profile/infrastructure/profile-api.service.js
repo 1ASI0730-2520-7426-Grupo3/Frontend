@@ -12,6 +12,7 @@ export class ProfileApiService {
    * @returns {Promise<UserProfile>}
    */
   async getUserProfile(userId) {
+    // eslint-disable-next-line no-useless-catch
     try {
       // Fetch user data
       const userResponse = await http.get(`/users/${userId}`)
@@ -27,7 +28,6 @@ export class ProfileApiService {
       // Convert to domain entity
       return ProfileAssembler.toUserProfileEntity(userData, planData)
     } catch (error) {
-      console.error('Error fetching user profile:', error)
       throw error
     }
   }
@@ -37,11 +37,11 @@ export class ProfileApiService {
    * @returns {Promise<Array<ClientPlan>>}
    */
   async getAllPlans() {
+    // eslint-disable-next-line no-useless-catch
     try {
       const response = await http.get('/clientPlans')
       return ProfileAssembler.toPlansArray(response.data)
     } catch (error) {
-      console.error('Error fetching plans:', error)
       throw error
     }
   }
@@ -53,6 +53,7 @@ export class ProfileApiService {
    * @returns {Promise<UserProfile>}
    */
   async updateUserPlan(userId, planId) {
+    // eslint-disable-next-line no-useless-catch
     try {
       // Update user's plan
       await http.patch(`/users/${userId}`, {
@@ -62,7 +63,6 @@ export class ProfileApiService {
       // Return updated profile
       return this.getUserProfile(userId)
     } catch (error) {
-      console.error('Error updating user plan:', error)
       throw error
     }
   }
@@ -74,12 +74,12 @@ export class ProfileApiService {
    * @returns {Promise<void>}
    */
   async updateProfilePhoto(userId, photoUrl) {
+    // eslint-disable-next-line no-useless-catch
     try {
       await http.patch(`/users/${userId}`, {
         profilePhoto: photoUrl,
       })
     } catch (error) {
-      console.error('Error updating profile photo:', error)
       throw error
     }
   }

@@ -277,7 +277,6 @@ const fetchMachineData = async (id) => {
   if (!id) {
     isLoading.value = false
     error.value = new Error('Machine ID is missing from route parameters.')
-    console.error(error.value.message)
     return
   }
 
@@ -296,7 +295,6 @@ const fetchMachineData = async (id) => {
       currentSetLevel.value = 0
     }
   } catch (err) {
-    console.error(`Error fetching machine ${id}:`, err)
     error.value = err
   } finally {
     isLoading.value = false

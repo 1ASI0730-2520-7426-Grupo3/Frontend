@@ -116,7 +116,6 @@ const loadData = async () => {
       description: `Rental #${String(req.id).padStart(5, '0')} - ${req.equipmentName || `Equipment #${req.equipmentId}`} - ${new Date(req.updatedDate).toLocaleDateString('en-GB')}`,
     }))
   } catch (error) {
-    console.error('Error loading data:', error)
     const errorMessage =
       error.response?.data?.message || t('provider.myClientsTeams.toast.failedToLoad')
     toast.add({
@@ -131,12 +130,10 @@ const loadData = async () => {
 }
 
 const viewClientHistory = () => {
-  console.log('View client history')
   // TODO: Navigate to client history page
 }
 
 const viewTechnicians = () => {
-  console.log('View technicians list')
   // TODO: Navigate to technicians page
 }
 

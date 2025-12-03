@@ -135,8 +135,8 @@ const loadMachines = async () => {
     const data = await equipmentService.getClientEquipment(clientId)
 
     machines.value = data
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.error('Error loading machines:', error)
     toast.add({
       severity: 'error',
       summary: t('equipment.myMachines.toast.error'),
@@ -180,8 +180,8 @@ const togglePower = async (machineId) => {
       detail: `${machine.name} ${newPowerState ? t('equipment.myMachines.toast.nowActive') : t('equipment.myMachines.toast.nowInactive')}`,
       life: 2000,
     })
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.error('Error toggling power:', error)
 
     machine.isPoweredOn = originalState
 

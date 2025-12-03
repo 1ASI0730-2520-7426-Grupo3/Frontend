@@ -102,7 +102,6 @@ const loadRentalRequests = async () => {
 
     rentalRequests.value = await rentService.getRentalRequestsByClientId(parseInt(clientId))
   } catch (err) {
-    console.error('Error loading rental requests:', err)
 
     // If backend returns a localized error message, use it
     const errorMessage = err.response?.data?.message || t('rentals.notifications.failedToLoad')

@@ -93,8 +93,8 @@ async function load() {
     } else if (eqs.length > 0) {
       selectedId.value = eqs[0].id
     }
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.error('Error loading equipments:', error)
     toast.add({ severity: 'error', summary: 'Error', detail: 'Could not load equipments list.' })
   } finally {
     loading.value = false
@@ -134,7 +134,6 @@ async function submit() {
 
     setTimeout(() => router.push({ name: 'home' }), 1500)
   } catch (error) {
-    console.error('Error creating request:', error)
     const msg = error.response?.data?.message || 'Failed to create request'
     toast.add({ severity: 'error', summary: 'Error', detail: msg })
   } finally {

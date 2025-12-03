@@ -82,7 +82,6 @@ const loadRequests = async () => {
       duration: '1 year',
     }))
   } catch (err) {
-    console.error('Error loading requests:', err)
 
     // If backend returns a localized error message, use it
     const errorMessage = err.response?.data?.message || t('provider.requests.toast.failedToLoad')
@@ -109,7 +108,6 @@ const handleAccept = async (requestId) => {
     })
     await loadRequests()
   } catch (err) {
-    console.error('Error accepting request:', err)
 
     // If backend returns a localized error message, use it
     const errorMessage = err.response?.data?.message || t('provider.requests.toast.failedToAccept')
@@ -134,7 +132,6 @@ const handleDeny = async (requestId) => {
     })
     await loadRequests()
   } catch (err) {
-    console.error('Error denying request:', err)
 
     // If backend returns a localized error message, use it
     const errorMessage = err.response?.data?.message || t('provider.requests.toast.failedToReject')

@@ -232,7 +232,6 @@ const handleFileSelect = async (event) => {
 
     reader.readAsDataURL(file)
   } catch (err) {
-    console.error('Error uploading photo:', err)
     const errorMessage = err.response?.data?.message || t('profile.toast.failedToUploadPhoto')
     toast.add({
       severity: 'error',
@@ -261,7 +260,6 @@ const handleSelectPlan = async (planId) => {
       life: 3000,
     })
   } catch (err) {
-    console.error('Error updating plan:', err)
     const errorMessage = err.response?.data?.message || t('profile.toast.failedToUpdatePlan')
     toast.add({
       severity: 'error',
@@ -282,29 +280,21 @@ const loadProfileData = async () => {
     loading.value = true
     error.value = null
 
-    console.log('Loading profile data...')
     const userId = authService.getCurrentUserId()
-    console.log('User ID from localStorage:', userId)
 
     if (!userId) {
       error.value = t('profile.userNotAuthenticated')
-      console.error('No user ID found in localStorage')
       return
     }
 
-    console.log('Fetching user profile and plans...')
     const [profile, allPlans] = await Promise.all([
       profileService.getUserProfile(userId),
       profileService.getAllPlans(),
     ])
 
-    console.log('User profile loaded:', profile)
-    console.log('Plans loaded:', allPlans)
-
     userProfile.value = profile
     plans.value = allPlans
   } catch (err) {
-    console.error('Error loading profile:', err)
     error.value =
       err.response?.data?.message || `${t('profile.toast.failedToLoadProfile')}: ${err.message}`
   } finally {

@@ -97,7 +97,6 @@ const fetchCompanyMachines = async () => {
       model: machine.model,
     }))
   } catch (error) {
-    console.error('Error fetching company machines:', error)
     machinesError.value = error
   } finally {
     isLoadingMachines.value = false
@@ -115,7 +114,6 @@ const fetchMaintenanceRequests = async () => {
     const requests = await api.getCompanyMaintenanceRequests(COMPANY_ID)
     maintenanceRequests.value = requests
   } catch (error) {
-    console.error('Error fetching maintenance requests:', error)
     requestsError.value = error
   } finally {
     isLoadingRequests.value = false
@@ -143,7 +141,6 @@ const formatStatus = (status) => {
  * Handle submit maintenance request
  */
 const handleSubmitRequest = (requestId) => {
-  console.log('Submit maintenance request:', requestId)
   // TODO: Implement submission logic
   alert(`Submitting maintenance request #${requestId}`)
 }

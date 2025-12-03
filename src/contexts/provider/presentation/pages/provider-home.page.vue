@@ -182,8 +182,7 @@ const loadProviderData = async () => {
       duration: '1 year',
     }))
 
-    // Load pending maintenance requests with client information
-    console.log('Pending maintenance requests:', pendingMaintenance)
+
 
     // Create equipment map for looking up names
     const equipmentMap = new Map(equipment.map(eq => [eq.id, eq.name]))
@@ -194,14 +193,11 @@ const loadProviderData = async () => {
         .map(r => r.clientId)
     )]
 
-    console.log('Client IDs to fetch:', clientIds)
     const clientMap = await userService.getUsersByIds(clientIds)
-    console.log('Client map:', clientMap)
 
     pendingMaintenanceRequests.value = pendingMaintenance.map((req) => {
       const client = clientMap.get(req.clientId)
       const equipmentName = equipmentMap.get(req.equipmentId) || req.equipmentName || `Equipment #${req.equipmentId}`
-      console.log(`Request ${req.id}: clientId=${req.clientId}, client=`, client)
 
       return {
         id: req.id,
@@ -214,9 +210,6 @@ const loadProviderData = async () => {
         selectedDate: req.selectedDate,
       }
     })
-
-    console.log('Final pendingMaintenanceRequests array:', pendingMaintenanceRequests.value)
-    console.log('Array length:', pendingMaintenanceRequests.value.length)
 
     const providerId = parseInt(localStorage.getItem('userId'))
     const providerInvoices = invoices.filter((invoice) => invoice.providerId === providerId)
@@ -231,7 +224,6 @@ const loadProviderData = async () => {
           : t('provider.home.billing.pending'),
     }))
   } catch (error) {
-    console.error('Error loading provider data:', error)
     const errorMessage = error.response?.data?.message || t('provider.home.toast.failedToLoad')
     toast.add({
       severity: 'error',
@@ -255,7 +247,6 @@ const handleAcceptRentalRequest = async (requestId) => {
     })
     await loadProviderData()
   } catch (error) {
-    console.error('Error accepting rental request:', error)
     const errorMessage = error.response?.data?.message || t('provider.home.toast.failedToAcceptRental')
     toast.add({
       severity: 'error',
@@ -277,7 +268,6 @@ const handleDenyRentalRequest = async (requestId) => {
     })
     await loadProviderData()
   } catch (error) {
-    console.error('Error denying rental request:', error)
     const errorMessage = error.response?.data?.message || t('provider.home.toast.failedToDenyRental')
     toast.add({
       severity: 'error',
@@ -299,7 +289,6 @@ const handleAcceptMaintenanceRequest = async (requestId) => {
     })
     await loadProviderData()
   } catch (error) {
-    console.error('Error accepting maintenance request:', error)
     const errorMessage = error.response?.data?.message || t('provider.home.toast.failedToAcceptMaintenance')
     toast.add({
       severity: 'error',
