@@ -204,7 +204,9 @@ const handleNavigation = (routeName) => {
 }
 
 const handleNotifications = () => {
-  router.push({ name: 'notifications' })
+  // Route to different notifications page based on user role
+  const notificationsRoute = userRole.value === 'provider' ? 'provider-notifications' : 'notifications'
+  router.push({ name: notificationsRoute })
 }
 
 const handleProfile = () => {

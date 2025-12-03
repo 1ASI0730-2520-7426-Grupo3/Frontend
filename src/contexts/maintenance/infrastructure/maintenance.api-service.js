@@ -40,6 +40,26 @@ export class MaintenanceApiService {
   async getPricingMap() {
     return new Map()
   }
+
+  /**
+   * Assigns a maintenance request to a provider (or self if no providerId specified).
+   */
+  async assignMaintenanceRequest(maintenanceRequestId, providerId = null) {
+    const response = await http.put(`/maintenanceRequests/${maintenanceRequestId}/assign`, {
+      providerId: providerId
+    })
+    return response.data
+  }
+
+  /**
+   * Updates the status of a maintenance request (e.g., mark as completed).
+   */
+  async updateMaintenanceRequestStatus(maintenanceRequestId, status) {
+    const response = await http.put(`/maintenanceRequests/${maintenanceRequestId}`, {
+      status: status
+    })
+    return response.data
+  }
 }
 
 export default MaintenanceApiService

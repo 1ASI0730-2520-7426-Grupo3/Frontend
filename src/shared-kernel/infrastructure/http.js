@@ -6,7 +6,7 @@ export const http = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 30000, // 30 seconds - handles Azure cold starts
+  timeout: 30000,
 })
 
 http.interceptors.request.use(

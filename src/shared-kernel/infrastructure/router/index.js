@@ -102,6 +102,12 @@ const routes = [
     component: () => import('@/contexts/provider/presentation/pages/work-orders.page.vue'),
     meta: { requiresAuth: true, role: 'provider' },
   },
+  {
+    path: '/provider/notifications',
+    name: 'provider-notifications',
+    component: () => import('@/contexts/provider/presentation/pages/provider-notifications.page.vue'),
+    meta: { requiresAuth: true, role: 'provider' },
+  },
 
   {
     path: '/profile',

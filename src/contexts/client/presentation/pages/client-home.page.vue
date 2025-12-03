@@ -70,7 +70,13 @@
 
         <ul v-else-if="maintenance.length > 0" class="list">
           <li class="list__item" v-for="item in maintenance.slice(0, 3)" :key="item.id">
-            <span class="list__label">{{ item.equipmentName }}</span>
+            <div class="maintenance-info">
+              <span class="list__label">{{ item.equipmentName }}</span>
+              <span v-if="item.assignedProviderName" class="provider-accepted">
+                <i class="pi pi-check-circle"></i>
+                {{ $t('client.home.maintenance.acceptedBy') }} <strong>{{ item.assignedProviderName }}</strong>
+              </span>
+            </div>
             <span class="badge" :class="getStatusClass(item.status)">
               {{ item.status }}
             </span>
@@ -110,22 +116,25 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, onActivated, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import MachineCard from '@/shared-kernel/presentation/ui/components/machine-card.component.vue'
 
 import { EquipmentApiService } from '../../../equipment/infrastructure/equipment-api.service.js'
 import { MaintenanceApiService } from '../../../maintenance/infrastructure/maintenance.api-service.js'
 import { AccountStatementApiService } from '../../../account-statement/infrastructure/account-statement.api-service.js'
 import { RentApiService } from '../../../rent/infrastructure/rent.api.service.js'
+import { UserApiService } from '@/shared-kernel/infrastructure/user.api-service.js'
 
 const router = useRouter()
+const route = useRoute()
 const goTo = (name) => router.push({ name })
 
 const equipmentService = new EquipmentApiService()
 const maintenanceService = new MaintenanceApiService()
 const billingService = new AccountStatementApiService()
 const rentService = new RentApiService()
+const userService = new UserApiService()
 
 const myMachines = ref([])
 const rentMachines = ref([])
@@ -146,7 +155,8 @@ const formatCurrency = (amount) => {
 
 const getStatusClass = (status) => {
   const s = status.toLowerCase()
-  if (s === 'completed' || s === 'done' || s === 'resolved') return 'badge--ok'
+  if (s === 'completed' || s === 'done' || s === 'resolved') return 'badge--done'
+  if (s === 'pending') return 'badge--pending'
   return 'badge--warn'
 }
 
@@ -184,15 +194,57 @@ const fetchData = async () => {
       equipmentService.getClientEquipment(USER_ID),
     ])
 
+    console.log('All maintenance requests:', requests)
+    console.log('Current user ID:', USER_ID, 'Type:', typeof USER_ID)
+
+    // Debug: Log each request to see its structure
+    requests.forEach((r, index) => {
+      console.log(`Request ${index}:`, {
+        id: r.id,
+        requestedByUserId: r.requestedByUserId,
+        userId: r.userId,
+        equipmentId: r.equipmentId,
+        status: r.status
+      })
+    })
+
+    // SECURITY FIX: Filter to only show requests created by the current user
+    // Convert USER_ID to number to ensure type matching
+    const userIdNum = Number(USER_ID)
+    const myRequests = requests.filter(r => {
+      const match = Number(r.requestedByUserId) === userIdNum || Number(r.userId) === userIdNum
+      console.log(`Checking request ${r.id}: requestedByUserId=${r.requestedByUserId}, userId=${r.userId}, matches=${match}`)
+      return match
+    })
+    console.log('My maintenance requests:', myRequests)
+
     const eqMap = new Map(equipments.map((e) => [e.id, e.name]))
 
-    maintenance.value = requests
-      .filter((r) => (r.status || '').toLowerCase() === 'pending')
-      .map((r) => ({
+    // Fetch provider information for assigned maintenance requests
+    const providerIds = [...new Set(myRequests.filter(r => r.assignedToProviderId).map(r => r.assignedToProviderId))]
+    console.log('Provider IDs to fetch:', providerIds)
+
+    const providerMap = await userService.getUsersByIds(providerIds)
+    console.log('Provider map:', providerMap)
+
+    // Convert user objects to names
+    const providerNameMap = new Map(
+      Array.from(providerMap.entries()).map(([id, user]) => {
+        console.log(`Provider ${id}:`, user)
+        return [id, user.name || user.username || `Provider #${id}`]
+      })
+    )
+
+    maintenance.value = myRequests.map((r) => {
+      const providerName = r.assignedToProviderId ? providerNameMap.get(r.assignedToProviderId) : null
+      console.log(`Request ${r.id}: assignedToProviderId=${r.assignedToProviderId}, providerName=${providerName}`)
+      return {
         id: r.id,
         equipmentName: eqMap.get(r.equipmentId) || `Equipment #${r.equipmentId}`,
         status: r.status,
-      }))
+        assignedProviderName: providerName,
+      }
+    })
   } catch (e) {
     error.value.maintenance = e
   } finally {
@@ -218,6 +270,20 @@ const fetchData = async () => {
 
 onMounted(() => {
   fetchData()
+})
+
+// Refresh data when navigating back to this page (e.g., after creating a maintenance request)
+onActivated(() => {
+  console.log('Home page activated - refreshing data...')
+  fetchData()
+})
+
+// Watch for route changes to refresh data
+watch(() => route.path, (newPath) => {
+  if (newPath === '/home' || newPath === '/') {
+    console.log('Navigated to home - refreshing data...')
+    fetchData()
+  }
 })
 </script>
 
@@ -296,7 +362,7 @@ onMounted(() => {
 
 .list__item {
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: 1fr auto;
   align-items: center;
   gap: 12px;
   background: #f8fafc;
@@ -305,12 +371,36 @@ onMounted(() => {
   border: 1px solid #e2e8f0;
 }
 
+.maintenance-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .list__label {
   font-weight: 600;
   color: #334155;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.provider-accepted {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: #16a34a;
+  font-weight: 500;
+}
+
+.provider-accepted i {
+  color: #22c55e;
+  font-size: 0.875rem;
+}
+
+.provider-accepted strong {
+  color: #15803d;
 }
 
 .list__amount {
@@ -323,7 +413,19 @@ onMounted(() => {
   border-radius: 6px;
   font-size: 0.75rem;
   font-weight: 700;
-  text-transform: uppercase;
+  text-transform: capitalize;
+}
+
+.badge--pending {
+  background: transparent;
+  color: #dc2626;
+  border: none;
+}
+
+.badge--done {
+  background: transparent;
+  color: #16a34a;
+  border: none;
 }
 
 .badge--ok {

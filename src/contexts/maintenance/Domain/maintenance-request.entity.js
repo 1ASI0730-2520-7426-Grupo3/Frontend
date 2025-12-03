@@ -15,6 +15,8 @@ export class MaintenanceRequest {
     notes = '',
     observation = '', // <--- AGREGADO: Campo que viene del Backend
     assignedTechnicianId = null,
+    assignedToProviderId = null, // <--- NUEVO: ID del provider asignado
+    requestedByUserId = null, // <--- NUEVO: ID del usuario que solicitó
   }) {
     this.id = id
     this.userId = userId
@@ -31,6 +33,8 @@ export class MaintenanceRequest {
     this.observation = this.notes
 
     this.assignedTechnicianId = assignedTechnicianId
+    this.assignedToProviderId = assignedToProviderId
+    this.requestedByUserId = requestedByUserId
   }
 
   /**

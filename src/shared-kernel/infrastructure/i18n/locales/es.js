@@ -274,6 +274,7 @@ export default {
       maintenance: {
         title: 'Mantenimiento',
         noPending: 'No hay solicitudes pendientes.',
+        acceptedBy: 'Aceptado por',
       },
       accountStatement: {
         title: 'Estado de cuenta',
@@ -290,11 +291,19 @@ export default {
       maintenance: {
         title: 'Mantenimiento',
         note: 'Aquí se mostrarán las tareas de mantenimiento de tus máquinas de gimnasio.',
+        noRequests: 'No hay solicitudes de mantenimiento pendientes',
       },
-      requests: {
-        title: 'Solicitudes',
+      rentalRequests: {
+        title: 'Solicitudes de Alquiler',
         requestedBy: 'Solicitado por:',
         time: 'Tiempo:',
+        noRequests: 'No hay solicitudes de alquiler pendientes',
+      },
+      maintenanceRequests: {
+        title: 'Solicitudes de Mantenimiento',
+        requestedBy: 'Solicitado por',
+        observation: 'Observación',
+        noRequests: 'No hay solicitudes de mantenimiento pendientes',
       },
       billing: {
         title: 'Facturación y Pagos',
@@ -310,12 +319,15 @@ export default {
       toast: {
         errorLoading: 'Error al cargar datos del proveedor:',
         failedToLoad: 'Error al cargar datos del proveedor',
-        requestAccepted: 'Solicitud Aceptada',
-        acceptSuccess: 'La solicitud de alquiler ha sido aceptada y se creó la factura',
-        requestDenied: 'Solicitud Rechazada',
-        denySuccess: 'La solicitud de alquiler ha sido rechazada',
-        failedToAccept: 'Error al aceptar la solicitud de alquiler',
-        failedToDeny: 'Error al rechazar la solicitud de alquiler',
+        rentalRequestAccepted: 'Solicitud de Alquiler Aceptada',
+        rentalAcceptSuccess: 'La solicitud de alquiler ha sido aceptada y se creó la factura',
+        rentalRequestDenied: 'Solicitud de Alquiler Rechazada',
+        rentalDenySuccess: 'La solicitud de alquiler ha sido rechazada',
+        failedToAcceptRental: 'Error al aceptar la solicitud de alquiler',
+        failedToDenyRental: 'Error al rechazar la solicitud de alquiler',
+        maintenanceAccepted: 'Solicitud de Mantenimiento Aceptada',
+        maintenanceAcceptSuccess: 'Has sido asignado a esta solicitud de mantenimiento',
+        failedToAcceptMaintenance: 'Error al aceptar la solicitud de mantenimiento',
       },
     },
     myClientsTeams: {
@@ -381,6 +393,21 @@ export default {
         failedToAccept: 'Error al aceptar la solicitud',
         failedToReject: 'Error al rechazar la solicitud',
       },
+    },
+    notifications: {
+      title: 'Mis Solicitudes de Mantenimiento Aceptadas',
+      empty: {
+        title: 'No Hay Solicitudes Aceptadas',
+        description: 'Aún no has aceptado ninguna solicitud de mantenimiento.',
+      },
+      details: {
+        client: 'Cliente',
+        observation: 'Observación',
+        scheduled: 'Programado para',
+        acceptedByYou: 'Aceptado por ti',
+      },
+      failedToLoad: 'Error al cargar las solicitudes de mantenimiento',
+      couldNotLoad: 'No se pudieron cargar tus solicitudes de mantenimiento aceptadas',
     },
   },
   rentals: {

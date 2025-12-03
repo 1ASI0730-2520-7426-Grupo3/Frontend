@@ -9,6 +9,10 @@
           <option v-if="loading" value="" disabled>Loading equipments...</option>
           <option v-for="opt in options" :key="opt.id" :value="opt.id">{{ opt.label }}</option>
         </select>
+        <div v-if="hasPendingRequest" class="duplicate-warning">
+          <i class="pi pi-exclamation-triangle"></i>
+          This equipment already has a pending maintenance request. Please select a different equipment.
+        </div>
       </div>
 
       <div class="field">
@@ -49,6 +53,7 @@ const toast = useToast()
 const loading = ref(false)
 const isSubmitting = ref(false)
 const equipments = ref([])
+const existingRequests = ref([])
 
 const selectedId = ref(null)
 const dateStr = ref(new Date().toISOString().slice(0, 10))
@@ -60,11 +65,24 @@ const options = computed(() => MaintenanceAssembler.toEquipmentOptions(equipment
 
 const canSubmit = computed(() => !!selectedId.value && !!dateStr.value && !!observation.value)
 
+// Check if selected equipment already has a pending maintenance request
+const hasPendingRequest = computed(() => {
+  if (!selectedId.value) return false
+  return existingRequests.value.some(
+    req => req.equipmentId === selectedId.value && req.status.toLowerCase() === 'pending'
+  )
+})
+
 async function load() {
   loading.value = true
   try {
-    const eqs = await api.getUserEquipments()
+    const [eqs, requests] = await Promise.all([
+      api.getUserEquipments(),
+      api.getAllRequests()
+    ])
+
     equipments.value = eqs
+    existingRequests.value = requests
 
     const queryId = route.query.equipmentId
     if (queryId) {
@@ -86,6 +104,17 @@ async function load() {
 async function submit() {
   if (!canSubmit.value) return
 
+  // Check for duplicate pending request
+  if (hasPendingRequest.value) {
+    toast.add({
+      severity: 'warn',
+      summary: 'Duplicate Request',
+      detail: 'This equipment already has a pending maintenance request.',
+      life: 4000
+    })
+    return
+  }
+
   isSubmitting.value = true
 
   try {
@@ -103,7 +132,7 @@ async function submit() {
       detail: 'Maintenance request created successfully',
     })
 
-    setTimeout(() => router.push({ name: 'my-machines' }), 1500)
+    setTimeout(() => router.push({ name: 'home' }), 1500)
   } catch (error) {
     console.error('Error creating request:', error)
     const msg = error.response?.data?.message || 'Failed to create request'
@@ -193,6 +222,23 @@ input[type='date']:focus,
 textarea:focus {
   border-color: #1976d2;
   box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.15);
+}
+
+.duplicate-warning {
+  margin-top: 8px;
+  padding: 10px 12px;
+  background-color: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+  color: #856404;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.duplicate-warning i {
+  color: #ffc107;
 }
 
 .btn {

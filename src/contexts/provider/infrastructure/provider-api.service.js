@@ -130,4 +130,67 @@ export class ProviderApiService {
       return []
     }
   }
+
+  /**
+   * Get all pending maintenance requests (for provider dashboard)
+   * @returns {Promise<Array>}
+   */
+  async getPendingMaintenanceRequests() {
+    try {
+      const response = await http.get('/maintenanceRequests')
+      console.log('Raw maintenance requests from API:', response.data)
+      console.log('Total requests count:', response.data.length)
+
+      // Filter only pending requests that aren't assigned yet
+      const filtered = response.data.filter((request) => {
+        const isPending = request.status && request.status.toLowerCase() === 'pending'
+        const notAssigned = !request.assignedToProviderId
+        console.log(`Request ${request.id}: status="${request.status}", isPending=${isPending}, assignedToProviderId=${request.assignedToProviderId}, notAssigned=${notAssigned}`)
+        return isPending && notAssigned
+      })
+
+      console.log('Filtered pending requests:', filtered)
+      console.log('Filtered count:', filtered.length)
+
+      // Map the response to ensure clientId is set
+      const mapped = filtered.map(req => {
+        const result = {
+          ...req,
+          clientId: req.requestedByUserId || req.clientId || null
+        }
+        console.log('Mapped request:', result)
+        return result
+      })
+
+      return mapped
+    } catch (error) {
+      console.error('Error fetching maintenance requests:', error)
+      return []
+    }
+  }
+
+  /**
+   * Accept/assign a maintenance request to the current provider
+   * @param {number} requestId - Maintenance request ID
+   * @returns {Promise<Object>}
+   */
+  async acceptMaintenanceRequest(requestId) {
+    const response = await http.put(`/maintenanceRequests/${requestId}/assign`)
+    return response.data
+  }
+
+  /**
+   * Get maintenance requests assigned to the current provider
+   * @returns {Promise<Array>}
+   */
+  async getMyMaintenanceRequests() {
+    try {
+      const providerId = parseInt(localStorage.getItem('userId'))
+      const response = await http.get(`/maintenanceRequests/provider/${providerId}`)
+      return response.data
+    } catch (error) {
+      console.error('Error fetching my maintenance requests:', error)
+      return []
+    }
+  }
 }

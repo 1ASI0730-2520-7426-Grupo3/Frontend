@@ -274,6 +274,7 @@ export default {
       maintenance: {
         title: 'Maintenance',
         noPending: 'No pending requests.',
+        acceptedBy: 'Accepted by',
       },
       accountStatement: {
         title: 'Account statement',
@@ -290,11 +291,19 @@ export default {
       maintenance: {
         title: 'Maintenance',
         note: 'Here, the maintenance tasks for your gym machines will be displayed.',
+        noRequests: 'No pending maintenance requests',
       },
-      requests: {
-        title: 'Requests',
+      rentalRequests: {
+        title: 'Rental Requests',
         requestedBy: 'Requested by:',
         time: 'Time:',
+        noRequests: 'No pending rental requests',
+      },
+      maintenanceRequests: {
+        title: 'Maintenance Requests',
+        requestedBy: 'Requested by',
+        observation: 'Observation',
+        noRequests: 'No pending maintenance requests',
       },
       billing: {
         title: 'Billing & Payments',
@@ -310,12 +319,15 @@ export default {
       toast: {
         errorLoading: 'Error loading provider data:',
         failedToLoad: 'Failed to load provider data',
-        requestAccepted: 'Request Accepted',
-        acceptSuccess: 'Rental request has been accepted and invoice created',
-        requestDenied: 'Request Denied',
-        denySuccess: 'Rental request has been rejected',
-        failedToAccept: 'Failed to accept rental request',
-        failedToDeny: 'Failed to reject rental request',
+        rentalRequestAccepted: 'Rental Request Accepted',
+        rentalAcceptSuccess: 'Rental request has been accepted and invoice created',
+        rentalRequestDenied: 'Rental Request Denied',
+        rentalDenySuccess: 'Rental request has been rejected',
+        failedToAcceptRental: 'Failed to accept rental request',
+        failedToDenyRental: 'Failed to reject rental request',
+        maintenanceAccepted: 'Maintenance Request Accepted',
+        maintenanceAcceptSuccess: 'You have been assigned to this maintenance request',
+        failedToAcceptMaintenance: 'Failed to accept maintenance request',
       },
     },
     myClientsTeams: {
@@ -381,6 +393,21 @@ export default {
         failedToAccept: 'Failed to accept request',
         failedToReject: 'Failed to reject request',
       },
+    },
+    notifications: {
+      title: 'My Accepted Maintenance Requests',
+      empty: {
+        title: 'No Accepted Requests',
+        description: 'You haven\'t accepted any maintenance requests yet.',
+      },
+      details: {
+        client: 'Client',
+        observation: 'Observation',
+        scheduled: 'Scheduled for',
+        acceptedByYou: 'Accepted by you',
+      },
+      failedToLoad: 'Failed to load maintenance requests',
+      couldNotLoad: 'Could not load your accepted maintenance requests',
     },
   },
   rentals: {

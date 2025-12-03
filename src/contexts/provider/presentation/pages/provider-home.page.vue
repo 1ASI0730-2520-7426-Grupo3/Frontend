@@ -18,23 +18,26 @@
           </div>
         </section>
 
-        <!-- Maintenance Section -->
+        <!-- Maintenance Requests Section -->
         <section class="dashboard-section">
           <h2 class="section-title">{{ t('provider.home.maintenance.title') }}</h2>
           <div class="maintenance-list">
-            <div v-for="task in maintenanceTasks" :key="task.id" class="maintenance-item">
-              <span class="maintenance-name">{{ task.equipmentName }}</span>
-              <Tag
-                :value="task.status"
-                :severity="
-                  task.status === 'Done'
-                    ? 'success'
-                    : task.status === 'Pending'
-                      ? 'danger'
-                      : 'warning'
-                "
+            <div v-for="request in pendingMaintenanceRequests.slice(0, 3)" :key="request.id" class="maintenance-item">
+              <div class="maintenance-info">
+                <span class="maintenance-name">{{ request.equipmentName }}</span>
+                <span class="maintenance-client">{{ request.clientName }} | {{ request.clientEmail }}</span>
+              </div>
+              <Button
+                :label="t('provider.home.actions.accept')"
+                severity="success"
+                size="small"
+                icon="pi pi-check"
+                @click="handleAcceptMaintenanceRequest(request.id)"
               />
             </div>
+            <p v-if="pendingMaintenanceRequests.length === 0" class="empty-message">
+              {{ t('provider.home.maintenance.noRequests') }}
+            </p>
           </div>
           <p class="section-note">
             {{ t('provider.home.maintenance.note') }}
@@ -44,11 +47,11 @@
 
       <!-- Right Column -->
       <div class="right-column">
-        <!-- Requests Section -->
+        <!-- Rental Requests Section -->
         <section class="dashboard-section">
-          <h2 class="section-title">{{ t('provider.home.requests.title') }}</h2>
+          <h2 class="section-title">{{ t('provider.home.rentalRequests.title') }}</h2>
           <div class="requests-list">
-            <Card v-for="request in maintenanceRequests" :key="request.id" class="request-card">
+            <Card v-for="request in rentalRequests" :key="request.id" class="request-card">
               <template #content>
                 <div class="request-content">
                   <div class="request-left">
@@ -60,11 +63,11 @@
                     <div class="request-info">
                       <p class="request-equipment">{{ request.equipmentName }}</p>
                       <p class="request-detail">
-                        <strong>{{ t('provider.home.requests.requestedBy') }}</strong
+                        <strong>{{ t('provider.home.rentalRequests.requestedBy') }}</strong
                         ><br />{{ request.clientName }}
                       </p>
                       <p class="request-detail">
-                        <strong>{{ t('provider.home.requests.time') }}</strong
+                        <strong>{{ t('provider.home.rentalRequests.time') }}</strong
                         ><br />{{ request.duration }}
                       </p>
                     </div>
@@ -74,18 +77,21 @@
                       :label="t('provider.home.actions.accept')"
                       severity="success"
                       size="small"
-                      @click="handleAcceptRequest(request.id)"
+                      @click="handleAcceptRentalRequest(request.id)"
                     />
                     <Button
                       :label="t('provider.home.actions.deny')"
                       severity="danger"
                       size="small"
-                      @click="handleDenyRequest(request.id)"
+                      @click="handleDenyRentalRequest(request.id)"
                     />
                   </div>
                 </div>
               </template>
             </Card>
+            <p v-if="rentalRequests.length === 0" class="empty-message">
+              {{ t('provider.home.rentalRequests.noRequests') }}
+            </p>
           </div>
         </section>
 
@@ -133,6 +139,7 @@ import Card from 'primevue/card'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
 import { ProviderApiService } from '@/contexts/provider/infrastructure/provider-api.service'
+import { UserApiService } from '@/shared-kernel/infrastructure/user.api-service'
 
 defineOptions({
   name: 'ProviderHomePage',
@@ -142,10 +149,11 @@ const router = useRouter()
 const toast = useToast()
 const { t } = useI18n()
 const providerService = new ProviderApiService()
+const userService = new UserApiService()
 
 const gymEquipment = ref([])
-const maintenanceTasks = ref([])
-const maintenanceRequests = ref([])
+const rentalRequests = ref([])
+const pendingMaintenanceRequests = ref([])
 const billingPayments = ref([])
 const loading = ref(true)
 
@@ -153,10 +161,10 @@ const loadProviderData = async () => {
   try {
     loading.value = true
 
-    const [equipment, rentalRequests, maintenanceReqs, invoices] = await Promise.all([
+    const [equipment, pendingRentals, pendingMaintenance, invoices] = await Promise.all([
       providerService.getProviderEquipment(),
       providerService.getPendingRentalRequests(),
-      providerService.getAllMaintenanceRequests(),
+      providerService.getPendingMaintenanceRequests(),
       providerService.getAllInvoices(),
     ])
 
@@ -166,20 +174,49 @@ const loadProviderData = async () => {
       image: eq.image || '/placeholder-equipment.png',
     }))
 
-    maintenanceTasks.value = maintenanceReqs.map((req) => ({
-      id: req.id,
-      equipmentName: req.equipmentName || `Equipment #${req.equipmentId}`,
-      status:
-        req.status === 'pending' ? 'Pending' : req.status === 'completed' ? 'Done' : 'In Progress',
-    }))
-
-    maintenanceRequests.value = rentalRequests.map((req) => ({
+    rentalRequests.value = pendingRentals.map((req) => ({
       id: req.id,
       equipmentName: req.equipmentName || `Equipment #${req.equipmentId}`,
       equipmentImage: req.equipmentImage || '/placeholder-equipment.png',
       clientName: req.clientEmail || `Client #${req.clientId}`,
       duration: '1 year',
     }))
+
+    // Load pending maintenance requests with client information
+    console.log('Pending maintenance requests:', pendingMaintenance)
+
+    // Create equipment map for looking up names
+    const equipmentMap = new Map(equipment.map(eq => [eq.id, eq.name]))
+
+    const clientIds = [...new Set(
+      pendingMaintenance
+        .filter(r => r.clientId !== undefined && r.clientId !== null)
+        .map(r => r.clientId)
+    )]
+
+    console.log('Client IDs to fetch:', clientIds)
+    const clientMap = await userService.getUsersByIds(clientIds)
+    console.log('Client map:', clientMap)
+
+    pendingMaintenanceRequests.value = pendingMaintenance.map((req) => {
+      const client = clientMap.get(req.clientId)
+      const equipmentName = equipmentMap.get(req.equipmentId) || req.equipmentName || `Equipment #${req.equipmentId}`
+      console.log(`Request ${req.id}: clientId=${req.clientId}, client=`, client)
+
+      return {
+        id: req.id,
+        equipmentId: req.equipmentId,
+        equipmentName: equipmentName,
+        clientId: req.clientId,
+        clientName: client?.name || client?.username || `User #${req.clientId || 'unknown'}`,
+        clientEmail: client?.email || 'No email',
+        observation: req.observation || '',
+        selectedDate: req.selectedDate,
+      }
+    })
+
+    console.log('Final pendingMaintenanceRequests array:', pendingMaintenanceRequests.value)
+    console.log('Array length:', pendingMaintenanceRequests.value.length)
 
     const providerId = parseInt(localStorage.getItem('userId'))
     const providerInvoices = invoices.filter((invoice) => invoice.providerId === providerId)
@@ -207,19 +244,19 @@ const loadProviderData = async () => {
   }
 }
 
-const handleAcceptRequest = async (requestId) => {
+const handleAcceptRentalRequest = async (requestId) => {
   try {
     await providerService.approveRentalRequest(requestId)
     toast.add({
       severity: 'success',
-      summary: t('provider.home.toast.requestAccepted'),
-      detail: t('provider.home.toast.acceptSuccess'),
+      summary: t('provider.home.toast.rentalRequestAccepted'),
+      detail: t('provider.home.toast.rentalAcceptSuccess'),
       life: 3000,
     })
     await loadProviderData()
   } catch (error) {
-    console.error('Error accepting request:', error)
-    const errorMessage = error.response?.data?.message || t('provider.home.toast.failedToAccept')
+    console.error('Error accepting rental request:', error)
+    const errorMessage = error.response?.data?.message || t('provider.home.toast.failedToAcceptRental')
     toast.add({
       severity: 'error',
       summary: t('common.error'),
@@ -229,19 +266,41 @@ const handleAcceptRequest = async (requestId) => {
   }
 }
 
-const handleDenyRequest = async (requestId) => {
+const handleDenyRentalRequest = async (requestId) => {
   try {
     await providerService.rejectRentalRequest(requestId)
     toast.add({
       severity: 'info',
-      summary: t('provider.home.toast.requestDenied'),
-      detail: t('provider.home.toast.denySuccess'),
+      summary: t('provider.home.toast.rentalRequestDenied'),
+      detail: t('provider.home.toast.rentalDenySuccess'),
       life: 3000,
     })
     await loadProviderData()
   } catch (error) {
-    console.error('Error denying request:', error)
-    const errorMessage = error.response?.data?.message || t('provider.home.toast.failedToDeny')
+    console.error('Error denying rental request:', error)
+    const errorMessage = error.response?.data?.message || t('provider.home.toast.failedToDenyRental')
+    toast.add({
+      severity: 'error',
+      summary: t('common.error'),
+      detail: errorMessage,
+      life: 3000,
+    })
+  }
+}
+
+const handleAcceptMaintenanceRequest = async (requestId) => {
+  try {
+    await providerService.acceptMaintenanceRequest(requestId)
+    toast.add({
+      severity: 'success',
+      summary: t('provider.home.toast.maintenanceAccepted'),
+      detail: t('provider.home.toast.maintenanceAcceptSuccess'),
+      life: 3000,
+    })
+    await loadProviderData()
+  } catch (error) {
+    console.error('Error accepting maintenance request:', error)
+    const errorMessage = error.response?.data?.message || t('provider.home.toast.failedToAcceptMaintenance')
     toast.add({
       severity: 'error',
       summary: t('common.error'),
@@ -358,11 +417,25 @@ onMounted(() => {
   background: #f9fafb;
   border-radius: 8px;
   border: 1px solid #e5e7eb;
+  gap: 1rem;
+}
+
+.maintenance-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
 }
 
 .maintenance-name {
-  font-weight: 500;
+  font-weight: 600;
   color: #1f2937;
+  font-size: 0.95rem;
+}
+
+.maintenance-client {
+  font-size: 0.8rem;
+  color: #6b7280;
 }
 
 .requests-list {
@@ -402,6 +475,23 @@ onMounted(() => {
   width: 80px;
   height: 80px;
   object-fit: contain;
+}
+
+.request-icon {
+  font-size: 3rem;
+  color: #2563eb;
+  width: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-message {
+  text-align: center;
+  color: #6b7280;
+  font-style: italic;
+  padding: 2rem;
+  margin: 0;
 }
 
 .request-info {
